@@ -24,6 +24,7 @@ const empty: Draft = {
   min_age: 6,
   max_age: 99,
   target_gender: "all",
+  image_url: "",
 };
 
 export function QuestionForm({ initial, draft: initialDraft, onSave, onCancel, topics }: Props) {
@@ -41,6 +42,7 @@ export function QuestionForm({ initial, draft: initialDraft, onSave, onCancel, t
           min_age: initial.min_age ?? 6,
           max_age: initial.max_age ?? 99,
           target_gender: initial.target_gender ?? "all",
+          image_url: initial.image_url ?? "",
         }
       : initialDraft ?? empty,
   );
@@ -81,7 +83,7 @@ export function QuestionForm({ initial, draft: initialDraft, onSave, onCancel, t
     <div className="fixed inset-0 z-30 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 my-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-slate-800">
+          <h3 className="text-slate-800 font-semibold text-lg">
             {initial ? "Sửa câu hỏi" : "Thêm câu hỏi"}
           </h3>
           <button
@@ -98,6 +100,16 @@ export function QuestionForm({ initial, draft: initialDraft, onSave, onCancel, t
               value={draft.question}
               onChange={(e) => set("question", e.target.value)}
               rows={2}
+              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-indigo-400 outline-none"
+            />
+          </Field>
+
+          <Field label="Đường dẫn ảnh/video/âm thanh đa phương tiện (không bắt buộc)">
+            <input
+              type="text"
+              placeholder="Ví dụ: https://example.com/audio.mp3"
+              value={draft.image_url ?? ""}
+              onChange={(e) => set("image_url", e.target.value)}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-indigo-400 outline-none"
             />
           </Field>
