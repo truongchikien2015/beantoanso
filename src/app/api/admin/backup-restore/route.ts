@@ -3,6 +3,78 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 
 const ADMIN_API_SECRET = process.env.ADMIN_API_SECRET ?? process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
+const EXPORT_TABLES = [
+  "profiles",
+  "teachers",
+  "topics",
+  "learning_paths",
+  "questions",
+  "results",
+  "teacher_topics",
+  "teacher_question_sets",
+  "teacher_questions",
+  "teacher_learning_paths",
+  "teacher_learning_path_steps",
+  "teacher_students",
+  "teacher_student_progress",
+];
+
+const IMPORT_TABLES = [
+  "profiles",
+  "teachers",
+  "topics",
+  "learning_paths",
+  "questions",
+  "results",
+  "teacher_topics",
+  "teacher_question_sets",
+  "teacher_learning_paths",
+  "teacher_questions",
+  "teacher_learning_path_steps",
+  "teacher_students",
+  "teacher_student_progress",
+];
+
+const LEGACY_TABLES = new Set([
+  "profiles",
+  "teachers",
+  "topics",
+  "learning_paths",
+  "questions",
+  "results",
+]);
+
+const CURRENT_DATA_TABLES = IMPORT_TABLES.filter((table) => !LEGACY_TABLES.has(table));
+
+function decodeJwtPayload(token: string): { role?: string } | null {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) return null;
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+    return JSON.parse(Buffer.from(padded, "base64").toString("utf-8"));
+  } catch {
+    return null;
+  }
+}
+
+function checkSupabaseAdminConfig(): NextResponse | null {
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceRoleKey) {
+    return NextResponse.json({ error: "SUPABASE_SERVICE_ROLE_KEY is not configured" }, { status: 503 });
+  }
+
+  const payload = decodeJwtPayload(serviceRoleKey);
+  if (payload && payload.role !== "service_role") {
+    return NextResponse.json(
+      { error: `SUPABASE_SERVICE_ROLE_KEY phải là service_role key, hiện tại đang là ${payload.role ?? "unknown"}.` },
+      { status: 503 }
+    );
+  }
+
+  return null;
+}
+
 function checkAdmin(req: NextRequest): NextResponse | null {
   if (!ADMIN_API_SECRET) {
     return NextResponse.json({ error: "Admin secret not configured" }, { status: 503 });
@@ -22,12 +94,13 @@ export async function GET(req: NextRequest) {
 
   const authError = checkAdmin(req);
   if (authError) return authError;
+  const configError = checkSupabaseAdminConfig();
+  if (configError) return configError;
 
-  const tables = ["profiles", "learning_paths", "topics", "questions", "results", "teachers"];
   const dbData: Record<string, any[]> = {};
 
   try {
-    for (const table of tables) {
+    for (const table of EXPORT_TABLES) {
       const { data, error } = await supabaseAdmin
         .from(table)
         .select("*");
@@ -55,6 +128,8 @@ export async function POST(req: NextRequest) {
 
   const authError = checkAdmin(req);
   if (authError) return authError;
+  const configError = checkSupabaseAdminConfig();
+  if (configError) return configError;
 
   let body: { data?: Record<string, any[]> };
   try {
@@ -68,15 +143,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing database 'data' object" }, { status: 400 });
   }
 
-  // To prevent foreign key constraint issues, we import in logical order:
-  // 1. profiles & teachers (independent tables or parents)
-  // 2. topics & learning_paths
-  // 3. questions & results (depend on topics/profiles)
-  const orderedTables = ["profiles", "teachers", "topics", "learning_paths", "questions", "results"];
   const results: Record<string, { count: number; status: string; error?: string }> = {};
 
   try {
-    for (const table of orderedTables) {
+    for (const table of IMPORT_TABLES) {
       const rows = importData[table];
       if (!Array.isArray(rows) || rows.length === 0) {
         results[table] = { count: 0, status: "skipped" };
@@ -96,8 +166,43 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const failedTables = Object.entries(results)
+      .filter(([, result]) => result.status === "failed")
+      .map(([table]) => table);
+    const blockingFailedTables = failedTables.filter((table) => !LEGACY_TABLES.has(table));
+
+    if (blockingFailedTables.length > 0) {
+      return NextResponse.json(
+        {
+          error: `Restore failed for table(s): ${blockingFailedTables.join(", ")}`,
+          results,
+        },
+        { status: 500 }
+      );
+    }
+
+    const restoredCurrentRows = CURRENT_DATA_TABLES.reduce((total, table) => {
+      const result = results[table];
+      return result?.status === "success" ? total + result.count : total;
+    }, 0);
+
+    if (restoredCurrentRows === 0) {
+      return NextResponse.json(
+        {
+          error: "File backup không có dữ liệu hiện tại để khôi phục. Hãy tạo lại file sao lưu bằng phiên bản mới rồi thử lại.",
+          results,
+        },
+        { status: 422 }
+      );
+    }
+
     return NextResponse.json({
-      message: "Restore operation completed",
+      message: failedTables.length > 0
+        ? "Restore operation completed with warnings"
+        : "Restore operation completed",
+      ...(failedTables.length > 0
+        ? { warning: `Restore skipped legacy table(s): ${failedTables.join(", ")}` }
+        : {}),
       results,
     });
   } catch (err: any) {

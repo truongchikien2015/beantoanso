@@ -16,9 +16,12 @@ const LOCAL_STORAGE_KEYS = [
   "bats:paths:v1",
   "bats:student_answers:v1",
   "bats:avatar",
-  "bats:daily",
+  "bats:daily:v1",
   "bats:xp",
   "bats:badge",
+  "be-an-toan-so:v2",
+  "student_token",
+  "teacher-content-v1",
   "be-an-toan-so-storage"
 ];
 
