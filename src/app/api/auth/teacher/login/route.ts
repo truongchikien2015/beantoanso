@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     userId = authData.user.id;
   } else {
     // Registration: create user with email_confirm=true (no confirmation email needed)
-    const createRes = await supabaseFetch("/auth/v1/admin/users", {
+    let createRes = await supabaseFetch("/auth/v1/admin/users", {
       method: "POST",
       body: JSON.stringify({
         email,
@@ -83,16 +83,64 @@ export async function POST(req: NextRequest) {
       }),
     });
 
-    if (!createRes.ok && createRes.status !== 409) {
-      const errMsg = await readSupabaseError(createRes, "Không thể tạo tài khoản");
-      return NextResponse.json({ error: errMsg }, { status: 400 });
+    let createData: any = null;
+    let fallbackToPublic = false;
+
+    if (!createRes.ok) {
+      // If service_role key is not configured or invalid (e.g. matching anon key),
+      // Supabase returns 400/403 "User not allowed". We fall back to public signup.
+      const cloneRes = createRes.clone();
+      const errMsg = await readSupabaseError(cloneRes, "");
+      if (
+        createRes.status === 409 ||
+        errMsg.includes("Email đã được sử dụng") ||
+        errMsg.includes("already registered")
+      ) {
+        return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 });
+      }
+
+      if (
+        createRes.status === 400 ||
+        createRes.status === 403 ||
+        errMsg.includes("User not allowed") ||
+        errMsg.includes("not allowed")
+      ) {
+        fallbackToPublic = true;
+      } else {
+        return NextResponse.json({ error: errMsg || "Không thể tạo tài khoản" }, { status: 400 });
+      }
     }
 
-    if (createRes.status === 409) {
-      return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 });
+    if (fallbackToPublic) {
+      // Fallback: public signup endpoint (uses anon key successfully)
+      createRes = await supabaseFetch("/auth/v1/signup", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password,
+          data: {
+            full_name: fullName ?? null,
+            gender: gender ?? null,
+            birth_year: birthYear ?? null,
+          },
+        }),
+      });
+
+      if (!createRes.ok) {
+        const errMsg = await readSupabaseError(createRes, "Không thể tạo tài khoản");
+        if (createRes.status === 409 || errMsg.includes("already registered")) {
+          return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 });
+        }
+        if (errMsg.toLowerCase().includes("rate limit") || createRes.status === 429) {
+          return NextResponse.json({
+            error: "Tần suất đăng ký quá nhanh (giới hạn bảo mật của Supabase). Vui lòng cấu hình khóa SUPABASE_SERVICE_ROLE_KEY chính xác trong tệp .env để bỏ giới hạn, hoặc vui lòng thử lại sau vài phút."
+          }, { status: 429 });
+        }
+        return NextResponse.json({ error: errMsg }, { status: 400 });
+      }
     }
 
-    const createData = await createRes.json();
+    createData = await createRes.json();
     const createdUserId = createData.user?.id ?? createData.id;
 
     // Immediately login the new user
@@ -101,24 +149,31 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({ email, password, gotrue_meta_security: {} }),
     });
 
-    if (!authRes.ok) {
-      return NextResponse.json({ error: "Tạo tài khoản thành công nhưng không thể đăng nhập" }, { status: 401 });
+    if (authRes.ok) {
+      const authData = await authRes.json();
+      access_token = authData.access_token;
+      refresh_token = authData.refresh_token;
+      userId = authData.user?.id ?? createdUserId;
+    } else {
+      userId = createdUserId;
+      // Immediate login failed (likely because email confirmation is required on this Supabase project).
+      // We do NOT block the request since the user was already created successfully in Supabase.
+      // We will proceed to create their profile so their account is functional once verified/logged in.
+      const errMsg = await readSupabaseError(authRes.clone(), "");
+      console.warn("[login-on-signup] Password login failed, proceeding with profile creation:", errMsg);
     }
 
-    const authData = await authRes.json();
-    access_token = authData.access_token;
-    refresh_token = authData.refresh_token;
-    userId = authData.user?.id;
-
     if (!userId) {
-      if (createdUserId) {
+      if (createdUserId && !fallbackToPublic) {
         await supabaseFetch(`/auth/v1/admin/users/${createdUserId}`, { method: "DELETE" });
       }
       return NextResponse.json({ error: "Không thể xác thực tài khoản vừa tạo" }, { status: 500 });
     }
 
     if (createdUserId && createdUserId !== userId) {
-      await supabaseFetch(`/auth/v1/admin/users/${createdUserId}`, { method: "DELETE" });
+      if (!fallbackToPublic) {
+        await supabaseFetch(`/auth/v1/admin/users/${createdUserId}`, { method: "DELETE" });
+      }
       return NextResponse.json({ error: "Thông tin tài khoản không khớp sau khi đăng ký" }, { status: 500 });
     }
 
@@ -142,7 +197,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (!profileRes.ok) {
-      await supabaseFetch(`/auth/v1/admin/users/${userId}`, { method: "DELETE" });
+      if (!fallbackToPublic && createdUserId) {
+        await supabaseFetch(`/auth/v1/admin/users/${createdUserId}`, { method: "DELETE" });
+      }
       const errMsg = await readSupabaseError(profileRes, "Không thể tạo hồ sơ người dùng");
       return NextResponse.json({ error: errMsg }, { status: 400 });
     }
