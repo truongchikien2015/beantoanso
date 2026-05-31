@@ -17,6 +17,8 @@ type Props = {
   assignedPath?: StudentLearningPathWithSteps | null;
   assignedStudent?: StudentSession | null;
   assignedLoading?: boolean;
+  showDailyQuiz?: boolean;
+  onOpenDailyQuiz?: () => void;
   onSelect: (path: LearningPath) => void;
   onSelectAssigned?: () => void;
   onBack: () => void;
@@ -61,6 +63,8 @@ export function LearningPathSelector({
   assignedPath,
   assignedStudent,
   assignedLoading = false,
+  showDailyQuiz = false,
+  onOpenDailyQuiz,
   onSelect,
   onSelectAssigned,
   onBack,
@@ -195,6 +199,33 @@ export function LearningPathSelector({
               </button>
             </div>
           </section>
+        )}
+
+        {showDailyQuiz && (
+          <div className="mb-7">
+            <section className="kid-sticker-card border-[var(--kid-yellow-new)]/70 bg-gradient-to-r from-amber-50 to-cyan-50 p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="mb-2 inline-flex items-center rounded-full bg-[var(--kid-yellow-new)]/45 px-3 py-1 text-sm font-black text-amber-800">
+                    🔥 Streak mỗi ngày
+                  </div>
+                  <h2 className="text-2xl font-black text-[var(--kid-ink)]">Làm 5 câu hôm nay</h2>
+                  <p className="kid-readable mt-1 text-[var(--kid-muted)]">
+                    Trả lời 5 câu ngẫu nhiên để giữ chuỗi học và cộng XP tích lũy.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    sfx.click();
+                    onOpenDailyQuiz?.();
+                  }}
+                  className="btn-kid btn-kid-yellow shrink-0"
+                >
+                  🎯 Vào thử thách
+                </button>
+              </div>
+            </section>
+          </div>
         )}
 
         {/* Path cards */}

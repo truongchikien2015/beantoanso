@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { getStudentId } from "@/lib/auth-helpers";
+import { ensureStudentStats } from "@/lib/server/studentRewards";
 
 export async function GET(req: NextRequest) {
   if (!supabaseAdmin) {
@@ -12,6 +13,7 @@ export async function GET(req: NextRequest) {
   if (session instanceof NextResponse) return session;
 
   const { studentId } = session;
+  const stats = await ensureStudentStats(studentId);
 
   // Get student info
   const { data: student, error: studentError } = await supabaseAdmin
@@ -31,6 +33,7 @@ export async function GET(req: NextRequest) {
       student,
       assigned_path: null,
       progress: [],
+      stats,
     });
   }
 
@@ -47,6 +50,7 @@ export async function GET(req: NextRequest) {
       student,
       assigned_path: null,
       progress: [],
+      stats,
     });
   }
 
@@ -72,5 +76,6 @@ export async function GET(req: NextRequest) {
       step_count: (steps ?? []).length,
     },
     progress: progress ?? [],
+    stats,
   });
 }

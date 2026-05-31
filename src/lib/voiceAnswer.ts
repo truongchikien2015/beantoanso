@@ -33,7 +33,7 @@ type SpeechRecognitionLike = EventTarget & {
 
 type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
 
-type SpeechRecognitionWindow = Window & {
+type SpeechRecognitionWindow = {
   SpeechRecognition?: SpeechRecognitionConstructor;
   webkitSpeechRecognition?: SpeechRecognitionConstructor;
 };
@@ -72,7 +72,7 @@ const STOP_WORDS = new Set([
 
 function getSpeechRecognition() {
   if (typeof window === "undefined") return null;
-  const speechWindow = window as SpeechRecognitionWindow;
+  const speechWindow = window as unknown as SpeechRecognitionWindow;
   return (
     speechWindow.SpeechRecognition ||
     speechWindow.webkitSpeechRecognition ||

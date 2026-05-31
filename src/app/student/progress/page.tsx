@@ -3,14 +3,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getStudentToken, clearStudentToken } from "@/lib/studentApi";
-import type { TeacherStudentProgress } from "@/types/teacher-content";
+import type { StudentProgressResponse, StudentRewardStats, TeacherStudentProgress } from "@/types/teacher-content";
 import StudentProgressCard from "@/components/student/StudentProgressCard";
+import { StudentChatbot } from "@/components/student/StudentChatbot";
 
 
 
 export default function StudentProgressPage() {
   const router = useRouter();
   const [progress, setProgress] = useState<TeacherStudentProgress[]>([]);
+  const [stats, setStats] = useState<StudentRewardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [resetting, setResetting] = useState(false);
@@ -27,8 +29,13 @@ export default function StudentProgressPage() {
       if (res.status === 401) { clearStudentToken(); router.replace("/student/login"); return; }
       if (!res.ok) { const b = await res.json(); setError(b.error ?? "Lỗi tải dữ liệu"); return; }
 
-      const json: TeacherStudentProgress[] = await res.json();
-      setProgress(json);
+      const json: StudentProgressResponse | TeacherStudentProgress[] = await res.json();
+      if (Array.isArray(json)) {
+        setProgress(json);
+      } else {
+        setProgress(json.progress);
+        setStats(json.stats);
+      }
     } catch {
       setError("Không thể kết nối");
     } finally {
@@ -110,6 +117,28 @@ export default function StudentProgressPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+        {stats && (
+          <div className="card-kid p-5 bg-gradient-to-r from-cyan-50 to-amber-50">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <p className="text-xs font-black uppercase text-slate-400">XP tích lũy</p>
+                <p className="text-3xl font-black text-[var(--kid-coral-new)]">{stats.total_xp}</p>
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase text-slate-400">Cấp độ</p>
+                <p className="text-3xl font-black text-[var(--kid-teal-new)]">Lv.{stats.level}</p>
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase text-slate-400">Streak</p>
+                <p className="text-3xl font-black text-[var(--kid-yellow-dark)]">🔥 {stats.current_streak}</p>
+              </div>
+            </div>
+            <p className="mt-3 text-sm font-bold text-slate-500">
+              XP và cấp độ được cộng dồn, không mất khi đặt lại tiến độ để làm lại.
+            </p>
+          </div>
+        )}
+
         {/* Summary stats - Achievement Style */}
         <div className="grid grid-cols-3 gap-3">
           <div className="Card p-4 text-center">
@@ -226,6 +255,8 @@ export default function StudentProgressPage() {
             {resetting ? "⏳ Đang đặt lại..." : "🔄 Đặt lại tiến độ để làm lại"}
           </button>
         )}
+
+        <StudentChatbot />
       </main>
     </div>
   );

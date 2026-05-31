@@ -1,4 +1,5 @@
 let voicesLoaded = false;
+let apiAudio: HTMLAudioElement | null = null;
 
 function pickVnVoice(): SpeechSynthesisVoice | null {
   if (typeof window === "undefined" || !("speechSynthesis" in window))
@@ -12,7 +13,31 @@ function pickVnVoice(): SpeechSynthesisVoice | null {
   );
 }
 
-export function speak(text: string) {
+async function speakWithEvenlab(text: string): Promise<boolean> {
+  if (typeof window === "undefined" || typeof Audio === "undefined") return false;
+
+  try {
+    const res = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) return false;
+
+    const audioBlob = await res.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    apiAudio?.pause();
+    apiAudio = new Audio(audioUrl);
+    apiAudio.onended = () => URL.revokeObjectURL(audioUrl);
+    apiAudio.onerror = () => URL.revokeObjectURL(audioUrl);
+    await apiAudio.play();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function speakWithBrowser(text: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   const synth = window.speechSynthesis;
   synth.cancel();
@@ -29,11 +54,22 @@ export function speak(text: string) {
   synth.speak(u);
 }
 
+export function speak(text: string) {
+  void speakWithEvenlab(text).then((spoken) => {
+    if (!spoken) speakWithBrowser(text);
+  });
+}
+
 export function stopSpeaking() {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-  window.speechSynthesis.cancel();
+  if (apiAudio) {
+    apiAudio.pause();
+    apiAudio = null;
+  }
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
 }
 
 export function ttsAvailable() {
-  return typeof window !== "undefined" && "speechSynthesis" in window;
+  return typeof window !== "undefined" && (typeof Audio !== "undefined" || "speechSynthesis" in window);
 }

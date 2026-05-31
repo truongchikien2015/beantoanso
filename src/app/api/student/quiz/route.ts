@@ -2,6 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { getStudentId } from "@/lib/auth-helpers";
+import {
+  XP_PER_CORRECT_ANSWER,
+  XP_TOPIC_COMPLETE,
+  awardStudentXp,
+} from "@/lib/server/studentRewards";
 
 export async function POST(req: NextRequest) {
   if (!supabaseAdmin) {
@@ -215,9 +220,19 @@ export async function POST(req: NextRequest) {
 
     if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
+    const xpAwarded = correct * XP_PER_CORRECT_ANSWER;
+    const stats = await awardStudentXp({
+      studentId,
+      source: "step_quiz",
+      xp: xpAwarded,
+      metadata: { path_id, step_id, score: finalScore, correct, total },
+    });
+
     return NextResponse.json({
       success: true,
       progress,
+      stats,
+      xp_awarded: xpAwarded,
       breakdown: {
         total,
         correct,
@@ -243,5 +258,13 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  return NextResponse.json({ success: true, progress: data });
+  const xpAwarded = step.step_type === "topic" ? XP_TOPIC_COMPLETE : 0;
+  const stats = await awardStudentXp({
+    studentId,
+    source: step.step_type === "topic" ? "topic_complete" : "step_quiz",
+    xp: xpAwarded,
+    metadata: { path_id, step_id, score: data.score, step_type: step.step_type },
+  });
+
+  return NextResponse.json({ success: true, progress: data, stats, xp_awarded: xpAwarded });
 }
