@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "dev": "./node_modules/.bin/next dev --webpack",
+  "dev": "next dev --webpack",
     "build": "./node_modules/.bin/next build",
     "start": "./node_modules/.bin/next start",
     "preview": "./node_modules/.bin/next build && ./node_modules/.bin/next start",

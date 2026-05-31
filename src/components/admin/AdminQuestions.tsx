@@ -16,6 +16,17 @@ import {
   type AiProviderId,
   type AiProviderStatus,
 } from "../../lib/grokApi";
+import { getYouTubeEmbedUrl, getMediaType } from "../../lib/mediaUtils";
+
+const topicStyles: Record<string, { icon: string; bg: string; text: string }> = {
+  stranger: { icon: "👤", bg: "from-blue-200 to-cyan-200", text: "text-blue-700" },
+  phishing: { icon: "🎣", bg: "from-red-200 to-orange-200", text: "text-red-700" },
+  password: { icon: "🔑", bg: "from-orange-200 to-pink-200", text: "text-indigo-600" },
+  privacy: { icon: "🛡️", bg: "from-green-200 to-emerald-200", text: "text-green-700" },
+  behavior: { icon: "🤝", bg: "from-purple-200 to-indigo-200", text: "text-purple-700" },
+  screentime: { icon: "⏱️", bg: "from-teal-200 to-emerald-200", text: "text-teal-700" },
+  badcontent: { icon: "⚠️", bg: "from-rose-200 to-red-200", text: "text-rose-700" },
+};
 
 type QuestionDraft = Omit<AdminQuestion, "id" | "created_at" | "updated_at">;
 
@@ -32,6 +43,7 @@ type DbQuestion = {
   min_age: number | null;
   max_age: number | null;
   target_gender: "all" | "male" | "female" | null;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -50,6 +62,7 @@ function fromDbQuestion(row: DbQuestion): AdminQuestion {
     min_age: row.min_age ?? 6,
     max_age: row.max_age ?? 99,
     target_gender: row.target_gender ?? "all",
+    image_url: row.image_url ?? undefined,
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
@@ -68,6 +81,7 @@ function toDbQuestion(data: QuestionDraft) {
     min_age: data.min_age ?? 6,
     max_age: data.max_age ?? 99,
     target_gender: data.target_gender ?? "all",
+    image_url: data.image_url ?? null,
     updated_at: new Date().toISOString(),
   };
 }
@@ -100,6 +114,7 @@ export function AdminQuestions({
   const [generatorGender, setGeneratorGender] = useState<"all" | "male" | "female">("all");
   const [generatorPrompt, setGeneratorPrompt] = useState("");
   const [generatorError, setGeneratorError] = useState("");
+  const [previewing, setPreviewing] = useState<AdminQuestion | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<AdminQuestion | null>(
     null,
   );
@@ -531,6 +546,12 @@ export function AdminQuestions({
                     <Td>
                       <div className="flex gap-1">
                         <button
+                          onClick={() => setPreviewing(q)}
+                          className="px-2 py-1 rounded-md hover:bg-sky-50 text-sky-600"
+                        >
+                          👁️ Xem trước
+                        </button>
+                        <button
                           onClick={() => {
                             setGeneratedDraft(null);
                             setEditing(q);
@@ -618,6 +639,14 @@ export function AdminQuestions({
         />
       )}
 
+      {previewing && (
+        <QuestionPreviewModal
+          question={previewing}
+          dbTopics={dbTopics}
+          onCancel={() => setPreviewing(null)}
+        />
+      )}
+
       {confirmDelete && (
         <ConfirmDialog
           title="Xóa câu hỏi?"
@@ -642,6 +671,150 @@ export function AdminQuestions({
           }}
         />
       )}
+    </div>
+  );
+}
+
+function QuestionPreviewModal({
+  question,
+  dbTopics,
+  onCancel,
+}: {
+  question: AdminQuestion;
+  dbTopics: Array<{ slug: string; label: string }>;
+  onCancel: () => void;
+}) {
+  const style = topicStyles[question.category] || { icon: "✨", bg: "from-sky-100 to-blue-100", text: "text-indigo-700" };
+  const topicLabel = dbTopics.find(t => t.slug === question.category)?.label || topicLabels[question.category as QuizTopic] || question.category;
+
+  const options = [
+    { key: "A", text: question.option_a },
+    { key: "B", text: question.option_b },
+    { key: "C", text: question.option_c },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 flex flex-col pt-10 px-4 overflow-y-auto">
+      <div className="w-full max-w-5xl mx-auto flex justify-end mb-4 relative z-10">
+        <button
+          onClick={onCancel}
+          className="bg-white/10 hover:bg-white/20 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl transition-colors"
+        >
+          ✕
+        </button>
+      </div>
+      <div className="w-full max-w-5xl mx-auto pb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          {/* Left Column: Question Card */}
+          <div className="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 flex flex-col items-center text-center relative overflow-hidden">
+            <div className={`w-32 h-32 mt-4 mb-6 rounded-3xl bg-gradient-to-b ${style.bg} flex items-center justify-center text-6xl shadow-inner border border-white/50`}>
+              {style.icon}
+            </div>
+            
+            <h2 className={`text-2xl font-semibold mb-6 ${style.text}`}>
+              {topicLabel}
+            </h2>
+
+            {/* Multimedia (if available) */}
+            {question.image_url && (() => {
+              const mediaType = getMediaType(question.image_url);
+              const embedUrl = getYouTubeEmbedUrl(question.image_url);
+              return (
+                <div className="w-full mb-6 rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex justify-center">
+                  {mediaType === "youtube" && embedUrl ? (
+                    <div className="relative w-full pt-[56.25%]">
+                      <iframe
+                        className="absolute inset-0 w-full h-full"
+                        src={embedUrl}
+                        title="Video câu hỏi"
+                        allowFullScreen
+                      />
+                    </div>
+                  ) : mediaType === "video" ? (
+                    <video src={question.image_url} controls className="w-full h-auto max-h-60 object-contain" />
+                  ) : mediaType === "audio" ? (
+                    <div className="w-full p-4">
+                      <audio src={question.image_url} controls className="w-full" />
+                    </div>
+                  ) : (
+                    <img src={question.image_url} alt="Hình ảnh câu hỏi" className="w-full h-auto max-h-60 object-contain" />
+                  )}
+                </div>
+              );
+            })()}
+
+            <div className="bg-amber-50/80 rounded-[24px] p-5 border border-amber-100 w-full mb-8">
+              <div className="flex items-start gap-4">
+                <span className="text-2xl mt-0.5">📖</span>
+                <p className="text-[17px] text-left text-slate-700 font-medium flex-1 leading-relaxed">
+                  {question.question}
+                </p>
+                <div className="flex gap-2 shrink-0">
+                  <button
+                    className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                  >
+                    🔊
+                  </button>
+                  <button
+                    className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+                  >
+                    🎙️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-end gap-3 w-full">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-b from-blue-500 to-indigo-600 flex items-center justify-center text-3xl shadow-md shrink-0 border border-blue-400">
+                🤖
+              </div>
+              <div className="bg-white border border-sky-100 rounded-2xl rounded-bl-none p-4 text-[15px] text-slate-600 flex-1 text-left relative shadow-sm">
+                Em hãy đọc kỹ rồi chọn câu trả lời đúng nhé!
+                {/* Optional speech bubble tail */}
+                <div className="absolute -left-2 bottom-0 w-3 h-3 bg-white border-b border-l border-sky-100 transform translate-y-[2px] rotate-45" />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Options & Next Button */}
+          <div className="flex flex-col gap-4 justify-center h-full pt-4 md:pt-10">
+            {options.map((opt) => {
+              const isCorrect = opt.key === question.correct_option;
+              
+              const btnClass = isCorrect 
+                ? "bg-emerald-50 border-emerald-300 shadow-md scale-[1.02]" 
+                : "bg-white border-slate-100 opacity-50";
+              const circleClass = isCorrect
+                ? "bg-emerald-500 text-white"
+                : "bg-slate-300 text-slate-500";
+
+              return (
+                <button
+                  key={opt.key}
+                  disabled
+                  className={`w-full text-left p-4 rounded-[28px] border-2 flex items-center gap-4 ${btnClass}`}
+                >
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-semibold shrink-0 ${circleClass}`}>
+                    {opt.key}
+                  </div>
+                  <span className={`text-[17px] font-medium ${isCorrect ? "text-emerald-800" : "text-slate-700"}`}>
+                    {opt.text}
+                  </span>
+                </button>
+              );
+            })}
+
+            <div
+              className={`mt-2 p-5 rounded-3xl border-2 bg-emerald-50 border-emerald-200 text-emerald-800`}
+            >
+              <p className="font-semibold text-lg mb-2">
+                🎉 Chính xác!
+              </p>
+              {question.explanation && <p className="opacity-90">{question.explanation}</p>}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

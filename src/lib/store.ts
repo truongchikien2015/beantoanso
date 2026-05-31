@@ -13,6 +13,7 @@ export type AdminQuestion = {
   min_age?: number;
   max_age?: number;
   target_gender?: "all" | "male" | "female";
+  image_url?: string;
   created_at: string;
   updated_at: string;
 };
@@ -93,6 +94,7 @@ function seedQuestions(): AdminQuestion[] {
       min_age: 6,
       max_age: 99,
       target_gender: "all",
+      image_url: undefined,
       created_at: now,
       updated_at: now,
     };

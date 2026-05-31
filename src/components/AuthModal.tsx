@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Link from "next/link";
 import { setStudentToken } from "@/lib/studentApi";
 import { supabase } from "@/lib/supabase";
 
@@ -195,18 +196,31 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           </button>
         </form>
 
-        <div className="px-6 pb-6 text-center text-sm text-slate-500 border-t border-slate-100 pt-4">
-          {isLogin ? "Chưa có tài khoản? " : "Đã có tài khoản? "}
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError("");
-            }}
-            className="text-indigo-600 font-bold hover:underline"
-          >
-            {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
-          </button>
+        <div className="px-6 pb-6 text-center text-sm text-slate-500 border-t border-slate-100 pt-4 flex flex-col gap-3">
+          <div>
+            {isLogin ? "Chưa có tài khoản? " : "Đã có tài khoản? "}
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError("");
+              }}
+              className="text-indigo-600 font-bold hover:underline"
+            >
+              {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
+            </button>
+          </div>
+
+          <div className="pt-3 border-t border-slate-100 text-xs">
+            Bạn là Quản trị viên hoặc Giáo viên?{" "}
+            <Link href="/admin" className="text-indigo-600 font-semibold hover:underline">
+              Admin
+            </Link>
+            <span className="mx-2 text-slate-300">|</span>
+            <Link href="/teacher" className="text-indigo-600 font-semibold hover:underline">
+              Giáo viên
+            </Link>
+          </div>
         </div>
 
         <button

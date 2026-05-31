@@ -427,11 +427,11 @@ function Scenery() {
       <Tree x={950} y={350} scale={0.9} />
 
       {/* House */}
-      <House x={50} y={300} />
+      <House x={50} y={380} />
       {/* School */}
-      <School x={420} y={260} />
+      <School x={420} y={290} />
       {/* Computer station */}
-      <Computer x={620} y={250} />
+      <Computer x={620} y={360} />
     </svg>
   );
 }

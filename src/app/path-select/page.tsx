@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LearningPathSelector } from "../../components/LearningPathSelector";
 import { useAppStore } from "../../lib/globalStore";
 import { Header } from "../../components/Header";
+import { StudentChatbot } from "../../components/student/StudentChatbot";
 import { totalXpForPlayer } from "../../lib/xp";
 import { supabase } from "../../lib/supabase";
 import { clearStudentToken, getStudentToken } from "../../lib/studentApi";
@@ -92,10 +93,13 @@ export default function PathSelectPage() {
         assignedPath={studentData?.assigned_path ?? null}
         assignedStudent={studentData?.student ?? null}
         assignedLoading={studentLoading}
+        showDailyQuiz={!!studentData}
+        onOpenDailyQuiz={() => router.push("/student/daily")}
         onSelect={handleSelectPath}
         onSelectAssigned={() => router.push("/student/dashboard")}
         onBack={() => router.push("/")}
       />
+      {studentData && <StudentChatbot />}
     </>
   );
 }
