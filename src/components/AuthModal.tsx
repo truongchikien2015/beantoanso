@@ -7,6 +7,7 @@ type AuthModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (user: any, profile: any) => void;
+  initialTab?: "login" | "register";
 };
 
 // Map common Supabase/auth errors to friendly Vietnamese messages.
@@ -21,8 +22,14 @@ function translateAuthError(message?: string): string {
   return message ?? "Đã có lỗi xảy ra";
 }
 
-export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const [isLogin, setIsLogin] = useState(true);
+export function AuthModal({ isOpen, onClose, onSuccess, initialTab = "login" }: AuthModalProps) {
+  const [isLogin, setIsLogin] = useState(initialTab === "login");
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setIsLogin(initialTab === "login");
+    }
+  }, [isOpen, initialTab]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 

@@ -1,10 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { lessons } from "../data/lessons";
 import { speak, stopSpeaking, ttsAvailable } from "../lib/tts";
 import { sfx } from "../lib/sound";
 
 export function LessonsScreen({ onBack }: { onBack: () => void }) {
   const [active, setActive] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const topic = params.get("topic");
+      if (topic) {
+        const idx = lessons.findIndex((l) => l.topic === topic);
+        if (idx !== -1) {
+          setActive(idx);
+        }
+      }
+    }
+  }, []);
 
   if (active !== null) {
     const lesson = lessons[active];
