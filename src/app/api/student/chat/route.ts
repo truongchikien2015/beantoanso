@@ -4,7 +4,7 @@ import {
   createChatCompletion,
   type AiChatMessage,
 } from "@/lib/server/aiProvider";
-import { getStudentId } from "@/lib/auth-helpers";
+import { getAnyStudentId } from "@/lib/auth-helpers";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const dynamic = "force-dynamic";
@@ -102,9 +102,9 @@ function buildMessages(message: string, history: StudentChatMessage[]): AiChatMe
 }
 
 export async function POST(req: NextRequest) {
-  const authResult = getStudentId(req);
+  const authResult = getAnyStudentId(req);
   if (authResult instanceof NextResponse) return authResult;
-  const { studentId } = authResult;
+  const { studentId, accountType } = authResult;
 
   let payload: StudentChatPayload;
   try {
@@ -124,15 +124,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data: student, error: studentError } = await supabaseAdmin!
-    .from("teacher_students")
-    .select("id")
-    .eq("id", studentId)
-    .eq("is_active", true)
-    .single();
+  // Teacher-created students must exist & be active in teacher_students.
+  // Self-registered students authenticate via Supabase Auth (no such row).
+  if (accountType === "teacher") {
+    const { data: student, error: studentError } = await supabaseAdmin!
+      .from("teacher_students")
+      .select("id")
+      .eq("id", studentId)
+      .eq("is_active", true)
+      .single();
 
-  if (studentError || !student) {
-    return NextResponse.json({ error: "Không tìm thấy học sinh" }, { status: 404 });
+    if (studentError || !student) {
+      return NextResponse.json({ error: "Không tìm thấy học sinh" }, { status: 404 });
+    }
   }
 
   try {

@@ -1,6 +1,7 @@
 // Student API client — shared fetch helper for student-facing pages
 // Uses base64 session token stored in localStorage
 
+import { supabase } from "@/lib/supabase";
 import type {
   StudentSession,
   StudentDashboardData,
@@ -22,6 +23,21 @@ function getStudentHeaders(token: string): HeadersInit {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   };
+}
+
+/**
+ * Resolve an auth token for student API calls. Teacher-created students use the
+ * base64 student_token; self-registered students authenticate via Supabase Auth,
+ * so we fall back to their Supabase session access token.
+ */
+export async function resolveStudentAuthToken(): Promise<string | null> {
+  const studentToken = getStudentToken();
+  if (studentToken) return studentToken;
+  if (supabase) {
+    const { data } = await supabase.auth.getSession();
+    return data.session?.access_token ?? null;
+  }
+  return null;
 }
 
 // ─── In-memory token store (client-side) ─────────────────────────────────────
@@ -60,7 +76,7 @@ async function studentFetch<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = getStudentToken();
+  const token = await resolveStudentAuthToken();
   if (!token) throw new Error("Chưa đăng nhập");
 
   const res = await fetch(`${getAppUrl()}${path}`, {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getStudentId } from "@/lib/auth-helpers";
+import { getAnyStudentId } from "@/lib/auth-helpers";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import {
   DAILY_QUESTION_COUNT,
@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 
-  const session = getStudentId(req);
+  const session = getAnyStudentId(req);
   if (session instanceof NextResponse) return session;
 
   const date = todayKey();
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 
-  const session = getStudentId(req);
+  const session = getAnyStudentId(req);
   if (session instanceof NextResponse) return session;
 
   let body: { answers?: StudentDailyQuizAnswer[] };
