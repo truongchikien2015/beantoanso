@@ -1,7 +1,7 @@
 // GET /api/student/dashboard — student info, assigned path, steps, progress
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { getStudentId } from "@/lib/auth-helpers";
+import { getAnyStudentId } from "@/lib/auth-helpers";
 import { ensureStudentStats } from "@/lib/server/studentRewards";
 
 export async function GET(req: NextRequest) {
@@ -9,11 +9,35 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 
-  const session = getStudentId(req);
+  const session = getAnyStudentId(req);
   if (session instanceof NextResponse) return session;
 
-  const { studentId } = session;
+  const { studentId, accountType } = session;
   const stats = await ensureStudentStats(studentId);
+
+  // Self-registered students live in `profiles` (Supabase Auth), not in
+  // teacher_students. They have no assigned path, but still get reward stats.
+  if (accountType === "self") {
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("id, full_name")
+      .eq("id", studentId)
+      .maybeSingle();
+
+    return NextResponse.json({
+      student: {
+        id: studentId,
+        nickname: profile?.full_name ?? "Bé học sinh",
+        email: null,
+        class_name: null,
+        student_code: "",
+        assigned_path_id: null,
+      },
+      assigned_path: null,
+      progress: [],
+      stats,
+    });
+  }
 
   // Get student info
   const { data: student, error: studentError } = await supabaseAdmin

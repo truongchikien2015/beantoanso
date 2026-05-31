@@ -8,7 +8,7 @@ import { Header } from "../../components/Header";
 import { StudentChatbot } from "../../components/student/StudentChatbot";
 import { totalXpForPlayer } from "../../lib/xp";
 import { supabase } from "../../lib/supabase";
-import { clearStudentToken, getStudentToken } from "../../lib/studentApi";
+import { clearStudentToken, getStudentToken, resolveStudentAuthToken } from "../../lib/studentApi";
 import type { StudentDashboardData } from "../../types/teacher-content";
 
 
@@ -61,11 +61,25 @@ export default function PathSelectPage() {
       }
 
       // Self-registered student: authenticated via Supabase Auth (no student_token).
-      // They also get the daily streak and AI chatbot.
+      // They also get the daily streak and AI chatbot, plus persistent reward stats.
       if (supabase) {
         const { data } = await supabase.auth.getSession();
         if (data.session?.user) {
           setIsSelfStudent(true);
+          try {
+            const authToken = await resolveStudentAuthToken();
+            if (authToken) {
+              const res = await fetch(`/api/student/dashboard`, {
+                headers: { Authorization: `Bearer ${authToken}` },
+              });
+              if (res.ok) {
+                const dashboard: StudentDashboardData = await res.json();
+                setStudentData(dashboard);
+              }
+            }
+          } catch {
+            // Non-fatal: stats just won't show; features still work.
+          }
         }
       }
       setStudentLoading(false);
@@ -96,12 +110,20 @@ export default function PathSelectPage() {
   //  - self-registered students (Supabase Auth account).
   const showStudentFeatures = !!studentData?.assigned_path || isSelfStudent;
 
+  // Persistent reward XP earned from daily quizzes / steps (server-side).
+  // The Header computes level from (xp + totalScore) and shows totalScore as the
+  // ⭐ star. When the student has persistent reward XP, surface it once via the
+  // star so reloads don't appear to reset progress; otherwise keep guest behavior.
+  const rewardXp = studentData?.stats?.total_xp ?? 0;
+  const headerTotalScore = rewardXp || totalScore;
+  const headerXp = rewardXp ? 0 : (profileXp || totalXpForPlayer(playerId));
+
   return (
     <>
       <Header
         nickname={nickname}
-        totalScore={totalScore}
-        xp={profileXp || totalXpForPlayer(playerId)}
+        totalScore={headerTotalScore}
+        xp={headerXp}
         onHome={() => router.push("/")}
         onLogout={handleLogout}
       />
