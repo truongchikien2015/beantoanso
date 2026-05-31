@@ -22,6 +22,7 @@ export default function PathSelectPage() {
   const quiz = useAppStore((state) => state.quiz);
   const [studentData, setStudentData] = useState<StudentDashboardData | null>(null);
   const [studentLoading, setStudentLoading] = useState(true);
+  const [isSelfStudent, setIsSelfStudent] = useState(false);
 
   const missionScore = Object.values(missionResults).reduce((s, r) => s + r.score, 0);
   const totalScore = missionScore + (quiz?.score ?? 0);
@@ -35,29 +36,39 @@ export default function PathSelectPage() {
   useEffect(() => {
     async function loadAssignedPath() {
       const token = getStudentToken();
-      if (!token) {
-        setStudentLoading(false);
+
+      // Teacher-created student: has a student_token → load their assigned path.
+      if (token) {
+        try {
+          const res = await fetch(`/api/student/dashboard`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (res.status === 401) {
+            clearStudentToken();
+            setStudentData(null);
+            return;
+          }
+
+          if (res.ok) {
+            const data: StudentDashboardData = await res.json();
+            setStudentData(data);
+          }
+        } finally {
+          setStudentLoading(false);
+        }
         return;
       }
 
-      try {
-        const res = await fetch(`/api/student/dashboard`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (res.status === 401) {
-          clearStudentToken();
-          setStudentData(null);
-          return;
+      // Self-registered student: authenticated via Supabase Auth (no student_token).
+      // They also get the daily streak and AI chatbot.
+      if (supabase) {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          setIsSelfStudent(true);
         }
-
-        if (res.ok) {
-          const data: StudentDashboardData = await res.json();
-          setStudentData(data);
-        }
-      } finally {
-        setStudentLoading(false);
       }
+      setStudentLoading(false);
     }
 
     loadAssignedPath();
@@ -80,6 +91,11 @@ export default function PathSelectPage() {
     return null;
   }
 
+  // Show streak + AI chatbot for:
+  //  - teacher-created students who have an assigned learning path, OR
+  //  - self-registered students (Supabase Auth account).
+  const showStudentFeatures = !!studentData?.assigned_path || isSelfStudent;
+
   return (
     <>
       <Header
@@ -94,13 +110,13 @@ export default function PathSelectPage() {
         assignedPath={studentData?.assigned_path ?? null}
         assignedStudent={studentData?.student ?? null}
         assignedLoading={studentLoading}
-        showDailyQuiz={!!studentData}
+        showDailyQuiz={showStudentFeatures}
         onOpenDailyQuiz={() => router.push("/student/daily")}
         onSelect={handleSelectPath}
         onSelectAssigned={() => router.push("/student/dashboard")}
         onBack={() => router.push("/")}
       />
-      {studentData && <StudentChatbot />}
+      {showStudentFeatures && <StudentChatbot />}
     </>
   );
 }

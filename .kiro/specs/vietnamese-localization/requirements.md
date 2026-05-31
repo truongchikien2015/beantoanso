@@ -38,8 +38,10 @@ This requirements document describes **what** the system must guarantee. Impleme
 
 1. THE App SHALL render all User_Facing_Text as Vietnamese_Text.
 2. WHERE a screen contains buttons, headings, input placeholders, or menu items, THE App SHALL display each such element as Vietnamese_Text.
-3. WHILE the App is displaying a loading, empty, or success state, THE App SHALL present the associated status text as Vietnamese_Text.
-4. THE App SHALL exclude code identifiers, developer console logs, and non-displayed HTML attributes from the User_Facing_Text translation scope.
+3. WHILE the App is in a loading state, THE App SHALL display Vietnamese_Text status text.
+4. WHILE the App is displaying an empty or success state, THE App SHALL present the associated status text as Vietnamese_Text.
+5. THE App SHALL render proper nouns and technical terms that appear within User_Facing_Text as Vietnamese_Text.
+6. THE App SHALL exclude code identifiers, developer console logs, and non-displayed HTML attributes from the User_Facing_Text translation scope.
 
 ### Requirement 2: Vietnamese error messages from all sources
 
@@ -62,7 +64,7 @@ This requirements document describes **what** the system must guarantee. Impleme
 
 1. THE App SHALL provide a single Error_Translation_Service that maps Error_Messages from every Error_Source to Vietnamese_Text.
 2. WHEN any component or screen displays an Error_Message, THE component SHALL obtain the displayed text from the Error_Translation_Service.
-3. WHEN the Error_Translation_Service receives an input that is already Vietnamese_Text, THE Error_Translation_Service SHALL return equivalent Vietnamese_Text.
+3. WHEN the Error_Translation_Service receives an input that is already Vietnamese_Text, THE Error_Translation_Service SHALL return Vietnamese_Text that is semantically equivalent to the input.
 4. THE Error_Translation_Service SHALL accept an Error_Message originating from any recognized Error_Source as input.
 
 ### Requirement 4: Centralized message catalog
@@ -74,6 +76,7 @@ This requirements document describes **what** the system must guarantee. Impleme
 1. THE App SHALL store User_Facing_Text strings used for shared labels and error mappings in a single Message_Catalog.
 2. WHEN the App needs a known Vietnamese label or Error_Message, THE App SHALL retrieve the string from the Message_Catalog.
 3. WHERE a string is requested from the Message_Catalog by a key that does not exist, THE Message_Catalog SHALL return the Fallback_Message rather than an empty value.
+4. IF the Message_Catalog is inaccessible or corrupted, THEN THE App SHALL fail the affected operation rather than display non-Vietnamese hardcoded text.
 
 ### Requirement 5: Authentication flow localization
 
@@ -84,7 +87,7 @@ This requirements document describes **what** the system must guarantee. Impleme
 1. WHEN authentication fails with a Supabase_Auth_Error of `Invalid login credentials`, THE App SHALL display a Vietnamese_Text Error_Message indicating that the email/student code or password is incorrect.
 2. WHEN authentication fails with a Supabase_Auth_Error of `Email not confirmed`, THE App SHALL display a Vietnamese_Text Error_Message indicating that the account is not yet activated.
 3. WHEN registration fails because the email is already in use, THE App SHALL display a Vietnamese_Text Error_Message indicating that the email is already registered.
-4. THE App SHALL display all labels, placeholders, and button captions in the authentication interface as Vietnamese_Text.
+4. WHILE the authentication interface is displayed, THE App SHALL display all labels, placeholders, and button captions in the authentication interface as Vietnamese_Text.
 5. WHEN authentication succeeds in the student, teacher, or admin login flow, THE App SHALL display any status text as Vietnamese_Text.
 
 ### Requirement 6: API route error localization

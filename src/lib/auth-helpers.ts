@@ -3,6 +3,41 @@
 import { NextRequest, NextResponse } from "next/server";
 import { decodeJWT } from "./jwt";
 
+// ─── Unified student auth (teacher-created OR self-registered) ───────────────────
+// Self-registered students authenticate via Supabase Auth (profiles), while
+// teacher-created students use a base64 student session token. This resolver
+// accepts either and reports which kind it found.
+
+export type StudentAccountType = "teacher" | "self";
+
+export interface AnyStudentAuthResult {
+  studentId: string;
+  accountType: StudentAccountType;
+}
+
+export function getAnyStudentId(req: NextRequest): NextResponse | AnyStudentAuthResult {
+  const auth = req.headers.get("authorization");
+  if (!auth?.startsWith("Bearer ")) {
+    return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
+  }
+
+  const token = auth.slice(7);
+
+  // 1) Teacher-created student: base64 session token (2 parts).
+  const teacherStudent = verifyStudentToken(token);
+  if (teacherStudent) {
+    return { studentId: teacherStudent.studentId, accountType: "teacher" };
+  }
+
+  // 2) Self-registered student: Supabase Auth JWT (3 parts).
+  const decoded = decodeJWT(token);
+  if (decoded?.sub && decoded.role === "authenticated") {
+    return { studentId: decoded.sub, accountType: "self" };
+  }
+
+  return NextResponse.json({ error: "Token không hợp lệ hoặc đã hết hạn" }, { status: 401 });
+}
+
 // ─── Teacher auth ────────────────────────────────────────────────────────────────
 
 export interface TeacherAuthResult {
