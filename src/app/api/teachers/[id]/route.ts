@@ -1,23 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-
-const ADMIN_API_SECRET = process.env.ADMIN_API_SECRET ?? process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
-function getHeader(req: NextRequest, name: string): string | null {
-  for (const [key, value] of req.headers.entries()) {
-    if (key.replace(/\s*;\s*$/, "").toLowerCase() === name.toLowerCase()) {
-      return value;
-    }
-  }
-  return null;
-}
-
-function checkAdmin(req: NextRequest): NextResponse | null {
-  if (!ADMIN_API_SECRET) {
-    return NextResponse.json({ error: "Admin secret not configured" }, { status: 503 });
-  }
-  return null;
-}
 
 type Params = { params: Promise<{ id: string }> };
 
