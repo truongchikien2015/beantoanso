@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { setStudentToken } from "@/lib/studentApi";
+import { setStudentToken, clearStudentToken } from "@/lib/studentApi";
 import { supabase } from "@/lib/supabase";
 
 type AuthModalProps = {
@@ -8,6 +8,18 @@ type AuthModalProps = {
   onClose: () => void;
   onSuccess: (user: any, profile: any) => void;
 };
+
+// Map common Supabase/auth errors to friendly Vietnamese messages.
+function translateAuthError(message?: string): string {
+  const m = (message ?? "").toLowerCase();
+  if (!m) return "Đã có lỗi xảy ra";
+  if (m.includes("invalid login credentials")) return "Email hoặc mật khẩu không đúng";
+  if (m.includes("email not confirmed")) return "Tài khoản chưa được kích hoạt. Vui lòng liên hệ giáo viên hoặc quản trị viên.";
+  if (m.includes("email already") || m.includes("already registered") || m.includes("đã được sử dụng")) return "Email đã được sử dụng";
+  if (m.includes("password")) return "Mật khẩu phải có ít nhất 6 ký tự";
+  if (m.includes("failed to fetch") || m.includes("networkerror")) return "Không kết nối được máy chủ. Vui lòng thử lại.";
+  return message ?? "Đã có lỗi xảy ra";
+}
 
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [isLogin, setIsLogin] = useState(true);
@@ -31,22 +43,27 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
     try {
       if (isLogin) {
-        const studentRes = await fetch("/api/student/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            student_code: email.trim(),
-            password,
-          }),
-        });
-        const studentData = await studentRes.json();
+        const loginId = email.trim();
+        const looksLikeEmail = loginId.includes("@");
 
-        if (studentRes.ok) {
+        if (!looksLikeEmail) {
+          // Student code → teacher-created account in teacher_students.
+          const studentRes = await fetch("/api/student/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_code: loginId, password }),
+          });
+          const studentData = await studentRes.json();
+
+          if (!studentRes.ok) {
+            throw new Error(studentData.error ?? "Mã học sinh hoặc mật khẩu không đúng");
+          }
+
           setStudentToken(studentData.token);
           onSuccess(
             {
               id: studentData.student.id,
-              email: studentData.student.email ?? email.trim(),
+              email: studentData.student.email ?? loginId,
             },
             {
               full_name: studentData.student.nickname,
@@ -56,9 +73,25 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           );
           return;
         }
+
+        // Email → self-registered student account in Supabase Auth.
+        const memberRes = await fetch("/api/auth/student/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: loginId, password, isLogin: true }),
+        });
+        const memberData = await memberRes.json();
+
+        if (!memberRes.ok) {
+          throw new Error(memberData.error ?? "Email hoặc mật khẩu không đúng");
+        }
+
+        await applyMemberSession(memberData);
+        return;
       }
 
-      const res = await fetch("/api/auth/teacher/login", {
+      // Registration (self-registered student).
+      const res = await fetch("/api/auth/student/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -77,26 +110,36 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         throw new Error(data.error ?? "Đã có lỗi xảy ra");
       }
 
-      if (data.access_token && data.refresh_token) {
-        const { error: sessionError } = await supabase?.auth.setSession({
-          access_token: data.access_token,
-          refresh_token: data.refresh_token,
-        }) ?? {};
-
-        if (sessionError) {
-          throw new Error(sessionError.message);
-        }
-      }
-
-      onSuccess(
-        { id: data.user?.id, email: data.user?.email },
-        data.profile
-      );
+      await applyMemberSession(data);
     } catch (err: any) {
-      setError(err.message || "Đã có lỗi xảy ra");
+      setError(translateAuthError(err.message));
     } finally {
       setLoading(false);
     }
+  };
+
+  // Shared handler: set the Supabase session then notify parent.
+  const applyMemberSession = async (data: any) => {
+    // Self-registered students authenticate via Supabase Auth, not the student
+    // token. Clear any stale teacher-student token so we don't load another
+    // student's assigned learning path on the path-select screen.
+    clearStudentToken();
+
+    if (data.access_token && data.refresh_token) {
+      const { error: sessionError } = await supabase?.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      }) ?? {};
+
+      if (sessionError) {
+        throw new Error(sessionError.message);
+      }
+    }
+
+    onSuccess(
+      { id: data.user?.id, email: data.user?.email },
+      data.profile
+    );
   };
 
   return (

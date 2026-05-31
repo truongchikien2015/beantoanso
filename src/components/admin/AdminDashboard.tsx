@@ -332,8 +332,564 @@ function OverviewTab() {
   );
 }
 
-// ── Students Tab ──────────────────────────────────────────────────────────────
+// ── Students Tab (parent with sub-views) ───────────────────────────────────────
 function StudentsTab() {
+  const [view, setView] = useState<"accounts" | "teacher" | "completed">("accounts");
+
+  const TABS = [
+    { key: "accounts", label: "🧒 Học sinh tự đăng ký" },
+    { key: "teacher", label: "👩‍🏫 Học sinh do giáo viên tạo" },
+    { key: "completed", label: "🏆 Kết quả hoàn thành" },
+  ] as const;
+
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+      {/* Sub-view toggle */}
+      <div className="inline-flex flex-wrap gap-1 rounded-2xl border-2 border-sky-100 bg-white p-1 shadow-sm">
+        {TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setView(t.key)}
+            className={`rounded-xl px-4 py-2 text-xs sm:text-sm font-black transition ${view === t.key ? "bg-sky-600 text-white shadow" : "text-sky-700 hover:bg-sky-50"}`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {view === "accounts" && <AllStudentsView />}
+      {view === "teacher" && <TeacherStudentsView />}
+      {view === "completed" && <CompletedResultsView />}
+    </div>
+  );
+}
+
+// ── All Self-Registered Students (members who signed up themselves) ─────────────
+type AdminStudent = {
+  id: string;
+  fullName: string;
+  email: string | null;
+  gender: string | null;
+  birthYear: number | null;
+  avatarUrl: string | null;
+  xp: number;
+  level: number;
+  totalScore: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function AllStudentsView() {
+  const [students, setStudents] = useState<AdminStudent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [resetTarget, setResetTarget] = useState<AdminStudent | null>(null);
+  const PAGE_SIZE = 20;
+
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const res = await fetch("/api/admin/students", {
+        headers: { "x-admin-password": pw },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+      setStudents(body.data ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Lỗi tải danh sách học sinh");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const filtered = useMemo(() => {
+    const t = search.trim().toLowerCase();
+    if (!t) return students;
+    return students.filter((s) =>
+      s.fullName.toLowerCase().includes(t) ||
+      (s.email ?? "").toLowerCase().includes(t)
+    );
+  }, [students, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const genderLabel = (g: string | null) => g === "male" ? "Nam" : g === "female" ? "Nữ" : g === "other" ? "Khác" : "—";
+
+  const exportCsv = () => {
+    const header = "full_name,email,gender,birth_year,level,xp,total_score,created_at\n";
+    const rows = students
+      .map((s) =>
+        `"${s.fullName}","${s.email ?? ""}","${genderLabel(s.gender)}",${s.birthYear ?? ""},${s.level},${s.xp},${s.totalScore},"${s.createdAt}"`
+      )
+      .join("\n");
+    const blob = new Blob(["\uFEFF" + header + rows], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `bats-all-students-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-sky-950">🧒 Học sinh tự đăng ký</h1>
+          <p className="text-sky-600 font-bold text-xs sm:text-sm mt-0.5">
+            Tổng {students.length} tài khoản đã tự đăng ký thành viên
+          </p>
+        </div>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <button onClick={load} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-xs">🔄 Tải lại</button>
+          <button onClick={exportCsv} disabled={students.length === 0} className="Btn BtnPrimary font-black rounded-2xl shadow-md flex-1 sm:flex-none">📥 Xuất CSV</button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border-4 border-sky-100 shadow-sm overflow-hidden">
+        <div className="p-4 sm:p-5 border-b-2 border-sky-100 bg-sky-50/30 flex flex-col sm:flex-row gap-3">
+          <input
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            placeholder="🔍 Tìm theo tên hoặc email..."
+            className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-xs sm:text-sm font-semibold"
+            style={{ maxWidth: 360 }}
+          />
+        </div>
+
+        {loading ? (
+          <div className="py-20 text-center font-bold text-slate-400">⏳ Đang tải danh sách học sinh...</div>
+        ) : error ? (
+          <div className="py-16 text-center">
+            <div className="text-3xl mb-3">⚠️</div>
+            <p className="text-rose-500 font-bold mb-4">{error}</p>
+            <button onClick={load} className="Btn BtnSm rounded-xl font-bold bg-sky-100 text-sky-700">Thử lại</button>
+          </div>
+        ) : (
+          <div className="w-full overflow-x-auto">
+            <table className="w-full min-w-[760px]">
+              <thead>
+                <tr className="bg-sky-50/50">
+                  {["Học sinh", "Email", "Giới tính", "Năm sinh", "Cấp độ", "Điểm", "Ngày đăng ký", "Thao tác"].map((h, i) => (
+                    <th key={i} className="TableTh text-sky-950 font-black py-4 px-3 text-left text-xs sm:text-sm">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {paged.map((s) => (
+                  <tr key={s.id} className="TableTr hover:bg-sky-50/20 border-b border-sky-100">
+                    <td className="TableTd font-black text-sky-950 px-3 py-3.5 text-xs sm:text-sm">{s.fullName}</td>
+                    <td className="TableTd text-slate-600 font-semibold px-3 py-3.5 text-xs sm:text-sm">{s.email || "—"}</td>
+                    <td className="TableTd text-slate-600 font-bold px-3 py-3.5 text-xs sm:text-sm">{genderLabel(s.gender)}</td>
+                    <td className="TableTd text-slate-600 font-bold px-3 py-3.5 text-xs sm:text-sm">{s.birthYear || "—"}</td>
+                    <td className="TableTd px-3 py-3.5 text-xs sm:text-sm">
+                      <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] sm:text-xs font-black text-sky-700">Lv {s.level}</span>
+                    </td>
+                    <td className="TableTd font-black px-3 py-3.5 text-xs sm:text-sm" style={{ color: "#f59e0b" }}>★ {s.totalScore}</td>
+                    <td className="TableTd text-slate-400 font-semibold text-[10px] sm:text-xs px-3 py-3.5">{new Date(s.createdAt).toLocaleDateString("vi-VN")}</td>
+                    <td className="TableTd px-3 py-3.5">
+                      <button onClick={() => setResetTarget(s)} className="Btn BtnSm rounded-xl font-bold bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs py-1 px-2.5">
+                        🔑 Đổi mật khẩu
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={8} className="text-center py-16 font-bold text-slate-400">
+                    {students.length === 0 ? "Chưa có học sinh nào tự đăng ký." : "Không có học sinh nào phù hợp với tìm kiếm."}
+                  </td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {!loading && !error && totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t-2 border-sky-100 bg-sky-50/30 gap-3">
+            <p className="text-xs sm:text-sm font-bold text-sky-800">
+              Đang xem {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} trên tổng {filtered.length} bé
+            </p>
+            <div className="flex gap-2 w-full sm:w-auto justify-end">
+              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-xs">← Trước</button>
+              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-xs">Sau →</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {resetTarget && (
+        <ResetStudentPasswordModal
+          student={resetTarget}
+          onClose={() => setResetTarget(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Reset Student Password Modal (admin) ────────────────────────────────────────
+function ResetStudentPasswordModal({ student, onClose }: { student: AdminStudent; onClose: () => void }) {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    if (newPassword.length < 6) { setError("Mật khẩu phải có ít nhất 6 ký tự."); return; }
+    if (newPassword !== confirmPassword) { setError("Mật khẩu xác nhận không khớp."); return; }
+    setLoading(true);
+    try {
+      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const res = await fetch(`/api/admin/students/${student.id}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": pw },
+        body: JSON.stringify({ newPassword }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? "Lỗi đặt lại mật khẩu");
+      setSuccess("Đã đặt lại mật khẩu thành công!");
+      setTimeout(onClose, 1300);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Lỗi đặt lại mật khẩu");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="ModalOverlay p-2 sm:p-4" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="ModalBox w-full rounded-3xl border-4 border-sky-200 shadow-2xl overflow-hidden" style={{ maxWidth: 440 }}>
+        <div className="ModalHeader bg-amber-50 border-b-2 border-amber-100 p-4 sm:p-5 flex items-center justify-between">
+          <div>
+            <h3 className="font-black text-amber-900 text-lg sm:text-xl flex items-center gap-1.5">🔑 Đổi mật khẩu</h3>
+            <p className="text-amber-700 font-bold text-xs sm:text-sm mt-0.5">Học sinh: {student.fullName}</p>
+          </div>
+          <button onClick={onClose} disabled={loading} className="Btn BtnSm rounded-xl font-black bg-rose-50 text-rose-600 hover:bg-rose-100 px-3 py-1 text-xs">✕ Đóng</button>
+        </div>
+        <form onSubmit={submit} className="p-4 sm:p-5 space-y-4 bg-white">
+          <div>
+            <label className="block text-sky-950 font-black text-xs sm:text-sm mb-1.5">Mật khẩu mới</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Ít nhất 6 ký tự"
+              className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-sm font-semibold"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="block text-sky-950 font-black text-xs sm:text-sm mb-1.5">Xác nhận mật khẩu</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Nhập lại mật khẩu mới"
+              className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-sm font-semibold"
+            />
+          </div>
+          {error && <div className="p-3 rounded-2xl bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs sm:text-sm">❌ {error}</div>}
+          {success && <div className="p-3 rounded-2xl bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-bold text-xs sm:text-sm">🎉 {success}</div>}
+          <div className="flex gap-2 pt-1">
+            <button type="submit" disabled={loading} className="Btn BtnPrimary font-black rounded-2xl shadow-md flex-1 justify-center">
+              {loading ? "Đang lưu..." : "Đặt lại mật khẩu"}
+            </button>
+            <button type="button" onClick={onClose} disabled={loading} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-sky-100">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Teacher-Created Students (imported / created by teachers) ───────────────────
+type AdminTeacherStudent = {
+  id: string;
+  nickname: string;
+  email: string | null;
+  className: string | null;
+  studentCode: string;
+  assignedPathId: string | null;
+  assignedPathTitle: string | null;
+  assignedAt: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  teacherName: string | null;
+  teacherEmail: string | null;
+};
+
+function TeacherStudentsView() {
+  const [students, setStudents] = useState<AdminTeacherStudent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [classFilter, setClassFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [resetTarget, setResetTarget] = useState<AdminTeacherStudent | null>(null);
+  const PAGE_SIZE = 20;
+
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const res = await fetch("/api/admin/teacher-students", {
+        headers: { "x-admin-password": pw },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+      setStudents(body.data ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Lỗi tải danh sách học sinh");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const classOptions = useMemo(() => {
+    return [...new Set(students.map((s) => s.className).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, "vi"));
+  }, [students]);
+
+  const filtered = useMemo(() => {
+    const t = search.trim().toLowerCase();
+    return students.filter((s) => {
+      if (classFilter && s.className !== classFilter) return false;
+      if (!t) return true;
+      return (
+        s.nickname.toLowerCase().includes(t) ||
+        s.studentCode.toLowerCase().includes(t) ||
+        (s.teacherName ?? "").toLowerCase().includes(t)
+      );
+    });
+  }, [students, search, classFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const exportCsv = () => {
+    const header = "nickname,student_code,class_name,email,teacher,assigned_path,is_active,created_at\n";
+    const rows = students
+      .map((s) =>
+        `"${s.nickname}","${s.studentCode}","${s.className ?? ""}","${s.email ?? ""}","${s.teacherName ?? ""}","${s.assignedPathTitle ?? ""}",${s.isActive ? "active" : "inactive"},"${s.createdAt}"`
+      )
+      .join("\n");
+    const blob = new Blob(["\uFEFF" + header + rows], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `bats-teacher-students-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const activeCount = students.filter((s) => s.isActive).length;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-black text-sky-950">👩‍🏫 Học sinh do giáo viên tạo</h1>
+          <p className="text-sky-600 font-bold text-xs sm:text-sm mt-0.5">
+            Tổng {students.length} tài khoản · {activeCount} đang hoạt động
+          </p>
+        </div>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <button onClick={load} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-xs">🔄 Tải lại</button>
+          <button onClick={exportCsv} disabled={students.length === 0} className="Btn BtnPrimary font-black rounded-2xl shadow-md flex-1 sm:flex-none">📥 Xuất CSV</button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl border-4 border-sky-100 shadow-sm overflow-hidden">
+        <div className="p-4 sm:p-5 border-b-2 border-sky-100 bg-sky-50/30 flex flex-col sm:flex-row gap-3">
+          <input
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            placeholder="🔍 Tìm theo tên, mã học sinh, giáo viên..."
+            className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-xs sm:text-sm font-semibold"
+            style={{ maxWidth: 360 }}
+          />
+          <select
+            value={classFilter}
+            onChange={(e) => { setClassFilter(e.target.value); setPage(1); }}
+            className="Input rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-xs sm:text-sm font-semibold"
+            style={{ maxWidth: 200 }}
+          >
+            <option value="">Tất cả lớp</option>
+            {classOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+
+        {loading ? (
+          <div className="py-20 text-center font-bold text-slate-400">⏳ Đang tải danh sách học sinh...</div>
+        ) : error ? (
+          <div className="py-16 text-center">
+            <div className="text-3xl mb-3">⚠️</div>
+            <p className="text-rose-500 font-bold mb-4">{error}</p>
+            <button onClick={load} className="Btn BtnSm rounded-xl font-bold bg-sky-100 text-sky-700">Thử lại</button>
+          </div>
+        ) : (
+          <div className="w-full overflow-x-auto">
+            <table className="w-full min-w-[820px]">
+              <thead>
+                <tr className="bg-sky-50/50">
+                  {["Học sinh", "Mã", "Lớp", "Giáo viên", "Lộ trình", "Trạng thái", "Ngày tạo", "Thao tác"].map((h, i) => (
+                    <th key={i} className="TableTh text-sky-950 font-black py-4 px-3 text-left text-xs sm:text-sm">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {paged.map((s) => (
+                  <tr key={s.id} className="TableTr hover:bg-sky-50/20 border-b border-sky-100">
+                    <td className="TableTd font-black text-sky-950 px-3 py-3.5 text-xs sm:text-sm">{s.nickname}</td>
+                    <td className="TableTd px-3 py-3.5">
+                      <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] sm:text-xs text-slate-600">{s.studentCode}</span>
+                    </td>
+                    <td className="TableTd text-slate-600 font-bold px-3 py-3.5 text-xs sm:text-sm">{s.className || "—"}</td>
+                    <td className="TableTd text-slate-600 font-semibold px-3 py-3.5 text-xs sm:text-sm">{s.teacherName || "—"}</td>
+                    <td className="TableTd px-3 py-3.5 text-xs sm:text-sm">
+                      {s.assignedPathTitle
+                        ? <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-sky-700">{s.assignedPathTitle}</span>
+                        : <span className="text-slate-400 text-[10px] sm:text-xs">Chưa gán</span>}
+                    </td>
+                    <td className="TableTd px-3 py-3.5">
+                      <span className={`px-2.5 py-0.5 rounded-xl text-[10px] sm:text-xs font-black ${s.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                        {s.isActive ? "● Hoạt động" : "○ Đã khóa"}
+                      </span>
+                    </td>
+                    <td className="TableTd text-slate-400 font-semibold text-[10px] sm:text-xs px-3 py-3.5">{new Date(s.createdAt).toLocaleDateString("vi-VN")}</td>
+                    <td className="TableTd px-3 py-3.5">
+                      <button onClick={() => setResetTarget(s)} className="Btn BtnSm rounded-xl font-bold bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs py-1 px-2.5">
+                        🔑 Đổi mật khẩu
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={8} className="text-center py-16 font-bold text-slate-400">
+                    {students.length === 0 ? "Chưa có học sinh nào được giáo viên tạo." : "Không có học sinh nào phù hợp với bộ lọc."}
+                  </td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {!loading && !error && totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t-2 border-sky-100 bg-sky-50/30 gap-3">
+            <p className="text-xs sm:text-sm font-bold text-sky-800">
+              Đang xem {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} trên tổng {filtered.length} bé
+            </p>
+            <div className="flex gap-2 w-full sm:w-auto justify-end">
+              <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-xs">← Trước</button>
+              <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-xs">Sau →</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {resetTarget && (
+        <ResetTeacherStudentPasswordModal
+          student={resetTarget}
+          onClose={() => setResetTarget(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Reset Teacher-Student Password Modal (admin) ────────────────────────────────
+function ResetTeacherStudentPasswordModal({ student, onClose }: { student: AdminTeacherStudent; onClose: () => void }) {
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    if (newPassword.length < 6) { setError("Mật khẩu phải có ít nhất 6 ký tự."); return; }
+    if (newPassword !== confirmPassword) { setError("Mật khẩu xác nhận không khớp."); return; }
+    setLoading(true);
+    try {
+      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const res = await fetch(`/api/admin/teacher-students/${student.id}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": pw },
+        body: JSON.stringify({ newPassword }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? "Lỗi đặt lại mật khẩu");
+      setSuccess("Đã đặt lại mật khẩu thành công!");
+      setTimeout(onClose, 1300);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Lỗi đặt lại mật khẩu");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="ModalOverlay p-2 sm:p-4" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="ModalBox w-full rounded-3xl border-4 border-sky-200 shadow-2xl overflow-hidden" style={{ maxWidth: 440 }}>
+        <div className="ModalHeader bg-amber-50 border-b-2 border-amber-100 p-4 sm:p-5 flex items-center justify-between">
+          <div>
+            <h3 className="font-black text-amber-900 text-lg sm:text-xl flex items-center gap-1.5">🔑 Đổi mật khẩu</h3>
+            <p className="text-amber-700 font-bold text-xs sm:text-sm mt-0.5">Học sinh: {student.nickname} ({student.studentCode})</p>
+          </div>
+          <button onClick={onClose} disabled={loading} className="Btn BtnSm rounded-xl font-black bg-rose-50 text-rose-600 hover:bg-rose-100 px-3 py-1 text-xs">✕ Đóng</button>
+        </div>
+        <form onSubmit={submit} className="p-4 sm:p-5 space-y-4 bg-white">
+          <div>
+            <label className="block text-sky-950 font-black text-xs sm:text-sm mb-1.5">Mật khẩu mới</label>
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Ít nhất 6 ký tự"
+              className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-sm font-semibold"
+              autoFocus
+            />
+          </div>
+          <div>
+            <label className="block text-sky-950 font-black text-xs sm:text-sm mb-1.5">Xác nhận mật khẩu</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Nhập lại mật khẩu mới"
+              className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-sm font-semibold"
+            />
+          </div>
+          {error && <div className="p-3 rounded-2xl bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs sm:text-sm">❌ {error}</div>}
+          {success && <div className="p-3 rounded-2xl bg-emerald-50 border-2 border-emerald-200 text-emerald-700 font-bold text-xs sm:text-sm">🎉 {success}</div>}
+          <div className="flex gap-2 pt-1">
+            <button type="submit" disabled={loading} className="Btn BtnPrimary font-black rounded-2xl shadow-md flex-1 justify-center">
+              {loading ? "Đang lưu..." : "Đặt lại mật khẩu"}
+            </button>
+            <button type="button" onClick={onClose} disabled={loading} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-sky-100">Hủy</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Completed Results View (journeys finished, from localStorage) ───────────────
+function CompletedResultsView() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
@@ -365,10 +921,10 @@ function StudentsTab() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-sky-950">🧒 Danh sách học sinh</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-sky-950">🏆 Kết quả hoàn thành</h1>
           <p className="text-sky-600 font-bold text-xs sm:text-sm mt-0.5">Đã có {results.length} bé hoàn thành hành trình an toàn số</p>
         </div>
         <button onClick={exportCsv} disabled={results.length === 0} className="Btn BtnPrimary font-black rounded-2xl shadow-md w-full sm:w-auto">

@@ -71,6 +71,7 @@ export default function PathSelectPage() {
 
   const handleLogout = async () => {
     await supabase?.auth.signOut();
+    clearStudentToken();
     useAppStore.getState().logout();
     router.push("/");
   };
