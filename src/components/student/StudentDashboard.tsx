@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { StudentDashboardData } from "@/types/teacher-content";
 import { topicLabels } from "@/data/quizQuestions";
+import { StudentChatbot } from "@/components/student/StudentChatbot";
 
 interface Props {
   data: StudentDashboardData;
@@ -12,6 +13,7 @@ interface Props {
 export default function StudentDashboard({ data, onLogout }: Props) {
   const router = useRouter();
   const { student, assigned_path, progress } = data;
+  const { stats } = data;
 
   const progressMap = new Map(progress.map((p) => [p.step_id, p]));
 
@@ -80,6 +82,32 @@ export default function StudentDashboard({ data, onLogout }: Props) {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+        <section className="card-kid p-5 bg-gradient-to-r from-amber-50 to-cyan-50">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-black text-[var(--kid-coral-new)]">🔥 Chuỗi học mỗi ngày</p>
+              <h2 className="mt-1 text-2xl font-black text-slate-800">
+                {stats.current_streak} ngày liên tục
+              </h2>
+              <p className="text-sm font-bold text-slate-500">
+                Lv.{stats.level} · {stats.total_xp} XP · Kỷ lục {stats.longest_streak} ngày
+              </p>
+            </div>
+            <button
+              onClick={() => router.push("/student/daily")}
+              className="btn-kid btn-kid-yellow shrink-0 justify-center px-5 py-3"
+            >
+              🎯 Làm 5 câu hôm nay
+            </button>
+          </div>
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/80">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[var(--kid-coral-new)] to-[var(--kid-teal-new)] transition-all"
+              style={{ width: `${Math.min((stats.xp_in_level / stats.xp_for_next) * 100, 100)}%` }}
+            />
+          </div>
+        </section>
+
         {assigned_path ? (
           <>
             {/* Path Card */}
@@ -240,16 +268,22 @@ export default function StudentDashboard({ data, onLogout }: Props) {
                 🚪 Thoát
               </button>
             </div>
+
+            <StudentChatbot />
           </>
         ) : (
-          <div className="card-kid p-10 text-center">
-            <div className="text-6xl mb-4 animate-wiggle">🗺️</div>
-            <h2 className="text-xl font-black text-slate-800">Chưa có hành trình</h2>
-            <p className="text-slate-500 mt-2 text-base">
-              Giáo viên chưa gán lộ trình cho bạn.
-              <br />Liên hệ giáo viên để bắt đầu nhé! 📚
-            </p>
-          </div>
+          <>
+            <div className="card-kid p-10 text-center">
+              <div className="text-6xl mb-4 animate-wiggle">🗺️</div>
+              <h2 className="text-xl font-black text-slate-800">Chưa có hành trình</h2>
+              <p className="text-slate-500 mt-2 text-base">
+                Giáo viên chưa gán lộ trình cho bạn.
+                <br />Liên hệ giáo viên để bắt đầu nhé! 📚
+              </p>
+            </div>
+
+            <StudentChatbot />
+          </>
         )}
       </main>
     </div>

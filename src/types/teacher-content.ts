@@ -79,6 +79,16 @@ export interface TeacherStudentProgress {
   completed_at: string | null;
 }
 
+export interface StudentRewardStats {
+  total_xp: number;
+  level: number;
+  xp_in_level: number;
+  xp_for_next: number;
+  current_streak: number;
+  longest_streak: number;
+  last_daily_completed_on: string | null;
+}
+
 // ============================================================
 // API request/response DTOs
 // ============================================================
@@ -310,6 +320,7 @@ export interface StudentDashboardData {
   student: StudentSession;
   assigned_path: StudentLearningPathWithSteps | null;
   progress: TeacherStudentProgress[];
+  stats: StudentRewardStats;
 }
 
 export interface StudentLearningPathWithSteps extends TeacherLearningPath {
@@ -336,4 +347,46 @@ export interface StudentQuizSubmission {
   step_id: string;
   path_id: string;
   answers: { question_id: string; selected_option: "A" | "B" | "C" }[];
+}
+
+export interface StudentProgressResponse {
+  progress: TeacherStudentProgress[];
+  stats: StudentRewardStats;
+}
+
+export interface StudentDailyQuizQuestion {
+  id: string;
+  question: string;
+  options: [string, string, string];
+}
+
+export interface StudentDailyQuizAnswer {
+  question_id: string;
+  selected_option: "A" | "B" | "C";
+}
+
+export interface StudentDailyQuizResult {
+  question_id: string;
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  selected_option: "A" | "B" | "C" | null;
+  correct_option: "A" | "B" | "C";
+  is_correct: boolean;
+  explanation: string | null;
+}
+
+export interface StudentDailyQuizResponse {
+  date: string;
+  completed: boolean;
+  stats: StudentRewardStats;
+  questions: StudentDailyQuizQuestion[];
+  result?: {
+    correct_count: number;
+    total: number;
+    xp_awarded: number;
+    answers: StudentDailyQuizResult[];
+    completed_at: string;
+  };
 }

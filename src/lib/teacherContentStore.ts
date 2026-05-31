@@ -68,6 +68,7 @@ interface TeacherContentState {
   fetchStudents: () => Promise<void>;
   importStudents: (students: ImportStudentInput[]) => Promise<TeacherStudent[]>;
   assignPathToStudent: (studentId: string, pathId: string) => Promise<void>;
+  resetStudentPassword: (studentId: string, newPassword: string) => Promise<string | null>;
   deleteStudent: (id: string) => Promise<void>;
   fetchStudentProgress: (studentId: string) => Promise<TeacherStudentProgress[]>;
 
@@ -418,6 +419,20 @@ export const useTeacherContentStore = create<TeacherContentState>()(
     set((s) => ({
       students: s.students.map((st) => (st.id === studentId ? updated : st)),
     }));
+  },
+
+  resetStudentPassword: async (studentId, newPassword) => {
+    const res = await teacherFetch(`/api/teacher/students/${studentId}/reset-password`, {
+      method: "POST",
+      body: JSON.stringify({ newPassword }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const message = body.error || "Lỗi đặt lại mật khẩu";
+      set({ error: message });
+      return message;
+    }
+    return null;
   },
 
   deleteStudent: async (id) => {

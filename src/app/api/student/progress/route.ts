@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { getStudentId } from "@/lib/auth-helpers";
+import { ensureStudentStats } from "@/lib/server/studentRewards";
 
 export async function GET(req: NextRequest) {
   if (!supabaseAdmin) {
@@ -13,6 +14,7 @@ export async function GET(req: NextRequest) {
   if (session instanceof NextResponse) return session;
 
   const { studentId } = session;
+  const stats = await ensureStudentStats(studentId);
 
   const { data, error } = await supabaseAdmin
     .from("teacher_student_progress")
@@ -22,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  return NextResponse.json(data ?? []);
+  return NextResponse.json({ progress: data ?? [], stats });
 }
 
 export async function DELETE(req: NextRequest) {

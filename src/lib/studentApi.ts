@@ -7,6 +7,9 @@ import type {
   StudentStepContent,
   StudentQuizSubmission,
   TeacherStudentProgress,
+  StudentProgressResponse,
+  StudentDailyQuizAnswer,
+  StudentDailyQuizResponse,
 } from "@/types/teacher-content";
 
 function getAppUrl() {
@@ -102,12 +105,49 @@ export async function submitQuiz(
 
 // ─── Progress ─────────────────────────────────────────────────────────────────
 
-export async function fetchStudentProgress(): Promise<TeacherStudentProgress[]> {
-  return studentFetch<TeacherStudentProgress[]>("/api/student/progress");
+export async function fetchStudentProgress(): Promise<StudentProgressResponse> {
+  return studentFetch<StudentProgressResponse>("/api/student/progress");
+}
+
+// ─── Daily quiz ───────────────────────────────────────────────────────────────
+
+export async function fetchStudentDailyQuiz(): Promise<StudentDailyQuizResponse> {
+  return studentFetch<StudentDailyQuizResponse>("/api/student/daily-quiz");
+}
+
+export async function submitStudentDailyQuiz(
+  answers: StudentDailyQuizAnswer[],
+): Promise<StudentDailyQuizResponse> {
+  return studentFetch<StudentDailyQuizResponse>("/api/student/daily-quiz", {
+    method: "POST",
+    body: JSON.stringify({ answers }),
+  });
 }
 
 // ─── Session info ─────────────────────────────────────────────────────────────
 
 export async function fetchStudentSession(): Promise<StudentSession> {
   return studentFetch<StudentSession>("/api/student/login");
+}
+
+// ─── Student chatbot ──────────────────────────────────────────────────────────
+
+export type StudentChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export type StudentChatResponse = {
+  answer: string;
+  refused: boolean;
+};
+
+export async function sendStudentChatMessage(
+  message: string,
+  history: StudentChatMessage[] = []
+): Promise<StudentChatResponse> {
+  return studentFetch<StudentChatResponse>("/api/student/chat", {
+    method: "POST",
+    body: JSON.stringify({ message, history }),
+  });
 }

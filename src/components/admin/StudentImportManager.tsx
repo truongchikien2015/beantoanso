@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
 import { supabase } from "@/lib/supabase";
 import { parseStudentFile, validateAndPrepareImport } from "@/lib/excelParser";
-import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List } from "lucide-react";
+import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound } from "lucide-react";
 
 const SAMPLE_HEADERS = ["nickname", "email", "class_name", "student_code", "password"];
 
@@ -16,7 +16,7 @@ interface ImportedCredential {
 export function StudentImportManager() {
   const {
     students, learningPaths, fetchStudents, fetchLearningPaths,
-    deleteStudent, assignPathToStudent, error, clearError,
+    deleteStudent, assignPathToStudent, resetStudentPassword, error, clearError,
   } = useTeacherContentStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,6 +25,11 @@ export function StudentImportManager() {
   const [importedCredentials, setImportedCredentials] = useState<ImportedCredential[] | null>(null);
   const [assignTarget, setAssignTarget] = useState<string | null>(null);
   const [assignPathId, setAssignPathId] = useState("");
+  const [resetTarget, setResetTarget] = useState<{ id: string; nickname: string } | null>(null);
+  const [resetForm, setResetForm] = useState({ newPassword: "", confirmPassword: "" });
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState("");
 
   // Multi-select state for bulk assign
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
@@ -203,6 +208,49 @@ export function StudentImportManager() {
     await assignPathToStudent(studentId, assignPathId);
     setAssignTarget(null);
     setAssignPathId("");
+  };
+
+  const openResetPassword = (student: { id: string; nickname: string }) => {
+    setResetTarget({ id: student.id, nickname: student.nickname });
+    setResetForm({ newPassword: "", confirmPassword: "" });
+    setResetError("");
+    setResetSuccess("");
+  };
+
+  const closeResetPassword = () => {
+    if (resetLoading) return;
+    setResetTarget(null);
+    setResetForm({ newPassword: "", confirmPassword: "" });
+    setResetError("");
+    setResetSuccess("");
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetTarget) return;
+    setResetError("");
+    setResetSuccess("");
+    if (resetForm.newPassword.length < 6) {
+      setResetError("Mật khẩu phải có ít nhất 6 ký tự.");
+      return;
+    }
+    if (resetForm.newPassword !== resetForm.confirmPassword) {
+      setResetError("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+    setResetLoading(true);
+    const errorMessage = await resetStudentPassword(resetTarget.id, resetForm.newPassword);
+    setResetLoading(false);
+    if (errorMessage) {
+      setResetError(errorMessage);
+      return;
+    }
+    setResetSuccess("Đã đặt lại mật khẩu học sinh.");
+    setTimeout(() => {
+      setResetTarget(null);
+      setResetSuccess("");
+      setResetForm({ newPassword: "", confirmPassword: "" });
+    }, 1200);
   };
 
   // Bulk select handlers
@@ -506,7 +554,7 @@ export function StudentImportManager() {
 
         {viewMode === "list" && filteredStudents.length > 0 && (
           <div className="overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm">
-            <div className="hidden grid-cols-[44px_1.2fr_0.55fr_0.7fr_1.2fr_92px] gap-3 bg-sky-50 px-4 py-3 text-xs font-bold uppercase tracking-wide text-sky-900 md:grid">
+            <div className="hidden grid-cols-[44px_1.2fr_0.55fr_0.7fr_1.2fr_132px] gap-3 bg-sky-50 px-4 py-3 text-xs font-bold uppercase tracking-wide text-sky-900 md:grid">
               <span></span>
               <span>Học sinh</span>
               <span>Lớp</span>
@@ -518,7 +566,7 @@ export function StudentImportManager() {
               {filteredStudents.map(student => {
                 const path = learningPaths.find(p => p.id === student.assigned_path_id);
                 return (
-                  <div key={student.id} className={`grid gap-3 px-4 py-3 transition hover:bg-sky-50/50 md:grid-cols-[44px_1.2fr_0.55fr_0.7fr_1.2fr_92px] md:items-center ${selectedStudents.has(student.id) ? "bg-indigo-50/70" : ""}`}>
+                  <div key={student.id} className={`grid gap-3 px-4 py-3 transition hover:bg-sky-50/50 md:grid-cols-[44px_1.2fr_0.55fr_0.7fr_1.2fr_132px] md:items-center ${selectedStudents.has(student.id) ? "bg-indigo-50/70" : ""}`}>
                     <div className="flex items-center justify-between md:block">
                       <input
                         type="checkbox"
@@ -533,6 +581,9 @@ export function StudentImportManager() {
                             <Plus size={14} />
                           </button>
                         )}
+                        <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
+                          <KeyRound size={14} />
+                        </button>
                         <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
                           <Trash2 size={14} />
                         </button>
@@ -559,6 +610,9 @@ export function StudentImportManager() {
                           <Plus size={14} />
                         </button>
                       )}
+                      <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
+                        <KeyRound size={14} />
+                      </button>
                       <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
                         <Trash2 size={14} />
                       </button>
@@ -622,6 +676,9 @@ export function StudentImportManager() {
                         <Plus size={14} />
                       </button>
                     )}
+                    <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
+                      <KeyRound size={14} />
+                    </button>
                     <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
                       <Trash2 size={14} />
                     </button>
@@ -645,6 +702,81 @@ export function StudentImportManager() {
           </div>
         )}
       </div>
+
+      {/* Reset Password Modal */}
+      {resetTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={(e) => { if (e.target === e.currentTarget) closeResetPassword(); }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <KeyRound size={18} className="text-amber-600" />
+                Đổi mật khẩu học sinh
+              </h3>
+              <button onClick={closeResetPassword} className="Btn Btn--ghost Btn--sm" disabled={resetLoading}>
+                <X size={14} />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-500">
+              Học sinh: <strong className="text-slate-800">{resetTarget.nickname}</strong>
+            </p>
+
+            <form onSubmit={handleResetPassword} className="space-y-3">
+              <label className="space-y-1 block">
+                <span className="text-sm font-medium text-gray-700">Mật khẩu mới</span>
+                <input
+                  className="Input w-full"
+                  type="password"
+                  value={resetForm.newPassword}
+                  onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
+                  placeholder="Ít nhất 6 ký tự"
+                  autoFocus
+                />
+              </label>
+
+              <label className="space-y-1 block">
+                <span className="text-sm font-medium text-gray-700">Xác nhận mật khẩu</span>
+                <input
+                  className="Input w-full"
+                  type="password"
+                  value={resetForm.confirmPassword}
+                  onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
+                  placeholder="Nhập lại mật khẩu mới"
+                />
+              </label>
+
+              {resetError && (
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                  {resetError}
+                </div>
+              )}
+              {resetSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">
+                  {resetSuccess}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end pt-2">
+                <button type="button" onClick={closeResetPassword} className="Btn Btn--secondary Btn--sm" disabled={resetLoading}>
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={resetLoading || !resetForm.newPassword || !resetForm.confirmPassword}
+                  className="Btn Btn--primary Btn--sm flex items-center gap-1"
+                >
+                  {resetLoading ? "Đang đổi..." : <><KeyRound size={14} /> Đổi mật khẩu</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Bulk Assign Modal */}
       {showBulkAssign && (

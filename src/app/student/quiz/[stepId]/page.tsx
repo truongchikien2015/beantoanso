@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { getStudentToken, clearStudentToken } from "@/lib/studentApi";
 import type { StudentStepContent, TeacherQuestion } from "@/types/teacher-content";
 import { topicLabels } from "@/data/quizQuestions";
+import { StudentChatbot } from "@/components/student/StudentChatbot";
 
 
 
@@ -127,6 +128,7 @@ export default function QuizPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [xpAwarded, setXpAwarded] = useState(0);
   const [breakdown, setBreakdown] = useState<{ total: number; correct: number; unanswered: number } | null>(null);
   const [answerBreakdown, setAnswerBreakdown] = useState<AnswerBreakdown[]>([]);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, "A" | "B" | "C">>({});
@@ -218,6 +220,9 @@ export default function QuizPage() {
       if (json.answer_breakdown) {
         setAnswerBreakdown(json.answer_breakdown);
       }
+      if (typeof json.xp_awarded === "number") {
+        setXpAwarded(json.xp_awarded);
+      }
 
       setSubmitted(true);
     } catch {
@@ -226,6 +231,45 @@ export default function QuizPage() {
       setSubmitting(false);
     }
   }, [step, selectedAnswers, router]);
+
+  const handleCompleteTopic = useCallback(async () => {
+    if (!step) return;
+    setSubmitting(true);
+    setError("");
+
+    try {
+      const token = getStudentToken();
+      if (!token) { router.replace("/student/login"); return; }
+
+      const res = await fetch(`/api/student/quiz`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          path_id: step.path_id,
+          step_id: step.step_id,
+          score: 100,
+        }),
+      });
+
+      if (!res.ok) {
+        const b = await res.json();
+        setError(b.error ?? "Lỗi lưu kết quả");
+        return;
+      }
+
+      const json = await res.json();
+      setScore(100);
+      setXpAwarded(typeof json.xp_awarded === "number" ? json.xp_awarded : 0);
+      setSubmitted(true);
+    } catch {
+      setError("Lỗi lưu kết quả");
+    } finally {
+      setSubmitting(false);
+    }
+  }, [step, router]);
 
   // Score calculation
   const totalQ = step?.questions?.length ?? 0;
@@ -319,6 +363,11 @@ export default function QuizPage() {
                passed ? "🎊 Bạn đã hoàn thành bài quiz này!" : 
                "📚 Học lại bài và thử lại nhé!"}
             </p>
+            {xpAwarded > 0 && (
+              <p className="mt-3 inline-flex rounded-full bg-[var(--kid-yellow-new)]/30 px-4 py-2 text-base font-black text-amber-800">
+                +{xpAwarded} XP tích lũy
+              </p>
+            )}
           </div>
 
           {/* Answer breakdown - Kid Friendly */}
@@ -400,6 +449,8 @@ export default function QuizPage() {
             </div>
           )}
 
+          <StudentChatbot />
+
           {/* Actions - Adventure Style */}
           <div className="space-y-3 pt-2">
             <button
@@ -415,6 +466,7 @@ export default function QuizPage() {
                   setSelectedAnswers({});
                   setBreakdown(null);
                   setAnswerBreakdown([]);
+                  setXpAwarded(0);
                   setCurrentQ(0);
                 }}
                 className="btn-kid btn-kid-teal w-full justify-center py-4 text-lg"
@@ -444,11 +496,15 @@ export default function QuizPage() {
         <main className="max-w-xl mx-auto px-4 py-6">
           <TopicContent step={step} />
           <button
-            onClick={() => router.push("/student/dashboard?view=1")}
+            onClick={handleCompleteTopic}
+            disabled={submitting}
             className="btn-kid btn-kid-teal w-full justify-center mt-4 py-3"
           >
-            Hoàn thành bài học
+            {submitting ? "⏳ Đang lưu..." : "Hoàn thành bài học"}
           </button>
+          <div className="mt-4">
+            <StudentChatbot />
+          </div>
         </main>
       </div>
     );
@@ -547,6 +603,8 @@ export default function QuizPage() {
             </button>
           ))}
         </div>
+
+        <StudentChatbot />
       </main>
     </div>
   );
