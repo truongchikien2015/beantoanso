@@ -227,7 +227,7 @@ export function HomeScreen({
             </h2>
             <div className="space-y-4 text-slate-500 text-sm font-bold leading-relaxed">
               <p>
-                Xin chào! Mình là Trương Chí Kiên. Nhận thấy trẻ em ngày nay tiếp xúc với Internet từ rất sớm nhưng lại thiếu các kỹ năng tự bảo vệ, mình đã tạo ra &quot;Bé An Toàn Số&quot; như một dự án tốt nghiệp với mong muốn đóng góp một phần nhỏ bé cho cộng đồng.
+                Xin chào! Mình là Trương Chí Kiên. Nhận thấy trẻ em ngày nay tiếp xúc với Internet từ rất sớm nhưng lại thiếu các kỹ năng tự bảo vệ, mình đã tạo ra &quot;Bé An Toàn Số&quot; với mong muốn đóng góp một phần nhỏ bé cho cộng đồng.
               </p>
               <p>
                 Trang web được thiết kế như một trò chơi tương tác, nơi các em có thể hóa thân thành những &quot;Hiệp sĩ không gian mạng&quot;, trải qua các thử thách để học cách nhận biết lừa đảo, bảo vệ thông tin cá nhân và ứng xử văn minh trên môi trường số.
