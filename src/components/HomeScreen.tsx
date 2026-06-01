@@ -107,8 +107,8 @@ export function HomeScreen({
       <section className="relative pt-12 pb-12 px-6 max-w-6xl mx-auto flex flex-col items-center flex-1">
         {/* Mascot Avatars */}
         <div className="mb-6 flex items-center justify-center gap-4">
-          <div className="w-14 h-14 bg-rose-100 border-2 border-white shadow-md rounded-full flex items-center justify-center text-2xl -rotate-6 animate-float">
-            👧
+          <div className="w-14 h-14 bg-sky-100 border-2 border-white shadow-md rounded-full flex items-center justify-center text-2xl -rotate-6 animate-float">
+            👦
           </div>
           <div className="w-14 h-14 bg-emerald-100 border-2 border-white shadow-md rounded-full flex items-center justify-center text-2xl rotate-6 animate-float delay-150">
             🤖

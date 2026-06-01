@@ -35,7 +35,7 @@ export function levelInfo(xp: number): LevelInfo {
 }
 
 const AVATARS = [
-  { id: "kid", emoji: "👧", name: "Bé Kiên", unlockLevel: 1 },
+  { id: "kid", emoji: "👦", name: "Bé Kiên", unlockLevel: 1 },
   { id: "boy", emoji: "👦", name: "Bé Bo", unlockLevel: 1 },
   { id: "robot", emoji: "🤖", name: "Robot", unlockLevel: 2 },
   { id: "ninja", emoji: "🥷", name: "Ninja", unlockLevel: 3 },
