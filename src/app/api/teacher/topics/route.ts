@@ -1,8 +1,9 @@
 // GET /api/teacher/topics - List all topics (default + custom)
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherTopic } from "@/lib/db/models/TeacherTopic";
 import { getTeacherUid } from "@/lib/auth-helpers";
-import { topicLabels, QuizTopic } from "@/data/quizQuestions";
+import { topicLabels } from "@/data/quizQuestions";
 
 // GET - List default topics + teacher's custom topics
 export async function GET(req: NextRequest) {
@@ -10,35 +11,26 @@ export async function GET(req: NextRequest) {
   if (authResult instanceof NextResponse) return authResult;
   const { uid } = authResult;
 
-  // Get teacher's custom topics
-  const { data: customTopics, error: customError } = await supabaseAdmin!
-    .from("teacher_topics")
-    .select("*")
-    .eq("created_by", uid)
-    .eq("is_active", true)
-    .order("label");
+  await connectDB();
 
-  if (customError) {
-    return NextResponse.json({ error: customError.message }, { status: 500 });
-  }
+  const customTopics = await TeacherTopic.find({ created_by: uid, is_active: true })
+    .sort({ label: 1 })
+    .lean();
 
-  // Combine default topics with custom topics
   const defaultTopics = Object.entries(topicLabels).map(([key, label]) => ({
     topic_key: key,
     label,
     is_default: true,
   }));
 
-  const customTopicsList = (customTopics ?? []).map((t) => ({
+  const customTopicsList = customTopics.map((t) => ({
     topic_key: t.topic_key,
     label: t.label,
     is_default: false,
-    id: t.id,
+    id: t._id.toString(),
   }));
 
-  const allTopics = [...defaultTopics, ...customTopicsList];
-
-  return NextResponse.json(allTopics);
+  return NextResponse.json([...defaultTopics, ...customTopicsList]);
 }
 
 // POST - Create a custom topic
@@ -48,9 +40,7 @@ export async function POST(req: NextRequest) {
   const { uid } = authResult;
 
   let body: { topic_key: string; label: string };
-  try {
-    body = await req.json();
-  } catch {
+  try { body = await req.json(); } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
@@ -64,37 +54,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Thiếu tên chủ đề" }, { status: 400 });
   }
 
-  // Check if topic_key already exists in default topics
   if (topic_key in topicLabels) {
     return NextResponse.json({ error: "Mã chủ đề đã tồn tại trong hệ thống" }, { status: 400 });
   }
 
-  // Check if teacher already has this topic_key
-  const { data: existing } = await supabaseAdmin!
-    .from("teacher_topics")
-    .select("id")
-    .eq("created_by", uid)
-    .eq("topic_key", topic_key.trim())
-    .single();
+  await connectDB();
 
+  const existing = await TeacherTopic.findOne({ created_by: uid, topic_key: topic_key.trim() }).lean();
   if (existing) {
     return NextResponse.json({ error: "Bạn đã tạo chủ đề này rồi" }, { status: 400 });
   }
 
-  // Create the topic
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_topics")
-    .insert({
-      created_by: uid,
-      topic_key: topic_key.trim(),
-      label: label.trim(),
-    })
-    .select()
-    .single();
+  const doc = await TeacherTopic.create({
+    created_by: uid,
+    topic_key: topic_key.trim(),
+    label: label.trim(),
+  });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json({
+    id: doc._id.toString(),
+    created_by: doc.created_by,
+    topic_key: doc.topic_key,
+    label: doc.label,
+    is_active: doc.is_active,
+    created_at: doc.created_at,
+    updated_at: doc.updated_at,
+  }, { status: 201 });
 }

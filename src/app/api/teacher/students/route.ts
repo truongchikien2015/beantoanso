@@ -1,7 +1,8 @@
 // GET /api/teacher/students — list all students for the authenticated teacher
 // POST /api/teacher/students — import students (bulk)
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
 import { getTeacherUid } from "@/lib/auth-helpers";
 import type { ImportStudentInput, ImportResult } from "@/types/teacher-content";
 
@@ -11,21 +12,25 @@ export async function GET(req: NextRequest) {
   if (result instanceof NextResponse) return result;
   const { uid } = result;
 
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_students")
-    .select("*, teacher_learning_paths(id, title)")
-    .eq("created_by", uid)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+  await connectDB();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  const data = await TeacherStudent.find({ created_by: uid, is_active: true })
+    .sort({ created_at: -1 })
+    .select("-password_hash")
+    .lean();
 
-  const students = (data ?? []).map((s) => ({
-    id: s.id, created_by: s.created_by, nickname: s.nickname,
-    email: s.email, class_name: s.class_name, student_code: s.student_code,
-    assigned_path_id: s.assigned_path_id, assigned_at: s.assigned_at,
-    is_active: s.is_active, created_at: s.created_at, updated_at: s.updated_at,
-    // Strip password_hash
+  const students = data.map((s) => ({
+    id: s._id.toString(),
+    created_by: s.created_by,
+    nickname: s.nickname,
+    email: s.email,
+    class_name: s.class_name,
+    student_code: s.student_code,
+    assigned_path_id: s.assigned_path_id?.toString() ?? null,
+    assigned_at: s.assigned_at,
+    is_active: s.is_active,
+    created_at: s.created_at,
+    updated_at: s.updated_at,
   }));
 
   return NextResponse.json(students);
@@ -47,6 +52,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "students array required" }, { status: 400 });
   }
 
+  await connectDB();
+
   // Hash passwords with bcryptjs
   const bcrypt = await import("bcryptjs");
   const results: Array<{ nickname: string; student_code: string; password: string }> = [];
@@ -63,30 +70,25 @@ export async function POST(req: NextRequest) {
 
     try {
       const hash = await bcrypt.hash(s.password, 10);
-      const { data, error } = await supabaseAdmin!
-        .from("teacher_students")
-        .insert({
-          created_by: uid,
-          nickname: s.nickname,
-          email: s.email ?? null,
-          class_name: s.class_name ?? null,
-          student_code: s.student_code,
-          password_hash: hash,
-          is_active: true,
-        })
-        .select("id, nickname, student_code")
-        .single();
 
-      if (error) {
-        if (error.code === "23505") {
-          errors.push({ row, message: `Mã học sinh "${s.student_code}" đã tồn tại` });
-        } else {
-          errors.push({ row, message: error.message });
-        }
+      // Check for duplicate student_code
+      const existing = await TeacherStudent.findOne({ student_code: s.student_code }).lean();
+      if (existing) {
+        errors.push({ row, message: `Mã học sinh "${s.student_code}" đã tồn tại` });
         continue;
       }
 
-      results.push({ nickname: data.nickname, student_code: data.student_code, password: s.password });
+      const doc = await TeacherStudent.create({
+        created_by: uid,
+        nickname: s.nickname,
+        email: s.email ?? null,
+        class_name: s.class_name ?? null,
+        student_code: s.student_code,
+        password_hash: hash,
+        is_active: true,
+      });
+
+      results.push({ nickname: doc.nickname, student_code: doc.student_code, password: s.password });
     } catch {
       errors.push({ row, message: "Lỗi băm mật khẩu" });
     }

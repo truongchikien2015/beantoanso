@@ -1,5 +1,5 @@
 {
-  "last_turn_at": "2026-05-31T06:07:07.933Z",
-  "turn_count": 71,
-  "last_agent_output": "## Bug Report\n\n**Symptom**: Khi đăng nhập học sinh sai/thất bại trong modal chung, UI có the"
+  "last_turn_at": "2026-05-31T11:22:57.366Z",
+  "turn_count": 72,
+  "last_agent_output": "Đã fix nguyên nhân production trả `User not allowed` khi đăng ký student self-registered.\n\nRoo"
 }

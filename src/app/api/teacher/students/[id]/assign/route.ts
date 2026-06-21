@@ -1,7 +1,19 @@
 // POST /api/teacher/students/[id]/assign — assign a learning path to a student
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
+import { TeacherLearningPath } from "@/lib/db/models/TeacherLearningPath";
 import { getTeacherUid } from "@/lib/auth-helpers";
+import mongoose from "mongoose";
+
+function toObjectId(id: string): mongoose.Types.ObjectId {
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    return new mongoose.Types.ObjectId(id);
+  }
+  const crypto = require("crypto");
+  const hash = crypto.createHash("md5").update(id.toString()).digest("hex");
+  return new mongoose.Types.ObjectId(hash.substring(0, 24));
+}
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -12,50 +24,63 @@ export async function POST(req: NextRequest, context: RouteContext) {
   const { id: studentId } = await context.params;
 
   let body: { path_id: string };
-  try { body = await req.json(); } catch {
+  try {
+    body = await req.json();
+  } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   const { path_id } = body;
   if (!path_id) return NextResponse.json({ error: "path_id required" }, { status: 400 });
 
-  // Verify student belongs to this teacher
-  const { data: student, error: studentError } = await supabaseAdmin!
-    .from("teacher_students")
-    .select("id")
-    .eq("id", studentId)
-    .eq("created_by", uid)
-    .single();
+  await connectDB();
 
-  if (studentError || !student) {
+  const studentObjectId = toObjectId(studentId);
+  const pathObjectId = toObjectId(path_id);
+
+  // Verify student belongs to this teacher
+  const student = await TeacherStudent.findOne({
+    _id: studentObjectId,
+    created_by: uid,
+    is_active: true,
+  }).lean();
+
+  if (!student) {
     return NextResponse.json({ error: "Student not found" }, { status: 404 });
   }
 
   // Verify path belongs to this teacher
-  const { data: path, error: pathError } = await supabaseAdmin!
-    .from("teacher_learning_paths")
-    .select("id")
-    .eq("id", path_id)
-    .eq("created_by", uid)
-    .single();
+  const path = await TeacherLearningPath.findOne({
+    _id: pathObjectId,
+    created_by: uid,
+    is_active: true,
+  }).lean();
 
-  if (pathError || !path) {
+  if (!path) {
     return NextResponse.json({ error: "Learning path not found" }, { status: 404 });
   }
 
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_students")
-    .update({ assigned_path_id: path_id, assigned_at: new Date().toISOString() })
-    .eq("id", studentId)
-    .select()
-    .single();
+  const updated = await TeacherStudent.findOneAndUpdate(
+    { _id: studentObjectId, created_by: uid },
+    { assigned_path_id: pathObjectId, assigned_at: new Date() },
+    { new: true }
+  ).lean();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (!updated) {
+    return NextResponse.json({ error: "Failed to update assignment" }, { status: 500 });
+  }
 
   return NextResponse.json({
-    id: data.id, created_by: data.created_by, nickname: data.nickname,
-    email: data.email, class_name: data.class_name, student_code: data.student_code,
-    assigned_path_id: data.assigned_path_id, assigned_at: data.assigned_at,
-    is_active: data.is_active, created_at: data.created_at, updated_at: data.updated_at,
+    id: updated._id.toString(),
+    created_by: updated.created_by,
+    nickname: updated.nickname,
+    email: updated.email,
+    class_name: updated.class_name,
+    student_code: updated.student_code,
+    assigned_path_id: updated.assigned_path_id?.toString() ?? null,
+    assigned_at: updated.assigned_at,
+    is_active: updated.is_active,
+    created_at: updated.created_at,
+    updated_at: updated.updated_at,
   });
 }

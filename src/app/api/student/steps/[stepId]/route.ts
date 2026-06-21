@@ -1,16 +1,28 @@
 // GET /api/student/steps/[stepId] — get step content (topic or quiz questions)
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherLearningPathStep } from "@/lib/db/models/TeacherLearningPathStep";
+import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
+import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
+import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
 import { getStudentId } from "@/lib/auth-helpers";
 import type { StudentStepContent } from "@/types/teacher-content";
+import mongoose from "mongoose";
+
+function toObjectId(id: string): mongoose.Types.ObjectId {
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    return new mongoose.Types.ObjectId(id);
+  }
+  const crypto = require("crypto");
+  const hash = crypto.createHash("md5").update(id.toString()).digest("hex");
+  return new mongoose.Types.ObjectId(hash.substring(0, 24));
+}
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ stepId: string }> }
 ) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  await connectDB();
 
   const session = getStudentId(req);
   if (session instanceof NextResponse) return session;
@@ -18,34 +30,31 @@ export async function GET(
   const { studentId } = session;
   const { stepId } = await params;
 
-  // Get the step
-  const { data: step, error: stepError } = await supabaseAdmin
-    .from("teacher_learning_path_steps")
-    .select("id, path_id, step_order, step_type, topic_id, question_set_id")
-    .eq("id", stepId)
-    .single();
+  const stepObjectId = toObjectId(stepId);
+  const studentObjectId = toObjectId(studentId);
 
-  if (stepError || !step) {
+  // Get the step
+  const step = await TeacherLearningPathStep.findOne({ _id: stepObjectId }).lean();
+
+  if (!step) {
     return NextResponse.json({ error: "Không tìm thấy bước học" }, { status: 404 });
   }
 
   // Verify student is assigned to this path
-  const { data: student } = await supabaseAdmin
-    .from("teacher_students")
-    .select("assigned_path_id, created_by")
-    .eq("id", studentId)
-    .single();
+  const student = await TeacherStudent.findOne({ _id: studentObjectId, is_active: true })
+    .select("assigned_path_id created_by")
+    .lean();
 
-  if (!student || student.assigned_path_id !== step.path_id) {
+  if (!student || student.assigned_path_id?.toString() !== step.path_id.toString()) {
     return NextResponse.json({ error: "Bạn không có quyền truy cập bước học này" }, { status: 403 });
   }
 
   const result: StudentStepContent = {
-    step_id: step.id,
-    path_id: step.path_id,
+    step_id: step._id.toString(),
+    path_id: step.path_id.toString(),
     step_type: step.step_type,
     topic_id: step.topic_id,
-    question_set_id: step.question_set_id,
+    question_set_id: step.question_set_id?.toString() ?? null,
     step_order: step.step_order,
   };
 
@@ -53,42 +62,60 @@ export async function GET(
     result.topic = step.topic_id as import("@/data/quizQuestions").QuizTopic;
     result.topic_label = getTopicLabel(result.topic);
 
-    const { data: sets } = await supabaseAdmin
-      .from("teacher_question_sets")
-      .select("id")
-      .eq("created_by", student.created_by)
-      .eq("topic_id", step.topic_id)
-      .eq("is_active", true);
+    const sets = await TeacherQuestionSet.find({
+      created_by: student.created_by,
+      topic_id: step.topic_id,
+      is_active: true,
+    })
+      .select("_id")
+      .lean();
 
-    const setIds = (sets ?? []).map((set) => set.id);
+    const setIds = sets.map((set) => set._id);
     if (setIds.length > 0) {
-      const { data: questions } = await supabaseAdmin
-        .from("teacher_questions")
-        .select("id, set_id, question, option_a, option_b, option_c, correct_option, explanation, is_active, created_at, updated_at")
-        .in("set_id", setIds)
-        .eq("is_active", true)
-        .limit(20);
+      const questions = await TeacherQuestion.find({
+        set_id: { $in: setIds },
+        is_active: true,
+      })
+        .limit(20)
+        .lean();
 
-      result.questions = (questions ?? []).map((q) => ({
-        ...q,
+      result.questions = questions.map((q) => ({
+        id: q._id.toString(),
+        set_id: q.set_id.toString(),
+        question: q.question,
+        option_a: q.option_a,
+        option_b: q.option_b,
+        option_c: q.option_c,
         correct_option: q.correct_option as "A" | "B" | "C",
+        explanation: q.explanation,
+        is_active: q.is_active,
+        created_at: q.created_at.toISOString(),
+        updated_at: q.updated_at.toISOString(),
       }));
       result.question_count = result.questions.length;
     }
   }
 
   if (step.step_type === "question_set" && step.question_set_id) {
-    const { data: questions } = await supabaseAdmin
-      .from("teacher_questions")
-      .select("id, set_id, question, option_a, option_b, option_c, correct_option, explanation, is_active, created_at, updated_at")
-      .eq("set_id", step.question_set_id)
-      .eq("is_active", true);
+    const questions = await TeacherQuestion.find({
+      set_id: step.question_set_id,
+      is_active: true,
+    }).lean();
 
-    result.questions = (questions ?? []).map((q) => ({
-      ...q,
+    result.questions = questions.map((q) => ({
+      id: q._id.toString(),
+      set_id: q.set_id.toString(),
+      question: q.question,
+      option_a: q.option_a,
+      option_b: q.option_b,
+      option_c: q.option_c,
       correct_option: q.correct_option as "A" | "B" | "C",
+      explanation: q.explanation,
+      is_active: q.is_active,
+      created_at: q.created_at.toISOString(),
+      updated_at: q.updated_at.toISOString(),
     }));
-    result.question_count = (questions ?? []).length;
+    result.question_count = questions.length;
   }
 
   return NextResponse.json(result);

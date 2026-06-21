@@ -1,7 +1,9 @@
 // GET /api/teacher/question-sets/[id]/questions
 // POST /api/teacher/question-sets/[id]/questions
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
+import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
 import { getTeacherUid } from "@/lib/auth-helpers";
 import type { CreateQuestionInput } from "@/types/teacher-content";
 
@@ -13,30 +15,33 @@ export async function GET(req: NextRequest, context: RouteContext) {
   const { uid } = result;
   const { id: setId } = await context.params;
 
-  // Verify ownership
-  const { data: set, error: setError } = await supabaseAdmin!
-    .from("teacher_question_sets")
-    .select("id")
-    .eq("id", setId)
-    .eq("created_by", uid)
-    .single();
+  await connectDB();
 
-  if (setError || !set) {
+  // Verify ownership
+  const set = await TeacherQuestionSet.findOne({ _id: setId, created_by: uid }).lean();
+  if (!set) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_questions")
-    .select("*")
-    .eq("set_id", setId)
-    .eq("is_active", true)
-    .order("created_at", { ascending: true });
+  const questions = await TeacherQuestion.find({ set_id: setId, is_active: true })
+    .sort({ created_at: 1 })
+    .lean();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const mapped = questions.map((q) => ({
+    id: q._id.toString(),
+    set_id: q.set_id.toString(),
+    question: q.question,
+    option_a: q.option_a,
+    option_b: q.option_b,
+    option_c: q.option_c,
+    correct_option: q.correct_option,
+    explanation: q.explanation,
+    is_active: q.is_active,
+    created_at: q.created_at,
+    updated_at: q.updated_at,
+  }));
 
-  return NextResponse.json(data ?? []);
+  return NextResponse.json(mapped);
 }
 
 export async function POST(req: NextRequest, context: RouteContext) {
@@ -45,15 +50,11 @@ export async function POST(req: NextRequest, context: RouteContext) {
   const { uid } = result;
   const { id: setId } = await context.params;
 
-  // Verify ownership
-  const { data: set, error: setError } = await supabaseAdmin!
-    .from("teacher_question_sets")
-    .select("id")
-    .eq("id", setId)
-    .eq("created_by", uid)
-    .single();
+  await connectDB();
 
-  if (setError || !set) {
+  // Verify ownership
+  const set = await TeacherQuestionSet.findOne({ _id: setId, created_by: uid }).lean();
+  if (!set) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
@@ -71,15 +72,27 @@ export async function POST(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "correct_option must be A, B, or C" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_questions")
-    .insert({ set_id: setId, question, option_a, option_b, option_c, correct_option, explanation: explanation ?? null })
-    .select()
-    .single();
+  const doc = await TeacherQuestion.create({
+    set_id: setId,
+    question,
+    option_a,
+    option_b,
+    option_c,
+    correct_option,
+    explanation: explanation ?? null,
+  });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
-
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json({
+    id: doc._id.toString(),
+    set_id: doc.set_id.toString(),
+    question: doc.question,
+    option_a: doc.option_a,
+    option_b: doc.option_b,
+    option_c: doc.option_c,
+    correct_option: doc.correct_option,
+    explanation: doc.explanation,
+    is_active: doc.is_active,
+    created_at: doc.created_at,
+    updated_at: doc.updated_at,
+  }, { status: 201 });
 }

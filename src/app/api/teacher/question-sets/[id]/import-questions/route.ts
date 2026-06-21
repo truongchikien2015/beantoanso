@@ -1,9 +1,21 @@
 // POST /api/teacher/question-sets/[id]/import-questions
 // Batch import questions from Excel file
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
+import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
 import { getTeacherUid } from "@/lib/auth-helpers";
 import type { CreateQuestionInput, QuestionImportResult } from "@/types/teacher-content";
+import mongoose from "mongoose";
+
+function toObjectId(id: string): mongoose.Types.ObjectId {
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    return new mongoose.Types.ObjectId(id);
+  }
+  const crypto = require("crypto");
+  const hash = crypto.createHash("md5").update(id.toString()).digest("hex");
+  return new mongoose.Types.ObjectId(hash.substring(0, 24));
+}
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -16,15 +28,18 @@ export async function POST(req: NextRequest, context: RouteContext) {
   const { uid } = authResult;
   const { id: setId } = await context.params;
 
-  // Verify question set ownership
-  const { data: questionSet, error: setError } = await supabaseAdmin!
-    .from("teacher_question_sets")
-    .select("id, title")
-    .eq("id", setId)
-    .eq("created_by", uid)
-    .single();
+  await connectDB();
 
-  if (setError || !questionSet) {
+  const setObjectId = toObjectId(setId);
+
+  // Verify question set ownership
+  const questionSet = await TeacherQuestionSet.findOne({
+    _id: setObjectId,
+    created_by: uid,
+    is_active: true,
+  }).lean();
+
+  if (!questionSet) {
     return NextResponse.json({ error: "Bộ câu hỏi không tìm thấy" }, { status: 404 });
   }
 
@@ -97,17 +112,26 @@ export async function POST(req: NextRequest, context: RouteContext) {
   // Insert valid questions
   let created = 0;
   if (validQuestions.length > 0) {
-    const { error: insertError } = await supabaseAdmin!
-      .from("teacher_questions")
-      .insert(validQuestions);
+    const docs = validQuestions.map((q) => ({
+      question_set_id: toObjectId(q.set_id),
+      question: q.question,
+      option_a: q.option_a,
+      option_b: q.option_b,
+      option_c: q.option_c,
+      correct_option: q.correct_option,
+      explanation: q.explanation,
+      is_active: true,
+    }));
 
-    if (insertError) {
+    try {
+      await TeacherQuestion.insertMany(docs);
+      created = validQuestions.length;
+    } catch (insertError: any) {
       return NextResponse.json(
         { error: `Lỗi khi lưu: ${insertError.message}` },
         { status: 500 }
       );
     }
-    created = validQuestions.length;
   }
 
   const result: QuestionImportResult = {

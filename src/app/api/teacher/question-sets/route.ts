@@ -1,7 +1,9 @@
 // GET /api/teacher/question-sets — list all question sets for the authenticated teacher
 // POST /api/teacher/question-sets — create a new question set
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
+import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
 import { getTeacherUid } from "@/lib/auth-helpers";
 import type { CreateQuestionSetInput } from "@/types/teacher-content";
 
@@ -11,30 +13,31 @@ export async function GET(req: NextRequest) {
   if (result instanceof NextResponse) return result;
   const { uid } = result;
 
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_question_sets")
-    .select("*, teacher_questions(count)")
-    .eq("created_by", uid)
-    .eq("is_active", true)
-    .order("created_at", { ascending: false });
+  await connectDB();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const sets = await TeacherQuestionSet.find({ created_by: uid, is_active: true })
+    .sort({ created_at: -1 })
+    .lean();
 
-  const sets = (data ?? []).map((s) => ({
-    id: s.id,
-    created_by: s.created_by,
-    title: s.title,
-    topic_id: s.topic_id,
-    description: s.description,
-    is_active: s.is_active,
-    created_at: s.created_at,
-    updated_at: s.updated_at,
-    question_count: Array.isArray(s.teacher_questions) ? s.teacher_questions.length : 0,
-  }));
+  // Count questions for each set
+  const setsWithCount = await Promise.all(
+    sets.map(async (s) => {
+      const count = await TeacherQuestion.countDocuments({ set_id: s._id });
+      return {
+        id: s._id.toString(),
+        created_by: s.created_by,
+        title: s.title,
+        topic_id: s.topic_id,
+        description: s.description,
+        is_active: s.is_active,
+        created_at: s.created_at,
+        updated_at: s.updated_at,
+        question_count: count,
+      };
+    })
+  );
 
-  return NextResponse.json(sets);
+  return NextResponse.json(setsWithCount);
 }
 
 // POST /api/teacher/question-sets
@@ -55,24 +58,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields: title, topic_id" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_question_sets")
-    .insert({ created_by: uid, title, topic_id, description: description ?? null })
-    .select()
-    .single();
+  await connectDB();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
+  const doc = await TeacherQuestionSet.create({
+    created_by: uid,
+    title,
+    topic_id,
+    description: description ?? null,
+  });
 
   return NextResponse.json({
-    id: data.id,
-    created_by: data.created_by,
-    title: data.title,
-    topic_id: data.topic_id,
-    description: data.description,
-    is_active: data.is_active,
-    created_at: data.created_at,
-    updated_at: data.updated_at,
+    id: doc._id.toString(),
+    created_by: doc.created_by,
+    title: doc.title,
+    topic_id: doc.topic_id,
+    description: doc.description,
+    is_active: doc.is_active,
+    created_at: doc.created_at,
+    updated_at: doc.updated_at,
   }, { status: 201 });
 }

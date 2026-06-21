@@ -1,7 +1,9 @@
 // PATCH /api/teacher/questions/[id]
 // DELETE /api/teacher/questions/[id]
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
+import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
 import { getTeacherUid } from "@/lib/auth-helpers";
 import type { UpdateQuestionInput } from "@/types/teacher-content";
 
@@ -13,21 +15,14 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
   const { uid } = result;
   const { id } = await context.params;
 
-  // Verify ownership via join
-  const { data: question, error: qError } = await supabaseAdmin!
-    .from("teacher_questions")
-    .select("id, set_id, teacher_question_sets!inner(created_by)")
-    .eq("id", id)
-    .single();
+  await connectDB();
 
-  if (qError || !question) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
+  // Find question and verify ownership via set
+  const question = await TeacherQuestion.findById(id).lean();
+  if (!question) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const set = question as unknown as { id: string; set_id: string; teacher_question_sets: { created_by: string } };
-  if (set.teacher_question_sets.created_by !== uid) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const set = await TeacherQuestionSet.findOne({ _id: question.set_id, created_by: uid }).lean();
+  if (!set) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   let body: UpdateQuestionInput;
   try { body = await req.json(); } catch {
@@ -49,18 +44,20 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
   if (explanation !== undefined) updates.explanation = explanation;
   if (is_active !== undefined) updates.is_active = is_active;
 
-  const { data, error } = await supabaseAdmin!
-    .from("teacher_questions")
-    .update(updates)
-    .eq("id", id)
-    .select()
-    .single();
+  const data = await TeacherQuestion.findByIdAndUpdate(id, updates, { new: true }).lean();
+  if (!data) return NextResponse.json({ error: "Update failed" }, { status: 400 });
 
-  if (error || !data) {
-    return NextResponse.json({ error: error?.message ?? "Update failed" }, { status: 400 });
-  }
-
-  return NextResponse.json(data);
+  return NextResponse.json({
+    id: data._id.toString(),
+    set_id: data.set_id.toString(),
+    question: data.question,
+    option_a: data.option_a,
+    option_b: data.option_b,
+    option_c: data.option_c,
+    correct_option: data.correct_option,
+    explanation: data.explanation,
+    is_active: data.is_active,
+  });
 }
 
 export async function DELETE(req: NextRequest, context: RouteContext) {
@@ -69,27 +66,16 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   const { uid } = result;
   const { id } = await context.params;
 
-  // Verify ownership
-  const { data: question, error: qError } = await supabaseAdmin!
-    .from("teacher_questions")
-    .select("id, teacher_question_sets!inner(created_by)")
-    .eq("id", id)
-    .single();
+  await connectDB();
 
-  if (qError || !question) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
+  const question = await TeacherQuestion.findById(id).lean();
+  if (!question) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const q = question as unknown as { id: string; teacher_question_sets: { created_by: string } };
-  if (q.teacher_question_sets.created_by !== uid) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const set = await TeacherQuestionSet.findOne({ _id: question.set_id, created_by: uid }).lean();
+  if (!set) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   // Soft-delete
-  await supabaseAdmin!
-    .from("teacher_questions")
-    .update({ is_active: false })
-    .eq("id", id);
+  await TeacherQuestion.findByIdAndUpdate(id, { is_active: false });
 
   return NextResponse.json({ success: true });
 }

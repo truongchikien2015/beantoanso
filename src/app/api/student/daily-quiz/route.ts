@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAnyStudentId } from "@/lib/auth-helpers";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherStudentDailyAttempt } from "@/lib/db/models/TeacherStudentDailyAttempt";
+import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
 import {
   DAILY_QUESTION_COUNT,
   XP_PER_CORRECT_ANSWER,
@@ -83,42 +85,68 @@ function buildAttemptResult(questions: QuestionRow[], attempt: AttemptRow): Stud
 }
 
 async function getAttempt(studentId: string, date: string): Promise<AttemptRow | null> {
-  const { data } = await supabaseAdmin!
-    .from("teacher_student_daily_attempts")
-    .select("question_ids, answers, correct_count, xp_awarded, completed_at")
-    .eq("student_id", studentId)
-    .eq("attempt_date", date)
-    .maybeSingle();
-
-  return (data as AttemptRow | null) ?? null;
+  const doc = await TeacherStudentDailyAttempt.findOne({
+    student_id: studentId,
+    attempt_date: date,
+  }).lean();
+  if (!doc) return null;
+  return {
+    question_ids: doc.question_ids,
+    answers: doc.answers.map((a: any) => ({
+      question_id: a.question_id,
+      selected_option: a.selected_option,
+      is_correct: a.is_correct,
+    })),
+    correct_count: doc.correct_count,
+    xp_awarded: doc.xp_awarded,
+    completed_at: doc.completed_at.toISOString(),
+  };
 }
 
 async function getQuestionsByIds(ids: string[]): Promise<QuestionRow[]> {
   if (ids.length === 0) return [];
-  const { data } = await supabaseAdmin!
-    .from("teacher_questions")
-    .select("id, question, option_a, option_b, option_c, correct_option, explanation")
-    .in("id", ids)
-    .eq("is_active", true);
+  const docs = await TeacherQuestion.find({
+    _id: { $in: ids },
+    is_active: true,
+  }).lean();
 
-  const byId = new Map((data ?? []).map((q) => [q.id, q as QuestionRow]));
-  return ids.map((id) => byId.get(id)).filter(Boolean) as QuestionRow[];
+  const byId = new Map(docs.map((q) => [q._id.toString(), q]));
+  return ids
+    .map((id) => {
+      const q = byId.get(id);
+      if (!q) return null;
+      return {
+        id: q._id.toString(),
+        question: q.question,
+        option_a: q.option_a,
+        option_b: q.option_b,
+        option_c: q.option_c,
+        correct_option: q.correct_option as "A" | "B" | "C",
+        explanation: q.explanation,
+      };
+    })
+    .filter(Boolean) as QuestionRow[];
 }
 
 async function getRandomQuestions(): Promise<QuestionRow[]> {
-  const { data } = await supabaseAdmin!
-    .from("teacher_questions")
-    .select("id, question, option_a, option_b, option_c, correct_option, explanation")
-    .eq("is_active", true)
-    .limit(250);
+  const docs = await TeacherQuestion.find({ is_active: true })
+    .limit(250)
+    .lean();
 
-  return shuffle((data ?? []) as QuestionRow[]).slice(0, DAILY_QUESTION_COUNT);
+  const shuffled = shuffle(docs);
+  return shuffled.slice(0, DAILY_QUESTION_COUNT).map((q) => ({
+    id: q._id.toString(),
+    question: q.question,
+    option_a: q.option_a,
+    option_b: q.option_b,
+    option_c: q.option_c,
+    correct_option: q.correct_option as "A" | "B" | "C",
+    explanation: q.explanation,
+  }));
 }
 
 export async function GET(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  await connectDB();
 
   const session = getAnyStudentId(req);
   if (session instanceof NextResponse) return session;
@@ -150,9 +178,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  await connectDB();
 
   const session = getAnyStudentId(req);
   if (session instanceof NextResponse) return session;
@@ -205,20 +231,44 @@ export async function POST(req: NextRequest) {
   const correctCount = storedAnswers.filter((answer) => answer.is_correct).length;
   const xpAwarded = correctCount * XP_PER_CORRECT_ANSWER;
 
-  const { data: attempt, error } = await supabaseAdmin
-    .from("teacher_student_daily_attempts")
-    .insert({
+  try {
+    const attemptDoc = await TeacherStudentDailyAttempt.create({
       student_id: session.studentId,
       attempt_date: date,
       question_ids: ids,
       answers: storedAnswers,
       correct_count: correctCount,
       xp_awarded: xpAwarded,
-    })
-    .select("question_ids, answers, correct_count, xp_awarded, completed_at")
-    .single();
+    });
 
-  if (error) {
+    const attemptData: AttemptRow = {
+      question_ids: attemptDoc.question_ids,
+      answers: attemptDoc.answers.map((a: any) => ({
+        question_id: a.question_id,
+        selected_option: a.selected_option,
+        is_correct: a.is_correct,
+      })),
+      correct_count: attemptDoc.correct_count,
+      xp_awarded: attemptDoc.xp_awarded,
+      completed_at: attemptDoc.completed_at.toISOString(),
+    };
+
+    await awardStudentXp({
+      studentId: session.studentId,
+      source: "daily_quiz",
+      xp: xpAwarded,
+      metadata: { date, correct_count: correctCount, total: DAILY_QUESTION_COUNT },
+    });
+    const stats = await completeDailyStreak(session.studentId);
+
+    return NextResponse.json({
+      date,
+      completed: true,
+      stats,
+      questions: publicQuestions(questions),
+      result: buildAttemptResult(questions, attemptData),
+    } satisfies StudentDailyQuizResponse);
+  } catch (error: any) {
     const current = await getAttempt(session.studentId, date);
     if (current) {
       const currentQuestions = await getQuestionsByIds(current.question_ids);
@@ -230,22 +280,6 @@ export async function POST(req: NextRequest) {
         result: buildAttemptResult(currentQuestions, current),
       } satisfies StudentDailyQuizResponse);
     }
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ error: error.message || "Lỗi lưu kết quả" }, { status: 400 });
   }
-
-  await awardStudentXp({
-    studentId: session.studentId,
-    source: "daily_quiz",
-    xp: xpAwarded,
-    metadata: { date, correct_count: correctCount, total: DAILY_QUESTION_COUNT },
-  });
-  const stats = await completeDailyStreak(session.studentId);
-
-  return NextResponse.json({
-    date,
-    completed: true,
-    stats,
-    questions: publicQuestions(questions),
-    result: buildAttemptResult(questions, attempt as AttemptRow),
-  } satisfies StudentDailyQuizResponse);
 }

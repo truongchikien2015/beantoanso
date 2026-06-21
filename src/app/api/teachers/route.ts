@@ -1,26 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdmin } from "@/lib/admin-auth";
+import { connectDB } from "@/lib/mongodb";
+import { Teacher } from "@/lib/db/models/Teacher";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import mongoose from "mongoose";
 
 // GET /api/teachers — list all teachers (admin only)
 export async function GET(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
-  }
   const authError = checkAdmin(req);
   if (authError) return authError;
 
-  const { data, error } = await supabaseAdmin
-    .from("teachers")
-    .select("*")
-    .order("created_at", { ascending: false });
+  await connectDB();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const data = await Teacher.find({} as any).sort({ created_at: -1 } as any).lean();
 
-  const teachers = (data ?? []).map((t) => ({
-    id: t.id,
+  const teachers = data.map((t) => ({
+    id: t._id.toString(),
     authUid: t.auth_uid,
     name: t.name,
     email: t.email,
@@ -35,9 +30,6 @@ export async function GET(req: NextRequest) {
 
 // POST /api/teachers — create teacher account (admin only)
 export async function POST(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
-  }
   const authError = checkAdmin(req);
   if (authError) return authError;
 
@@ -53,50 +45,72 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields: name, email, password" }, { status: 400 });
   }
 
-  // 1. Create Supabase Auth user
-  const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { full_name: name },
-  });
+  await connectDB();
 
-  if (createUserError || !authUser.user) {
-    return NextResponse.json(
-      { error: createUserError?.message ?? "Failed to create auth user" },
-      { status: 400 }
-    );
+  // Check if email already registered in MongoDB
+  const existing = await Teacher.findOne({ email }).lean();
+  if (existing) {
+    return NextResponse.json({ error: "Email đã được đăng ký" }, { status: 409 });
   }
 
-  // 2. Insert into teachers table
-  const { data: teacher, error: dbError } = await supabaseAdmin
-    .from("teachers")
-    .insert({
-      auth_uid: authUser.user.id,
+  const bcrypt = await import("bcryptjs");
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  // Try to create in Supabase Auth first for auth fallback, but default to random UUID if not configured
+  let authUid = new mongoose.Types.ObjectId().toString();
+  let createdSupabaseUser = false;
+
+  if (supabaseAdmin) {
+    try {
+      const { data: authUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: name },
+      });
+
+      if (authUser?.user) {
+        authUid = authUser.user.id;
+        createdSupabaseUser = true;
+      } else {
+        console.warn("[teachers] Supabase auth user creation skipped:", createUserError?.message);
+      }
+    } catch (e: any) {
+      console.warn("[teachers] Supabase auth error:", e.message);
+    }
+  }
+
+  try {
+    const teacher = await Teacher.create({
+      auth_uid: authUid,
       name,
       email,
+      password_hash: passwordHash,
       school_id: schoolId ?? null,
       is_active: true,
-    })
-    .select()
-    .single();
+    });
 
-  if (dbError || !teacher) {
-    // Rollback: delete the auth user
-    await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
-    return NextResponse.json({ error: dbError?.message ?? "Failed to create teacher" }, { status: 400 });
+    return NextResponse.json({
+      data: {
+        id: teacher._id.toString(),
+        authUid: teacher.auth_uid,
+        name: teacher.name,
+        email: teacher.email,
+        schoolId: teacher.school_id,
+        isActive: teacher.is_active,
+        createdAt: teacher.created_at,
+        updatedAt: teacher.updated_at,
+      },
+    }, { status: 201 });
+  } catch (dbError: any) {
+    // Rollback Supabase user if DB creation fails
+    if (createdSupabaseUser && supabaseAdmin) {
+      try {
+        await supabaseAdmin.auth.admin.deleteUser(authUid);
+      } catch (err: any) {
+        console.error("[teachers-rollback] Failed to delete Supabase user:", err.message);
+      }
+    }
+    return NextResponse.json({ error: dbError.message || "Failed to save teacher" }, { status: 500 });
   }
-
-  return NextResponse.json({
-    data: {
-      id: teacher.id,
-      authUid: teacher.auth_uid,
-      name: teacher.name,
-      email: teacher.email,
-      schoolId: teacher.school_id,
-      isActive: teacher.is_active,
-      createdAt: teacher.created_at,
-      updatedAt: teacher.updated_at,
-    },
-  }, { status: 201 });
 }

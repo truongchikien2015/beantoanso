@@ -1,17 +1,30 @@
 // POST /api/student/quiz — Submit a quiz result for a step
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherLearningPathStep } from "@/lib/db/models/TeacherLearningPathStep";
+import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
+import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
+import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
+import { TeacherStudentProgress } from "@/lib/db/models/TeacherStudentProgress";
 import { getStudentId } from "@/lib/auth-helpers";
 import {
   XP_PER_CORRECT_ANSWER,
   XP_TOPIC_COMPLETE,
   awardStudentXp,
 } from "@/lib/server/studentRewards";
+import mongoose from "mongoose";
+
+function toObjectId(id: string): mongoose.Types.ObjectId {
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    return new mongoose.Types.ObjectId(id);
+  }
+  const crypto = require("crypto");
+  const hash = crypto.createHash("md5").update(id.toString()).digest("hex");
+  return new mongoose.Types.ObjectId(hash.substring(0, 24));
+}
 
 export async function POST(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  await connectDB();
 
   const session = getStudentId(req);
   if (session instanceof NextResponse) return session;
@@ -35,51 +48,64 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Verify step belongs to this path
-  const { data: step } = await supabaseAdmin
-    .from("teacher_learning_path_steps")
-    .select("id, path_id, step_type, topic_id, question_set_id")
-    .eq("id", step_id)
-    .single();
+  const pathObjectId = toObjectId(path_id);
+  const stepObjectId = toObjectId(step_id);
+  const studentObjectId = toObjectId(studentId);
 
-  if (!step || step.path_id !== path_id) {
+  // Verify step belongs to this path
+  const step = await TeacherLearningPathStep.findOne({
+    _id: stepObjectId,
+  }).lean();
+
+  if (!step || step.path_id.toString() !== path_id) {
     return NextResponse.json({ error: "Bước không hợp lệ" }, { status: 400 });
   }
 
   let questionsForScoring: Array<{ id: string; correct_option: string }> = [];
   if (answers) {
     if (step.step_type === "question_set" && step.question_set_id) {
-      const { data: questions } = await supabaseAdmin
-        .from("teacher_questions")
-        .select("id, correct_option")
-        .eq("set_id", step.question_set_id)
-        .eq("is_active", true);
+      const questions = await TeacherQuestion.find({
+        set_id: step.question_set_id,
+        is_active: true,
+      })
+        .select("_id correct_option")
+        .lean();
 
-      questionsForScoring = questions ?? [];
+      questionsForScoring = questions.map((q) => ({
+        id: q._id.toString(),
+        correct_option: q.correct_option,
+      }));
     } else if (step.step_type === "topic" && step.topic_id) {
-      const { data: student } = await supabaseAdmin
-        .from("teacher_students")
+      const student = await TeacherStudent.findOne({
+        _id: studentObjectId,
+      })
         .select("created_by")
-        .eq("id", studentId)
-        .single();
+        .lean();
 
-      const { data: sets } = await supabaseAdmin
-        .from("teacher_question_sets")
-        .select("id")
-        .eq("created_by", student?.created_by)
-        .eq("topic_id", step.topic_id)
-        .eq("is_active", true);
+      if (student) {
+        const sets = await TeacherQuestionSet.find({
+          created_by: student.created_by,
+          topic_id: step.topic_id,
+          is_active: true,
+        })
+          .select("_id")
+          .lean();
 
-      const setIds = (sets ?? []).map((set) => set.id);
-      if (setIds.length > 0) {
-        const { data: questions } = await supabaseAdmin
-          .from("teacher_questions")
-          .select("id, correct_option")
-          .in("set_id", setIds)
-          .eq("is_active", true)
-          .limit(20);
+        const setIds = sets.map((set) => set._id);
+        if (setIds.length > 0) {
+          const questions = await TeacherQuestion.find({
+            set_id: { $in: setIds },
+            is_active: true,
+          })
+            .select("_id correct_option")
+            .limit(20)
+            .lean();
 
-        questionsForScoring = questions ?? [];
+          questionsForScoring = questions.map((q) => ({
+            id: q._id.toString(),
+            correct_option: q.correct_option,
+          }));
+        }
       }
     }
   }
@@ -119,51 +145,46 @@ export async function POST(req: NextRequest) {
 
   if (answers && questionsForScoring.length > 0) {
     // Get full question data for breakdown
-    let fullQuestions: Array<{
-      id: string;
-      question: string;
-      option_a: string;
-      option_b: string;
-      option_c: string;
-      correct_option: string;
-      explanation: string | null;
-    }> = [];
+    let fullQuestions: any[] = [];
 
     if (step.step_type === "question_set" && step.question_set_id) {
-      const { data: questions } = await supabaseAdmin
-        .from("teacher_questions")
-        .select("id, question, option_a, option_b, option_c, correct_option, explanation")
-        .eq("set_id", step.question_set_id)
-        .eq("is_active", true);
-      fullQuestions = questions ?? [];
+      fullQuestions = await TeacherQuestion.find({
+        set_id: step.question_set_id,
+        is_active: true,
+      })
+        .select("question option_a option_b option_c correct_option explanation")
+        .lean();
     } else if (step.step_type === "topic" && step.topic_id) {
-      const { data: student } = await supabaseAdmin
-        .from("teacher_students")
+      const student = await TeacherStudent.findOne({
+        _id: studentObjectId,
+      })
         .select("created_by")
-        .eq("id", studentId)
-        .single();
+        .lean();
 
-      const { data: sets } = await supabaseAdmin
-        .from("teacher_question_sets")
-        .select("id")
-        .eq("created_by", student?.created_by)
-        .eq("topic_id", step.topic_id)
-        .eq("is_active", true);
+      if (student) {
+        const sets = await TeacherQuestionSet.find({
+          created_by: student.created_by,
+          topic_id: step.topic_id,
+          is_active: true,
+        })
+          .select("_id")
+          .lean();
 
-      const setIds = (sets ?? []).map((set) => set.id);
-      if (setIds.length > 0) {
-        const { data: questions } = await supabaseAdmin
-          .from("teacher_questions")
-          .select("id, question, option_a, option_b, option_c, correct_option, explanation")
-          .in("set_id", setIds)
-          .eq("is_active", true)
-          .limit(20);
-        fullQuestions = questions ?? [];
+        const setIds = sets.map((set) => set._id);
+        if (setIds.length > 0) {
+          fullQuestions = await TeacherQuestion.find({
+            set_id: { $in: setIds },
+            is_active: true,
+          })
+            .select("question option_a option_b option_c correct_option explanation")
+            .limit(20)
+            .lean();
+        }
       }
     }
 
     const correctMap = new Map(questionsForScoring.map((q) => [q.id, q.correct_option]));
-    const questionMap = new Map(fullQuestions.map((q) => [q.id, q]));
+    const questionMap = new Map(fullQuestions.map((q) => [q._id.toString(), q]));
 
     for (const answer of answers) {
       const q = questionMap.get(answer.question_id);
@@ -188,7 +209,6 @@ export async function POST(req: NextRequest) {
   let finalScore = score;
   if (answers && questionsForScoring.length > 0) {
     const correctMap = new Map(questionsForScoring.map((q) => [q.id, q.correct_option]));
-    const answeredIds = new Set(answers.map((a) => a.question_id));
 
     let correct = 0;
     let total = correctMap.size;
@@ -205,20 +225,16 @@ export async function POST(req: NextRequest) {
 
     finalScore = total > 0 ? Math.round((correct / total) * 100) : 0;
 
-    // Store answers in progress as JSON
-    const { data: progress, error } = await supabaseAdmin
-      .from("teacher_student_progress")
-      .upsert({
-        student_id: studentId,
-        path_id,
-        step_id,
+    // Upsert student progress in MongoDB
+    const progressDoc = await TeacherStudentProgress.findOneAndUpdate(
+      { student_id: studentObjectId, step_id: stepObjectId },
+      {
+        path_id: pathObjectId,
         score: finalScore,
-        completed_at: new Date().toISOString(),
-      }, { onConflict: "student_id,step_id" })
-      .select()
-      .single();
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+        completed_at: new Date(),
+      },
+      { upsert: true, new: true }
+    ).lean();
 
     const xpAwarded = correct * XP_PER_CORRECT_ANSWER;
     const stats = await awardStudentXp({
@@ -227,6 +243,15 @@ export async function POST(req: NextRequest) {
       xp: xpAwarded,
       metadata: { path_id, step_id, score: finalScore, correct, total },
     });
+
+    const progress = {
+      id: progressDoc._id.toString(),
+      student_id: progressDoc.student_id.toString(),
+      path_id: progressDoc.path_id.toString(),
+      step_id: progressDoc.step_id.toString(),
+      score: progressDoc.score,
+      completed_at: progressDoc.completed_at,
+    };
 
     return NextResponse.json({
       success: true,
@@ -244,27 +269,32 @@ export async function POST(req: NextRequest) {
   }
 
   // Topic type or no answers — just upsert score
-  const { data, error } = await supabaseAdmin
-    .from("teacher_student_progress")
-    .upsert({
-      student_id: studentId,
-      path_id,
-      step_id,
+  const progressDoc = await TeacherStudentProgress.findOneAndUpdate(
+    { student_id: studentObjectId, step_id: stepObjectId },
+    {
+      path_id: pathObjectId,
       score: Math.max(0, Math.min(100, finalScore)),
-      completed_at: new Date().toISOString(),
-    }, { onConflict: "student_id,step_id" })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+      completed_at: new Date(),
+    },
+    { upsert: true, new: true }
+  ).lean();
 
   const xpAwarded = step.step_type === "topic" ? XP_TOPIC_COMPLETE : 0;
   const stats = await awardStudentXp({
     studentId,
     source: step.step_type === "topic" ? "topic_complete" : "step_quiz",
     xp: xpAwarded,
-    metadata: { path_id, step_id, score: data.score, step_type: step.step_type },
+    metadata: { path_id, step_id, score: progressDoc.score, step_type: step.step_type },
   });
 
-  return NextResponse.json({ success: true, progress: data, stats, xp_awarded: xpAwarded });
+  const progress = {
+    id: progressDoc._id.toString(),
+    student_id: progressDoc.student_id.toString(),
+    path_id: progressDoc.path_id.toString(),
+    step_id: progressDoc.step_id.toString(),
+    score: progressDoc.score,
+    completed_at: progressDoc.completed_at,
+  };
+
+  return NextResponse.json({ success: true, progress, stats, xp_awarded: xpAwarded });
 }

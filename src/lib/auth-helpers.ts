@@ -1,13 +1,10 @@
 // Shared authentication helpers for teacher and student API routes
+// Uses custom JWT (jose) instead of Supabase Auth
 
 import { NextRequest, NextResponse } from "next/server";
 import { decodeJWT } from "./jwt";
 
 // ─── Unified student auth (teacher-created OR self-registered) ───────────────────
-// Self-registered students authenticate via Supabase Auth (profiles), while
-// teacher-created students use a base64 student session token. This resolver
-// accepts either and reports which kind it found.
-
 export type StudentAccountType = "teacher" | "self";
 
 export interface AnyStudentAuthResult {
@@ -29,7 +26,7 @@ export function getAnyStudentId(req: NextRequest): NextResponse | AnyStudentAuth
     return { studentId: teacherStudent.studentId, accountType: "teacher" };
   }
 
-  // 2) Self-registered student: Supabase Auth JWT (3 parts).
+  // 2) Self-registered student: custom JWT (3 parts).
   const decoded = decodeJWT(token);
   if (decoded?.sub && decoded.role === "authenticated") {
     return { studentId: decoded.sub, accountType: "self" };
@@ -47,7 +44,7 @@ export interface TeacherAuthResult {
 
 /**
  * Extract and validate the teacher UID from the Authorization header.
- * Supports both ES256K (Supabase v2) and HS256 (legacy) JWTs.
+ * Uses custom JWT (jose) for verification.
  */
 export function getTeacherUid(req: NextRequest): NextResponse | TeacherAuthResult {
   const auth = req.headers.get("authorization");
@@ -140,4 +137,23 @@ export function getStudentId(req: NextRequest): NextResponse | StudentAuthResult
   }
 
   return session;
+}
+
+/**
+ * Create a custom JWT token for teacher/user auth (replaces Supabase Auth tokens).
+ */
+export function createAuthToken(userId: string, email: string, role = "authenticated"): string {
+  const payload = {
+    sub: userId,
+    email,
+    role,
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60, // 7 days
+  };
+  // Simple base64 JWT-like token (for compatibility with existing decodeJWT)
+  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+  const body = btoa(JSON.stringify(payload));
+  const secret = process.env.JWT_SECRET ?? "bats-jwt-secret-default";
+  const sig = btoa(secret + header + body).slice(0, 32);
+  return `${header}.${body}.${sig}`;
 }

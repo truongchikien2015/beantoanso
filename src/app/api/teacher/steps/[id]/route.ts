@@ -1,6 +1,8 @@
 // DELETE /api/teacher/steps/[id]
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherLearningPathStep } from "@/lib/db/models/TeacherLearningPathStep";
+import { TeacherLearningPath } from "@/lib/db/models/TeacherLearningPath";
 import { getTeacherUid } from "@/lib/auth-helpers";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -11,21 +13,16 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   const { uid } = result;
   const { id } = await context.params;
 
-  // Verify ownership via path
-  const { data: step, error } = await supabaseAdmin!
-    .from("teacher_learning_path_steps")
-    .select("id, path_id, teacher_learning_paths!inner(created_by)")
-    .eq("id", id)
-    .single();
+  await connectDB();
 
-  if (error || !step) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  // Find step and verify ownership via path
+  const step = await TeacherLearningPathStep.findById(id).lean();
+  if (!step) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const s = step as unknown as { id: string; path_id: string; teacher_learning_paths: { created_by: string } };
-  if (s.teacher_learning_paths.created_by !== uid) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const path = await TeacherLearningPath.findOne({ _id: step.path_id, created_by: uid }).lean();
+  if (!path) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  await supabaseAdmin!.from("teacher_learning_path_steps").delete().eq("id", id);
+  await TeacherLearningPathStep.findByIdAndDelete(id);
 
   return NextResponse.json({ success: true });
 }

@@ -2,14 +2,22 @@
 // These students authenticate with a bcrypt-hashed password stored in teacher_students.
 import { NextRequest, NextResponse } from "next/server";
 import { checkAdmin } from "@/lib/admin-auth";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
+import mongoose from "mongoose";
+
+function toObjectId(id: string): mongoose.Types.ObjectId {
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    return new mongoose.Types.ObjectId(id);
+  }
+  const crypto = require("crypto");
+  const hash = crypto.createHash("md5").update(id.toString()).digest("hex");
+  return new mongoose.Types.ObjectId(hash.substring(0, 24));
+}
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(req: NextRequest, context: RouteContext) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
-  }
   const authError = checkAdmin(req);
   if (authError) return authError;
 
@@ -27,28 +35,21 @@ export async function POST(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Mật khẩu phải có ít nhất 6 ký tự" }, { status: 400 });
   }
 
-  // Admin can reset any teacher's student (no created_by filter).
-  const { data: student, error: fetchError } = await supabaseAdmin
-    .from("teacher_students")
-    .select("id")
-    .eq("id", id)
-    .single();
+  await connectDB();
 
-  if (fetchError || !student) {
+  const studentObjectId = toObjectId(id);
+
+  // Admin can reset any teacher's student.
+  const student = await TeacherStudent.findOne({ _id: studentObjectId } as any).lean();
+
+  if (!student) {
     return NextResponse.json({ error: "Không tìm thấy học sinh" }, { status: 404 });
   }
 
   const bcrypt = await import("bcryptjs");
   const passwordHash = await bcrypt.hash(newPassword, 10);
 
-  const { error: updateError } = await supabaseAdmin
-    .from("teacher_students")
-    .update({ password_hash: passwordHash })
-    .eq("id", id);
-
-  if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 400 });
-  }
+  await (TeacherStudent as any).updateOne({ _id: studentObjectId }, { password_hash: passwordHash });
 
   return NextResponse.json({ success: true });
 }

@@ -5,7 +5,18 @@ import {
   type AiChatMessage,
 } from "@/lib/server/aiProvider";
 import { getAnyStudentId } from "@/lib/auth-helpers";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
+import mongoose from "mongoose";
+
+function toObjectId(id: string): mongoose.Types.ObjectId {
+  if (mongoose.Types.ObjectId.isValid(id)) {
+    return new mongoose.Types.ObjectId(id);
+  }
+  const crypto = require("crypto");
+  const hash = crypto.createHash("md5").update(id.toString()).digest("hex");
+  return new mongoose.Types.ObjectId(hash.substring(0, 24));
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -87,7 +98,7 @@ function buildMessages(message: string, history: StudentChatMessage[]): AiChatMe
         "Không làm hộ bài kiểm tra; hãy gợi ý cách suy nghĩ từng bước.",
         "Trả lời ngắn gọn bằng tiếng Việt, thân thiện, dễ hiểu.",
         "Bắt buộc trả về JSON hợp lệ, không markdown: {\"answer\":\"...\",\"refused\":false}.",
-        "Nếu từ chối, đặt refused=true và answer là lời từ chối nhẹ nhàng kèm gợi ý hỏi lại về học tập/an toàn số.",
+        "Nếu từ chối, đặt refused=true and answer là lời từ chối nhẹ nhàng kèm gợi ý hỏi lại về học tập/an toàn số.",
       ].join("\n"),
     },
     ...history.map((item) => ({
@@ -102,6 +113,8 @@ function buildMessages(message: string, history: StudentChatMessage[]): AiChatMe
 }
 
 export async function POST(req: NextRequest) {
+  await connectDB();
+
   const authResult = getAnyStudentId(req);
   if (authResult instanceof NextResponse) return authResult;
   const { studentId, accountType } = authResult;
@@ -125,16 +138,16 @@ export async function POST(req: NextRequest) {
   }
 
   // Teacher-created students must exist & be active in teacher_students.
-  // Self-registered students authenticate via Supabase Auth (no such row).
+  // Self-registered students authenticate via profiles.
   if (accountType === "teacher") {
-    const { data: student, error: studentError } = await supabaseAdmin!
-      .from("teacher_students")
-      .select("id")
-      .eq("id", studentId)
-      .eq("is_active", true)
-      .single();
+    const student = await TeacherStudent.findOne({
+      _id: toObjectId(studentId),
+      is_active: true,
+    })
+      .select("_id")
+      .lean();
 
-    if (studentError || !student) {
+    if (!student) {
       return NextResponse.json({ error: "Không tìm thấy học sinh" }, { status: 404 });
     }
   }

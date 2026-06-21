@@ -1,4 +1,6 @@
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherStudentStats } from "@/lib/db/models/TeacherStudentStats";
+import { TeacherXpEvent } from "@/lib/db/models/TeacherXpEvent";
 
 export type StudentRewardStats = {
   total_xp: number;
@@ -47,23 +49,15 @@ export function buildStudentStats(raw?: RawStats | null): StudentRewardStats {
 }
 
 export async function ensureStudentStats(studentId: string): Promise<StudentRewardStats> {
-  if (!supabaseAdmin) return buildStudentStats(null);
+  await connectDB();
 
-  const { data } = await supabaseAdmin
-    .from("teacher_student_stats")
-    .select("student_id, total_xp, current_streak, longest_streak, last_daily_completed_on")
-    .eq("student_id", studentId)
-    .maybeSingle();
+  const data = await TeacherStudentStats.findOne({ student_id: studentId }).lean();
 
-  if (data) return buildStudentStats(data as RawStats);
+  if (data) return buildStudentStats(data as unknown as RawStats);
 
-  const { data: created } = await supabaseAdmin
-    .from("teacher_student_stats")
-    .insert({ student_id: studentId })
-    .select("student_id, total_xp, current_streak, longest_streak, last_daily_completed_on")
-    .single();
+  const created = await TeacherStudentStats.create({ student_id: studentId });
 
-  return buildStudentStats(created as RawStats | null);
+  return buildStudentStats(created.toObject() as unknown as RawStats);
 }
 
 export async function awardStudentXp({
@@ -77,32 +71,29 @@ export async function awardStudentXp({
   xp: number;
   metadata?: Record<string, unknown>;
 }): Promise<StudentRewardStats> {
-  if (!supabaseAdmin) return buildStudentStats(null);
+  await connectDB();
 
   const safeXp = Math.max(0, Math.floor(xp));
   await ensureStudentStats(studentId);
 
   if (safeXp > 0) {
-    await supabaseAdmin
-      .from("teacher_student_xp_events")
-      .insert({ student_id: studentId, source, xp: safeXp, metadata });
+    await TeacherXpEvent.create({ student_id: studentId, source, xp: safeXp, metadata });
   }
 
   const stats = await ensureStudentStats(studentId);
   const nextTotalXp = stats.total_xp + safeXp;
 
-  const { data } = await supabaseAdmin
-    .from("teacher_student_stats")
-    .update({ total_xp: nextTotalXp })
-    .eq("student_id", studentId)
-    .select("student_id, total_xp, current_streak, longest_streak, last_daily_completed_on")
-    .single();
+  const updated = await TeacherStudentStats.findOneAndUpdate(
+    { student_id: studentId },
+    { total_xp: nextTotalXp },
+    { new: true }
+  ).lean();
 
-  return buildStudentStats(data as RawStats | null);
+  return buildStudentStats(updated as unknown as RawStats);
 }
 
 export async function completeDailyStreak(studentId: string): Promise<StudentRewardStats> {
-  if (!supabaseAdmin) return buildStudentStats(null);
+  await connectDB();
 
   const today = toDateKey();
   const yesterday = yesterdayKey();
@@ -114,18 +105,17 @@ export async function completeDailyStreak(studentId: string): Promise<StudentRew
     stats.last_daily_completed_on === yesterday ? stats.current_streak + 1 : 1;
   const nextLongest = Math.max(stats.longest_streak, nextStreak);
 
-  const { data } = await supabaseAdmin
-    .from("teacher_student_stats")
-    .update({
+  const updated = await TeacherStudentStats.findOneAndUpdate(
+    { student_id: studentId },
+    {
       current_streak: nextStreak,
       longest_streak: nextLongest,
       last_daily_completed_on: today,
-    })
-    .eq("student_id", studentId)
-    .select("student_id, total_xp, current_streak, longest_streak, last_daily_completed_on")
-    .single();
+    },
+    { new: true }
+  ).lean();
 
-  return buildStudentStats(data as RawStats | null);
+  return buildStudentStats(updated as unknown as RawStats);
 }
 
 export function todayKey() {

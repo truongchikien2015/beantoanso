@@ -43,14 +43,14 @@ export function ClassifyGame({ onBack }: { onBack: () => void }) {
     if (correct) {
       sfx.correct();
       setScore((s) => s + 10);
-      setFeedback("✅ Chính xác!");
+      setFeedback("✅ Chính xác! Bạn nhỏ trả lời rất tốt.");
     } else {
       sfx.wrong();
       setScore((s) => Math.max(0, s - 5));
       setFeedback(
         item.safe
-          ? "❌ Thông tin này có thể chia sẻ bình thường."
-          : "❌ Thông tin này nên giữ riêng tư!",
+          ? "❌ Chưa đúng rồi! Món này có thể chia sẻ bình thường."
+          : "❌ Ôi nguy hiểm! Thông tin này nên giữ riêng tư!",
       );
     }
     if (target === "safe") setSafe((p) => [...p, item]);
@@ -68,60 +68,74 @@ export function ClassifyGame({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <button onClick={onBack} className="text-indigo-600 hover:underline mb-4">
-        ← Trang chủ
-      </button>
-
-      <div className="text-center mb-4">
-        <h2 className="text-indigo-700">🧩 Phân loại thông tin</h2>
-        <p className="text-slate-600">
-          Bấm vào thông tin rồi thả vào hộp phù hợp.
-        </p>
-        <div className="inline-flex items-center gap-3 mt-2 px-4 py-1 rounded-full bg-amber-100 text-amber-700">
-          ⭐ Điểm: {score}
+    <div className="kid-paper-page min-h-screen pb-12">
+      {/* Header */}
+      <header className="kid-paper-header px-4 py-5 mb-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <button
+            onClick={onBack}
+            className="min-h-12 text-white/85 hover:text-white font-bold text-sm flex items-center gap-1"
+          >
+            ← Trang chủ
+          </button>
+          <h1 className="font-black text-white text-lg flex items-center gap-2">
+            🧩 Trò chơi Phân loại
+          </h1>
+          <div className="w-16" />
         </div>
-        {feedback && (
-          <p className="mt-2 text-slate-600">{feedback}</p>
-        )}
-      </div>
+      </header>
 
-      <div className="bg-white rounded-2xl p-4 shadow border border-sky-100 mb-4">
-        <p className="text-slate-500 mb-2">Cần phân loại:</p>
-        {items.length === 0 ? (
-          <p className="text-emerald-600">🎉 Đã phân loại xong!</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {items.map((it) => (
-              <ItemChip key={it.id} item={it} onPlace={place} />
-            ))}
+      <main className="max-w-4xl mx-auto px-4 space-y-6">
+        <div className="text-center mb-4 animate-bounce-in">
+          <h2 className="text-3xl font-black text-[var(--kid-ink)]">🧩 Thử tài Phân Loại</h2>
+          <p className="text-[var(--kid-muted)] font-bold mt-1">
+            Bấm vào từng thẻ thông tin bên dưới rồi chọn hộp thả thích hợp nhé!
+          </p>
+          <div className="inline-flex items-center gap-3 mt-4 px-5 py-2 rounded-full bg-[var(--kid-yellow-new)]/30 text-amber-800 font-black text-lg shadow-sm">
+            ⭐ Điểm: {score}
+          </div>
+          {feedback && (
+            <p className={`mt-3 font-black text-base transition-all ${feedback.startsWith("✅") ? "text-[var(--kid-success)] animate-bounce" : "text-[var(--kid-coral-new)] animate-shake"}`}>{feedback}</p>
+          )}
+        </div>
+
+        <div className="card-kid p-6 bg-white animate-fade-up">
+          <p className="text-slate-400 font-bold mb-3 uppercase tracking-wider text-xs">Cần phân loại:</p>
+          {items.length === 0 ? (
+            <p className="text-[var(--kid-success)] font-black text-lg text-center py-4">🎉 Bạn đã phân loại xuất sắc toàn bộ thông tin!</p>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {items.map((it) => (
+                <ItemChip key={it.id} item={it} onPlace={place} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-6 animate-fade-up delay-100">
+          <Bucket
+            title="✅ Có thể chia sẻ"
+            accent="emerald"
+            items={safe}
+          />
+          <Bucket
+            title="🔒 Nên giữ riêng tư"
+            accent="rose"
+            items={unsafe}
+          />
+        </div>
+
+        {finished && (
+          <div className="mt-8 text-center animate-bounce-in">
+            <button
+              onClick={reset}
+              className="btn-kid btn-kid-coral px-8 py-3 text-lg"
+            >
+              🔄 Chơi lại
+            </button>
           </div>
         )}
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Bucket
-          title="✅ Có thể chia sẻ"
-          accent="emerald"
-          items={safe}
-        />
-        <Bucket
-          title="🔒 Nên giữ riêng tư"
-          accent="rose"
-          items={unsafe}
-        />
-      </div>
-
-      {finished && (
-        <div className="mt-6 text-center">
-          <button
-            onClick={reset}
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow"
-          >
-            🔄 Chơi lại
-          </button>
-        </div>
-      )}
+      </main>
     </div>
   );
 }
@@ -137,19 +151,25 @@ function ItemChip({
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen((o) => !o)}
-        className="px-3 py-2 rounded-xl bg-sky-50 border border-sky-200 text-slate-700 hover:bg-sky-100"
+        onClick={() => {
+          sfx.click();
+          setOpen((o) => !o);
+        }}
+        className={`px-4 py-3 rounded-2xl border-2 font-black text-base shadow-sm transition-all
+          ${open 
+            ? "border-[var(--kid-coral-new)] bg-[var(--kid-coral-new)]/10 text-slate-800 scale-105" 
+            : "border-sky-100 bg-sky-50/50 text-slate-700 hover:border-[var(--kid-coral-new)]/50 hover:bg-white"}`}
       >
         {item.text}
       </button>
       {open && (
-        <div className="absolute z-10 left-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-md p-1 flex gap-1">
+        <div className="absolute z-20 left-1/2 -translate-x-1/2 top-full mt-2 bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-2 flex gap-2 animate-bounce-in min-w-[200px] justify-center">
           <button
             onClick={() => {
               setOpen(false);
               onPlace(item, "safe");
             }}
-            className="px-2 py-1 rounded-lg hover:bg-emerald-50 text-emerald-700"
+            className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-sm transition-colors"
           >
             ✅ Chia sẻ
           </button>
@@ -158,7 +178,7 @@ function ItemChip({
               setOpen(false);
               onPlace(item, "unsafe");
             }}
-            className="px-2 py-1 rounded-lg hover:bg-rose-50 text-rose-700"
+            className="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-sm transition-colors"
           >
             🔒 Riêng tư
           </button>
@@ -179,20 +199,24 @@ function Bucket({
 }) {
   const cls =
     accent === "emerald"
-      ? "border-emerald-300 bg-emerald-50"
-      : "border-rose-300 bg-rose-50";
+      ? "border-[var(--kid-success)] bg-[var(--kid-success)]/5 text-[var(--kid-success)]"
+      : "border-[var(--kid-coral-new)] bg-[var(--kid-coral-new)]/5 text-[var(--kid-coral-new)]";
   return (
-    <div className={`rounded-2xl border-2 border-dashed p-4 min-h-[140px] ${cls}`}>
-      <p className="text-slate-700 mb-2">{title}</p>
-      <div className="flex flex-wrap gap-2">
-        {items.map((i) => (
-          <span
-            key={i.id}
-            className="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700"
-          >
-            {i.text}
-          </span>
-        ))}
+    <div className={`card-kid border-3 border-dashed p-5 min-h-[200px] ${cls}`}>
+      <p className="font-black text-lg mb-4">{title}</p>
+      <div className="flex flex-wrap gap-2.5">
+        {items.length === 0 ? (
+          <p className="text-slate-400 font-bold text-sm italic">Hộp đang trống...</p>
+        ) : (
+          items.map((i) => (
+            <span
+              key={i.id}
+              className="px-3.5 py-2 rounded-xl bg-white border-2 border-slate-100 text-slate-700 font-bold text-sm shadow-sm"
+            >
+              {i.text}
+            </span>
+          ))
+        )}
       </div>
     </div>
   );

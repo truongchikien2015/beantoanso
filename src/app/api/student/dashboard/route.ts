@@ -1,13 +1,16 @@
 // GET /api/student/dashboard — student info, assigned path, steps, progress
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { connectDB } from "@/lib/mongodb";
+import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
+import { TeacherLearningPath } from "@/lib/db/models/TeacherLearningPath";
+import { TeacherLearningPathStep } from "@/lib/db/models/TeacherLearningPathStep";
+import { TeacherStudentProgress } from "@/lib/db/models/TeacherStudentProgress";
+import { Profile } from "@/lib/db/models/Profile";
 import { getAnyStudentId } from "@/lib/auth-helpers";
 import { ensureStudentStats } from "@/lib/server/studentRewards";
 
 export async function GET(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  await connectDB();
 
   const session = getAnyStudentId(req);
   if (session instanceof NextResponse) return session;
@@ -15,14 +18,9 @@ export async function GET(req: NextRequest) {
   const { studentId, accountType } = session;
   const stats = await ensureStudentStats(studentId);
 
-  // Self-registered students live in `profiles` (Supabase Auth), not in
-  // teacher_students. They have no assigned path, but still get reward stats.
+  // Self-registered students live in `profiles`, not in teacher_students.
   if (accountType === "self") {
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("id, full_name")
-      .eq("id", studentId)
-      .maybeSingle();
+    const profile = await Profile.findOne({ _id: studentId } as any).lean();
 
     return NextResponse.json({
       student: {
@@ -40,38 +38,44 @@ export async function GET(req: NextRequest) {
   }
 
   // Get student info
-  const { data: student, error: studentError } = await supabaseAdmin
-    .from("teacher_students")
-    .select("id, nickname, email, class_name, student_code, assigned_path_id")
-    .eq("id", studentId)
-    .eq("is_active", true)
-    .single();
+  const student = await TeacherStudent.findOne({ _id: studentId, is_active: true })
+    .select("nickname email class_name student_code assigned_path_id")
+    .lean();
 
-  if (studentError || !student) {
+  if (!student) {
     return NextResponse.json({ error: "Không tìm thấy học sinh" }, { status: 404 });
   }
+
+  const studentData = {
+    id: student._id.toString(),
+    nickname: student.nickname,
+    email: student.email,
+    class_name: student.class_name,
+    student_code: student.student_code,
+    assigned_path_id: student.assigned_path_id?.toString() ?? null,
+  };
 
   // No assigned path → return empty
   if (!student.assigned_path_id) {
     return NextResponse.json({
-      student,
+      student: studentData,
       assigned_path: null,
       progress: [],
       stats,
     });
   }
 
-  // Get assigned path with steps
-  const { data: path } = await supabaseAdmin
-    .from("teacher_learning_paths")
-    .select("id, title, description, created_at")
-    .eq("id", student.assigned_path_id)
-    .eq("is_active", true)
-    .single();
+  // Get assigned path
+  const path = await TeacherLearningPath.findOne({
+    _id: student.assigned_path_id,
+    is_active: true,
+  })
+    .select("title description created_at")
+    .lean();
 
   if (!path) {
     return NextResponse.json({
-      student,
+      student: studentData,
       assigned_path: null,
       progress: [],
       stats,
@@ -79,27 +83,48 @@ export async function GET(req: NextRequest) {
   }
 
   // Get steps in order
-  const { data: steps } = await supabaseAdmin
-    .from("teacher_learning_path_steps")
-    .select("id, path_id, step_order, step_type, topic_id, question_set_id")
-    .eq("path_id", path.id)
-    .order("step_order", { ascending: true });
+  const steps = await TeacherLearningPathStep.find({ path_id: path._id })
+    .sort({ step_order: 1 })
+    .select("path_id step_order step_type topic_id question_set_id")
+    .lean();
+
+  const mappedSteps = steps.map((s) => ({
+    id: s._id.toString(),
+    path_id: s.path_id.toString(),
+    step_order: s.step_order,
+    step_type: s.step_type,
+    topic_id: s.topic_id,
+    question_set_id: s.question_set_id?.toString() ?? null,
+  }));
 
   // Get progress for this student + path
-  const { data: progress } = await supabaseAdmin
-    .from("teacher_student_progress")
-    .select("id, student_id, path_id, step_id, score, completed_at")
-    .eq("student_id", studentId)
-    .eq("path_id", path.id);
+  const progress = await TeacherStudentProgress.find({
+    student_id: studentId,
+    path_id: path._id,
+  })
+    .select("student_id path_id step_id score completed_at")
+    .lean();
+
+  const mappedProgress = progress.map((p) => ({
+    id: p._id.toString(),
+    student_id: p.student_id.toString(),
+    path_id: p.path_id.toString(),
+    step_id: p.step_id.toString(),
+    score: p.score,
+    completed_at: p.completed_at,
+  }));
 
   return NextResponse.json({
-    student,
+    student: studentData,
     assigned_path: {
-      ...path,
-      steps: steps ?? [],
-      step_count: (steps ?? []).length,
+      id: path._id.toString(),
+      title: path.title,
+      description: path.description,
+      created_at: path.created_at,
+      steps: mappedSteps,
+      step_count: mappedSteps.length,
     },
-    progress: progress ?? [],
+    progress: mappedProgress,
     stats,
   });
 }
