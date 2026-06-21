@@ -358,10 +358,10 @@ function PlayerMarker({ x, y }: { x: number; y: number }) {
       style={{ left: `${(x / 1000) * 100}%`, top: `${(y / 560) * 100}%` }}
     >
       <div className="relative animate-bounce">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-pink-300 to-rose-400 border-2 border-white flex items-center justify-center shadow-lg">
-          <span className="text-2xl sm:text-3xl">👧</span>
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-sky-300 to-indigo-400 border-2 border-white flex items-center justify-center shadow-lg">
+          <span className="text-2xl sm:text-3xl">👦</span>
         </div>
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-3 h-3 bg-rose-500 rotate-45" />
+        <div className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-3 h-3 bg-sky-500 rotate-45" />
       </div>
     </div>
   );

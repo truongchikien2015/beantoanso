@@ -60,8 +60,8 @@ export function Header({ nickname, totalScore, xp, onHome, onLogout }: Props) {
             
             {/* Nickname bubble */}
             {nickname && (
-              <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-100 text-pink-700 font-bold text-sm border border-pink-200">
-                👧 {nickname}
+              <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-100 text-sky-700 font-bold text-sm border border-sky-200">
+                👦 {nickname}
               </span>
             )}
 

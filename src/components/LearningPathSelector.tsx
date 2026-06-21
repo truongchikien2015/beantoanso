@@ -27,7 +27,7 @@ type Props = {
 const PATH_ICONS: Record<string, string> = {
   "Cơ bản": "🌱",
   "Nâng cao": "🚀",
-  "Toàn diện": "🏆",
+  "Toàn diện": "🎓",
 };
 
 const PATH_COLORS: Record<string, { bg: string; border: string; text: string; gradient: string }> = {
