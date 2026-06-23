@@ -23,4 +23,6 @@ TeacherStudentProgressSchema.index({ student_id: 1, step_id: 1 }, { unique: true
 TeacherStudentProgressSchema.index({ path_id: 1 });
 TeacherStudentProgressSchema.index({ student_id: 1 });
 
-export const TeacherStudentProgress: Model<ITeacherStudentProgress> = models.TeacherStudentProgress || model<ITeacherStudentProgress>("TeacherStudentProgress", TeacherStudentProgressSchema);
+export const TeacherStudentProgress: Model<ITeacherStudentProgress> =
+  models.TeacherStudentProgress ||
+  model<ITeacherStudentProgress>("TeacherStudentProgress", TeacherStudentProgressSchema, "teacher_student_progress");

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
-import { supabase } from "@/lib/supabase";
 import { topicLabels } from "@/data/quizQuestions";
 import type { TeacherLearningPath, TeacherLearningPathStep, TeacherQuestionSet, TeacherStudent, TeacherTopic } from "@/types/teacher-content";
 import { Plus, Trash2, Edit2, Check, X, ChevronDown, ChevronUp, GripVertical, Users } from "lucide-react";
@@ -146,10 +145,7 @@ export function LearningPathManager() {
     setAssignLoading(true);
     setAssignSuccess("");
     try {
-      const { data: sessionData } = supabase
-        ? await supabase.auth.getSession()
-        : { data: { session: null } };
-      const token = sessionData.session?.access_token;
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
       const res = await fetch(`/api/teacher/learning-paths/${assignPathId}/assign-students`, {
         method: "POST",
         headers: {

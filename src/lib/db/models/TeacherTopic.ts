@@ -22,4 +22,5 @@ const TeacherTopicSchema = new Schema<ITeacherTopic>(
 TeacherTopicSchema.index({ created_by: 1, topic_key: 1 }, { unique: true });
 TeacherTopicSchema.index({ created_by: 1, is_active: 1 });
 
-export const TeacherTopic: Model<ITeacherTopic> = models.TeacherTopic || model<ITeacherTopic>("TeacherTopic", TeacherTopicSchema);
+export const TeacherTopic: Model<ITeacherTopic> =
+  models.TeacherTopic || model<ITeacherTopic>("TeacherTopic", TeacherTopicSchema, "teacher_topics");

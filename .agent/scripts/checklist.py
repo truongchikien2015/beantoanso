@@ -87,7 +87,7 @@ def run_script(name: str, script_path: Path, project_path: str, url: Optional[st
     print_step(f"Running: {name}")
     
     # Build command
-    cmd = ["python", str(script_path), project_path]
+    cmd = [sys.executable, str(script_path), project_path]
     if url and ("lighthouse" in script_path.name.lower() or "playwright" in script_path.name.lower()):
         cmd.append(url)
     
@@ -192,12 +192,12 @@ Examples:
     for name, script_path, required in CORE_CHECKS:
         script = project_path / script_path
         result = run_script(name, script, str(project_path))
-        results.append(result)
+        results.append((result, required))
         
         # If required check fails, stop
         if required and not result["passed"] and not result.get("skipped"):
             print_error(f"CRITICAL: {name} failed. Stopping checklist.")
-            print_summary(results)
+            print_summary([r[0] for r in results])
             sys.exit(1)
     
     # Run performance checks if URL provided
@@ -206,12 +206,14 @@ Examples:
         for name, script_path, required in PERFORMANCE_CHECKS:
             script = project_path / script_path
             result = run_script(name, script, str(project_path), args.url)
-            results.append(result)
+            results.append((result, required))
     
     # Print summary
-    all_passed = print_summary(results)
+    all_passed = print_summary([r[0] for r in results])
     
-    sys.exit(0 if all_passed else 1)
+    # Exit with 1 if any required check failed
+    required_failed = any(not r[0]["passed"] and not r[0].get("skipped") for r in results if r[1])
+    sys.exit(1 if required_failed else 0)
 
 if __name__ == "__main__":
     main()

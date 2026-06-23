@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Admin, CustomTopic } from "../../lib/store";
-import { supabase } from "../../lib/supabase";
 
 type LearningPathDB = {
   id: string;
@@ -81,17 +80,25 @@ export function PathManager({ onLogout, onHome }: Props) {
   const [confirmDelete, setConfirmDelete] = useState<LearningPathUI | null>(null);
 
   const refresh = async () => {
-    if (!supabase) return;
     setIsLoading(true);
+    try {
+      const adminPassword = Admin.getPassword();
+      const [pathsRes, topicsRes] = await Promise.all([
+        fetch("/api/admin/learning-paths", {
+          headers: { "x-admin-password": adminPassword },
+        }).then((res) => res.json()),
+        fetch("/api/admin/topics", {
+          headers: { "x-admin-password": adminPassword },
+        }).then((res) => res.json()),
+      ]);
 
-    const [pathsRes, topicsRes] = await Promise.all([
-      supabase.from("learning_paths").select("*").order("created_at", { ascending: true }),
-      supabase.from("topics").select("*").order("topic_order", { ascending: true }),
-    ]);
-
-    if (pathsRes.data) setPaths(pathsRes.data.map(mapPath));
-    if (topicsRes.data) setTopics(topicsRes.data.map(mapTopic));
-    setIsLoading(false);
+      if (pathsRes.data) setPaths(pathsRes.data.map(mapPath));
+      if (topicsRes.data) setTopics(topicsRes.data.map(mapTopic));
+    } catch (err) {
+      console.error("Failed to refresh paths:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -99,40 +106,73 @@ export function PathManager({ onLogout, onHome }: Props) {
   }, []);
 
   const handleToggle = async (path: LearningPathUI) => {
-    if (!supabase) return;
-    await supabase
-      .from("learning_paths")
-      .update({ is_active: !path.isActive, updated_at: new Date().toISOString() })
-      .eq("id", path.id);
-    refresh();
+    const adminPassword = Admin.getPassword();
+    try {
+      await fetch(`/api/admin/learning-paths/${path.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": adminPassword,
+        },
+        body: JSON.stringify({ is_active: !path.isActive }),
+      });
+      refresh();
+    } catch (err) {
+      console.error("Failed to toggle path status:", err);
+    }
   };
 
   const handleDelete = async (id: string) => {
-    if (!supabase) return;
-    await supabase.from("learning_paths").delete().eq("id", id);
-    setConfirmDelete(null);
-    refresh();
+    const adminPassword = Admin.getPassword();
+    try {
+      await fetch(`/api/admin/learning-paths/${id}`, {
+        method: "DELETE",
+        headers: {
+          "x-admin-password": adminPassword,
+        },
+      });
+      setConfirmDelete(null);
+      refresh();
+    } catch (err) {
+      console.error("Failed to delete path:", err);
+    }
   };
 
   const handleSave = async (data: { title: string; description: string; topicIds: string[]; isActive: boolean }, editId?: string) => {
-    if (!supabase) return;
+    const adminPassword = Admin.getPassword();
     const row = {
       title: data.title,
       description: data.description,
       topic_ids: data.topicIds,
       is_active: data.isActive,
-      updated_at: new Date().toISOString(),
     };
 
-    if (editId) {
-      await supabase.from("learning_paths").update(row).eq("id", editId);
-    } else {
-      await supabase.from("learning_paths").insert(row);
+    try {
+      if (editId) {
+        await fetch(`/api/admin/learning-paths/${editId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": adminPassword,
+          },
+          body: JSON.stringify(row),
+        });
+      } else {
+        await fetch("/api/admin/learning-paths", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": adminPassword,
+          },
+          body: JSON.stringify(row),
+        });
+      }
+      setCreating(false);
+      setEditing(null);
+      refresh();
+    } catch (err) {
+      console.error("Failed to save path:", err);
     }
-
-    setCreating(false);
-    setEditing(null);
-    refresh();
   };
 
   const getTopicLabel = (id: string): string => topics.find((t) => t.id === id)?.label || id;

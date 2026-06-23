@@ -200,8 +200,9 @@ export function parseQuestionFile(file: File): Promise<ExcelQuestionRow[]> {
             const option_c = get(["option_c", "c", "dap_an_c", "dap_an_3", "đáp án c"]);
             const correct_option = get(["correct_option", "correct", "dap_an", "đáp án", "answer", "ans"]).toUpperCase();
             const explanation = get(["explanation", "giai_thich", "giải thích", "explain", "explaination"]);
+            const image_url = get(["image_url", "image", "media", "media_url", "anh", "ảnh", "video", "audio"]);
 
-            return { question, option_a, option_b, option_c, correct_option, explanation: explanation || undefined };
+            return { question, option_a, option_b, option_c, correct_option, explanation: explanation || undefined, image_url: image_url || undefined };
           })
           .filter((row) => row.question && row.question.length > 0);
 
@@ -271,6 +272,7 @@ export function validateAndPrepareQuestionImport(
       option_c: row.option_c.trim(),
       correct_option: correct as "A" | "B" | "C",
       explanation: row.explanation?.trim() || undefined,
+      image_url: row.image_url?.trim() || undefined,
     });
   });
 
@@ -291,9 +293,9 @@ export function buildQuestionImportSummary(total: number, created: number, faile
  * Generate CSV template for question import
  */
 export function generateQuestionTemplate(): string {
-  const headers = ["question", "option_a", "option_b", "option_c", "correct_option", "explanation"];
-  const example1 = [" Bé Kiên nhận được tin nhắn từ số lạ. Em nên làm gì?", "Trả lời tin nhắn", "Xóa tin nhắn và không chia sẻ thông tin", "Chia sẻ cho bạn bè", "C", "Không nên tương tác với người lạ trên mạng"];
-  const example2 = ["Mật khẩu mạnh cần có đặc điểm gì?", "Ít nhất 8 ký tự", "Có chữ hoa, chữ thường, số và ký tự đặc biệt", "Chỉ cần tên của mình", "B", "Mật khẩu mạnh nên kết hợp nhiều loại ký tự"];
+  const headers = ["question", "option_a", "option_b", "option_c", "correct_option", "explanation", "image_url"];
+  const example1 = [" Bé Kiên nhận được tin nhắn từ số lạ. Em nên làm gì?", "Trả lời tin nhắn", "Xóa tin nhắn và không chia sẻ thông tin", "Chia sẻ cho bạn bè", "C", "Không nên tương tác với người lạ trên mạng", ""];
+  const example2 = ["Mật khẩu mạnh cần có đặc điểm gì?", "Ít nhất 8 ký tự", "Có chữ hoa, chữ thường, số và ký tự đặc biệt", "Chỉ cần tên của mình", "B", "Mật khẩu mạnh nên kết hợp nhiều loại ký tự", ""];
 
   return [headers.join(","), example1.map(v => `"${v}"`).join(","), example2.map(v => `"${v}"`).join(",")].join("\n");
 }

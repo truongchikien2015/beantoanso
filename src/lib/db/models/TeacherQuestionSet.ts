@@ -23,4 +23,5 @@ const TeacherQuestionSetSchema = new Schema<ITeacherQuestionSet>(
 
 TeacherQuestionSetSchema.index({ created_by: 1, is_active: 1 });
 
-export const TeacherQuestionSet: Model<ITeacherQuestionSet> = models.TeacherQuestionSet || model<ITeacherQuestionSet>("TeacherQuestionSet", TeacherQuestionSetSchema);
+export const TeacherQuestionSet: Model<ITeacherQuestionSet> =
+  models.TeacherQuestionSet || model<ITeacherQuestionSet>("TeacherQuestionSet", TeacherQuestionSetSchema, "teacher_question_sets");

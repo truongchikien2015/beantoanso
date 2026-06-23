@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quét nguy hiểm - Cú Cú An Toàn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c3c6d7",
+                        "background": "#f7f9fb",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed": "#00174b",
+                        "tertiary-container": "#8b6700",
+                        "surface-container": "#eceef0",
+                        "on-secondary-fixed": "#23005c",
+                        "primary-fixed": "#dbe1ff",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#eeefff",
+                        "secondary-fixed": "#e9ddff",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#ffeed3",
+                        "on-surface-variant": "#434655",
+                        "secondary": "#6b38d4",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "surface-tint": "#0053db",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-background": "#191c1e",
+                        "on-secondary-container": "#fffbff",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#6d5000",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "inverse-surface": "#2d3133",
+                        "primary": "#004ac6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-fixed": "#ffdf9f",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-tertiary-fixed": "#261a00",
+                        "outline": "#737686",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-container": "#8455ef",
+                        "secondary-fixed-dim": "#d0bcff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "auto",
+                        "max-width-content": "1100px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "64px",
+                        "margin-mobile": "16px",
+                        "base": "8px",
+                        "gutter": "20px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Be Vietnam Pro"],
+                        "headline-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-bold": ["Be Vietnam Pro"],
+                        "headline-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "label-bold": ["14px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom Scan Animation */
+        @keyframes scan-down {
+            0% { transform: translateY(-100%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(300%); opacity: 0; }
+        }
+        .scan-line-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 74, 198, 0.1), rgba(0, 74, 198, 0.8));
+            border-bottom: 2px solid #004ac6;
+            animation: scan-down 3s infinite ease-in-out;
+            pointer-events: none;
+            border-radius: 50%;
+            filter: blur(2px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col relative pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-on-surface docked full-width top-0 z-40 sticky shadow-sm">
+<div class="flex items-center justify-between px-margin-mobile py-base w-full max-w-content mx-auto">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center overflow-hidden border-2 border-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A cute, colorful cartoon avatar of a young child, rendered in a 3D Pixar-like style with bright lighting, suitable for a safe kids app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJz6iu9if1ZvGneuikCjd5dsfsVD29ZaOCHk2W4_7CiJ72IEGgFxF3a4JBJauiS91emJcE7EwJ5QZFAngTTWDXGsAHcimiB4M_Xbem3ThBV1tLDT6zJCNejExItekYZwQc2DOGIL7da2JuUynomba-dU04IhB9YWCe06RKFpXjXkkvAQoiq86XybMYY7Pl-rrNUWig3aNjlD4hxo6zfg3pNNK_-u99lYhWRjrCXYgA1JyVs2L-yzqxYS9VnuKbuyUOgKgsOoLvX1s"/>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed">Chào con, bạn nhỏ!</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-variant transition-colors text-on-surface">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 w-full max-w-content mx-auto px-margin-mobile pt-md flex flex-col gap-6">
+<!-- Header & Scan Visual -->
+<section class="flex flex-col items-center text-center mt-4">
+<div class="relative w-24 h-24 mb-4 bg-primary-fixed rounded-full flex items-center justify-center shadow-[0_4px_0_0_#b4c5ff] overflow-hidden">
+<span class="material-symbols-outlined text-[48px] text-primary z-10" data-icon="security" style="font-variation-settings: 'FILL' 1;">security</span>
+<div class="scan-line-effect"></div>
+</div>
+<h2 class="font-display-mobile text-display-mobile text-on-surface mb-2">Kiểm tra nội dung đáng ngờ</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[280px]">Dán tin nhắn lạ vào đây để Cú Cú kiểm tra giúp con nhé!</p>
+</section>
+<!-- Tabs -->
+<div class="bg-surface-container rounded-xl p-1 flex shadow-inner">
+<button class="flex-1 py-3 text-center rounded-lg font-label-bold text-label-bold text-on-surface-variant transition-all hover:bg-surface-container-high">Dán link</button>
+<button class="flex-1 py-3 text-center rounded-lg font-label-bold text-label-bold bg-surface text-primary shadow-[0_2px_4px_rgba(0,0,0,0.1)] transition-all">Dán tin nhắn</button>
+<button class="flex-1 py-3 text-center rounded-lg font-label-bold text-label-bold text-on-surface-variant transition-all hover:bg-surface-container-high">Chụp màn hình</button>
+</div>
+<!-- Input Area (Tactile/Chunky Style) -->
+<div class="relative w-full">
+<textarea class="w-full min-h-[180px] bg-surface-container-lowest rounded-[24px] p-6 border-2 border-primary outline-none font-body-lg text-body-lg text-on-surface resize-none shadow-[0_6px_0_0_#dbe1ff] focus:shadow-[0_6px_0_0_#2563eb] focus:border-primary-container transition-all" placeholder="Dán tin nhắn vào đây...">Bấm link nhận quà game miễn phí, gửi mã OTP để xác nhận ngay.</textarea>
+<button class="absolute bottom-6 right-6 w-10 h-10 bg-surface-container rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="content_paste">content_paste</span>
+</button>
+</div>
+<!-- Helper Note -->
+<div class="bg-surface-container-low rounded-xl p-4 flex gap-4 items-start shadow-sm mt-2">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary" data-icon="lightbulb" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-1">
+<strong class="text-on-surface">Ghi chú:</strong> Cú Cú sẽ giúp con tìm dấu hiệu nguy hiểm. Không cần gửi mật khẩu hay thông tin riêng tư.
+            </p>
+</div>
+<!-- CTA Button -->
+<button class="w-full bg-primary text-on-primary font-headline-md text-headline-md rounded-xl py-5 shadow-[0_8px_0_0_#003ea8] active:translate-y-[4px] active:shadow-[0_4px_0_0_#003ea8] transition-all flex justify-center items-center gap-3 mt-4">
+<span class="material-symbols-outlined text-[28px]" data-icon="search" style="font-variation-settings: 'FILL' 1;">search</span>
+            Kiểm tra ngay
+        </button>
+</main>
+<!-- FAB: Red SOS -->
+<button class="fixed bottom-[100px] right-margin-mobile z-40 bg-error text-on-error rounded-full w-[64px] h-[64px] flex flex-col items-center justify-center shadow-[0_6px_0_0_#93000a] hover:bg-[#a61717] active:translate-y-[4px] active:shadow-[0_2px_0_0_#93000a] transition-all">
+<span class="material-symbols-outlined text-[28px]" data-icon="sos" style="font-variation-settings: 'FILL' 1;">sos</span>
+<span class="font-label-bold text-[10px] uppercase mt-1">Khẩn</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface dark:bg-inverse-surface border-t-4 border-surface-variant dark:border-outline-variant shadow-lg rounded-t-lg md:hidden">
+<!-- Trang chủ -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-colors rounded-lg w-20">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="home">home</span>
+<span class="font-label-bold text-[11px]">Trang chủ</span>
+</button>
+<!-- Luyện kỹ năng -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-colors rounded-lg w-20">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="school">school</span>
+<span class="font-label-bold text-[11px]">Luyện kỹ năng</span>
+</button>
+<!-- Quét nguy hiểm (ACTIVE) -->
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 translate-y-[-2px] shadow-[0_4px_0_0_rgba(0,74,198,1)] w-24">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="security" style="font-variation-settings: 'FILL' 1;">security</span>
+<span class="font-label-bold text-[11px]">Quét nguy hiểm</span>
+</button>
+<!-- Hồ sơ -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-colors rounded-lg w-20">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="person">person</span>
+<span class="font-label-bold text-[11px]">Hồ sơ</span>
+</button>
+</nav>
+<!-- Desktop Navigation Placeholder (Hidden on Mobile, per requirements to use fluid-fixed grid, but prompt focuses on mobile layout primarily) -->
+<div class="hidden md:flex fixed bottom-0 w-full h-16 bg-surface border-t border-surface-variant items-center justify-center text-on-surface-variant">
+<p class="font-body-md text-body-md">Sử dụng trên thiết bị di động để có trải nghiệm tốt nhất.</p>
+</div>
+</body></html>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Teacher } from "@/lib/store";
+import { Teacher, Admin } from "@/lib/store";
 
 type TeacherRow = Teacher;
 
@@ -9,8 +9,7 @@ type CreateForm = { name: string; email: string; password: string; schoolId: str
 type ResetForm = { newPassword: string; confirmPassword: string };
 
 function apiHeaders(): HeadersInit {
-  // Read from the same localStorage key Admin.login() uses
-  const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+  const pw = Admin.getPassword();
   return { "Content-Type": "application/json", "x-admin-password": pw };
 }
 

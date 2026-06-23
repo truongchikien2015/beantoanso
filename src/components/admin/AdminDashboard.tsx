@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Admin, Questions, Paths, Results, StudentAnswers, TOPIC_VALUES, topicLabels } from "../../lib/store";
-import { supabase } from "../../lib/supabase";
 import { downloadBackup, restoreBackup } from "../../lib/backupService";
 import { AdminQuestions } from "./AdminQuestions";
 import { QuestionForm } from "./QuestionForm";
 import { TopicManager } from "./TopicManager";
 import { PathManager } from "./PathManager";
 import { TeacherManager } from "./TeacherManager";
+import { FeedbackManager } from "./FeedbackManager";
+import { NewsManager } from "./NewsManager";
 
-type AdminTab = "overview" | "questions" | "topics" | "paths" | "students" | "teachers" | "system";
+type AdminTab = "overview" | "questions" | "topics" | "paths" | "students" | "teachers" | "feedbacks" | "news" | "system";
 
 const NAV = [
   { key: "overview", label: "Trang chủ", icon: "🏠" },
@@ -18,6 +19,8 @@ const NAV = [
   { key: "paths", label: "Lộ trình", icon: "🗺️" },
   { key: "students", label: "Học sinh", icon: "🧒" },
   { key: "teachers", label: "Giáo viên", icon: "👩‍🏫" },
+  { key: "feedbacks", label: "Góp ý", icon: "💡" },
+  { key: "news", label: "Tin tức", icon: "📰" },
   { key: "system", label: "Dữ liệu", icon: "💾" },
 ] as const;
 
@@ -167,6 +170,16 @@ export function AdminDashboard({ onBack }: { onBack: () => void }) {
             <TeacherManager onLogout={() => {}} onHome={onBack} />
           </AdminContentShell>
         )}
+        {tab === "feedbacks" && (
+          <AdminContentShell>
+            <FeedbackManager onHome={onBack} />
+          </AdminContentShell>
+        )}
+        {tab === "news" && (
+          <AdminContentShell wide>
+            <NewsManager onHome={onBack} />
+          </AdminContentShell>
+        )}
         {tab === "system" && (
           <AdminContentShell>
             <SystemTab />
@@ -202,9 +215,24 @@ function OverviewTab() {
   const [dbTopicsCount, setDbTopicsCount] = useState(0);
 
   useEffect(() => {
-    if (!supabase) return;
-    supabase.from("learning_paths").select("*").then(({ data }) => { if (data) setDbPaths(data); });
-    supabase.from("topics").select("id", { count: "exact", head: true }).then(({ count }) => { setDbTopicsCount(count ?? 0); });
+    const adminPassword = Admin.getPassword();
+    fetch("/api/admin/learning-paths", {
+      headers: { "x-admin-password": adminPassword },
+    })
+      .then((res) => res.json())
+      .then((body) => {
+        if (body.data) setDbPaths(body.data);
+      })
+      .catch((err) => console.error("Failed to load paths for dashboard overview:", err));
+
+    fetch("/api/admin/topics", {
+      headers: { "x-admin-password": adminPassword },
+    })
+      .then((res) => res.json())
+      .then((body) => {
+        if (body.data) setDbTopicsCount(body.data.length);
+      })
+      .catch((err) => console.error("Failed to load topics count for dashboard overview:", err));
   }, []);
 
   const stats = useMemo(() => {
@@ -222,6 +250,18 @@ function OverviewTab() {
       answers: answers.length,
     };
   }, [results, questions, dbPaths, dbTopicsCount, answers]);
+
+  const questionsByTopic = useMemo(() => {
+    const byTopic: Record<string, number> = {};
+    for (const q of questions.filter((q) => q.is_active)) {
+      byTopic[q.category] = (byTopic[q.category] || 0) + 1;
+    }
+    return byTopic;
+  }, [questions]);
+
+  const totalActiveQuestions = useMemo(() => {
+    return Object.values(questionsByTopic).reduce((a, b) => a + b, 0) || 1;
+  }, [questionsByTopic]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
@@ -270,18 +310,8 @@ function OverviewTab() {
           <h2 className="text-lg sm:text-xl font-black text-sky-950">📊 Câu hỏi theo chủ đề</h2>
         </div>
         <div className="space-y-4">
-          {Object.entries(
-            useMemo(() => {
-              const byTopic: Record<string, number> = {};
-              for (const q of questions.filter((q) => q.is_active)) byTopic[q.category] = (byTopic[q.category] || 0) + 1;
-              return byTopic;
-            }, [questions])
-          ).map(([k, v]) => {
-            const total = Object.values(useMemo(() => {
-              const m: Record<string, number> = {};
-              for (const q of questions.filter((q) => q.is_active)) m[q.category] = (m[q.category] || 0) + 1;
-              return m;
-            }, [questions])).reduce((a, b) => a + b, 0) || 1;
+          {Object.entries(questionsByTopic).map(([k, v]) => {
+            const total = totalActiveQuestions;
             const pct = Math.round((v / total) * 100);
             return (
               <div key={k} className="flex items-center gap-3 sm:gap-4">
@@ -392,7 +422,7 @@ function AllStudentsView() {
     setLoading(true);
     setError("");
     try {
-      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const pw = Admin.getPassword();
       const res = await fetch("/api/admin/students", {
         headers: { "x-admin-password": pw },
       });
@@ -549,7 +579,7 @@ function ResetStudentPasswordModal({ student, onClose }: { student: AdminStudent
     if (newPassword !== confirmPassword) { setError("Mật khẩu xác nhận không khớp."); return; }
     setLoading(true);
     try {
-      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const pw = Admin.getPassword();
       const res = await fetch(`/api/admin/students/${student.id}/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-password": pw },
@@ -643,7 +673,7 @@ function TeacherStudentsView() {
     setLoading(true);
     setError("");
     try {
-      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const pw = Admin.getPassword();
       const res = await fetch("/api/admin/teacher-students", {
         headers: { "x-admin-password": pw },
       });
@@ -825,7 +855,7 @@ function ResetTeacherStudentPasswordModal({ student, onClose }: { student: Admin
     if (newPassword !== confirmPassword) { setError("Mật khẩu xác nhận không khớp."); return; }
     setLoading(true);
     try {
-      const pw = localStorage.getItem("be_an_toan_so_admin") ?? "";
+      const pw = Admin.getPassword();
       const res = await fetch(`/api/admin/teacher-students/${student.id}/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-password": pw },
@@ -1105,7 +1135,7 @@ function SystemTab() {
 
   useEffect(() => {
     // Read cached admin password if available
-    const cached = localStorage.getItem("be_an_toan_so_admin") || "";
+    const cached = Admin.getPassword();
     setPassword(cached);
   }, []);
 
@@ -1217,7 +1247,7 @@ function SystemTab() {
             <span className="text-3xl">📥</span>
             <h3 className="text-base sm:text-lg font-black text-sky-950 mt-3 mb-2">Tải file sao lưu</h3>
             <p className="text-slate-500 font-bold text-xs leading-relaxed">
-              Tải xuống toàn bộ cơ sở dữ liệu (Supabase tables) và các thiết lập cục bộ (LocalStorage) trong một file JSON duy nhất để lưu trữ an toàn.
+              Tải xuống toàn bộ cơ sở dữ liệu (Database collections) và các thiết lập cục bộ (LocalStorage) trong một file JSON duy nhất để lưu trữ an toàn.
             </p>
           </div>
           <div className="mt-6">

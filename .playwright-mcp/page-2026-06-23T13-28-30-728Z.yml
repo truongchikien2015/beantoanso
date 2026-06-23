@@ -1,0 +1,45 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - button "Bé An Toàn Số" [ref=e5]:
+          - img "Bé An Toàn Số" [ref=e6]
+        - generic [ref=e7]: 👨‍👩‍👧‍👦 Cổng Phụ Huynh
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: 🛡️ Theo dõi hành trình học tập của con
+        - heading "Đồng hành cùng con an toàn số" [level=1] [ref=e12]
+        - paragraph [ref=e13]: Tra cứu kết quả học tập, phát hiện điểm yếu kỹ năng và nhận các gợi ý hướng dẫn con tự bảo vệ tại nhà.
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: 2,500+
+            - generic [ref=e17]: Học sinh
+          - generic [ref=e18]:
+            - generic [ref=e19]: "7"
+            - generic [ref=e20]: Chủ đề kỹ năng
+          - generic [ref=e21]:
+            - generic [ref=e22]: 14k+
+            - generic [ref=e23]: Bài tập hoàn thành
+      - generic [ref=e25]:
+        - heading "Tra cứu tiến độ của con" [level=2] [ref=e26]
+        - paragraph [ref=e27]: Nhập mã liên kết hiển thị trên trang cá nhân hoặc bản đồ học tập của con.
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e30]: Mã liên kết của con
+            - 'textbox "Ví dụ: PH-XXXXXXXX" [ref=e31]'
+            - paragraph [ref=e32]: "* Mã hiển thị tại Trang cá nhân hoặc Bản đồ học tập của con."
+          - button "🔍 Xem báo cáo của con" [disabled] [ref=e33]
+    - contentinfo [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - heading "Bé An Toàn Số" [level=4] [ref=e37]
+          - paragraph [ref=e38]: © 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt trên không gian mạng.
+        - generic [ref=e39]:
+          - link "Điều khoản" [ref=e40] [cursor=pointer]:
+            - /url: "#"
+          - link "Bảo mật" [ref=e41] [cursor=pointer]:
+            - /url: "#"
+          - link "Liên hệ" [ref=e42] [cursor=pointer]:
+            - /url: "#"
+  - button "Open Next.js Dev Tools" [ref=e48] [cursor=pointer]:
+    - img [ref=e49]

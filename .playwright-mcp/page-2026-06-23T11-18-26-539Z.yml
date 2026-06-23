@@ -1,0 +1,35 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4] [cursor=pointer]:
+        - img [ref=e6]
+        - generic [ref=e8]: Bé An Toàn Số
+      - navigation [ref=e9]:
+        - button "Khóa học" [ref=e10] [cursor=pointer]
+        - button "Thử thách" [ref=e11] [cursor=pointer]
+        - button "Bảng xếp hạng" [ref=e12] [cursor=pointer]
+        - button "Về chúng tôi" [ref=e13] [cursor=pointer]
+      - generic [ref=e14]:
+        - button "Đăng nhập" [ref=e15] [cursor=pointer]
+        - button "Đăng ký" [ref=e16] [cursor=pointer]
+  - generic [ref=e17]:
+    - main [ref=e18]:
+      - generic [ref=e19]:
+        - heading "🔥 Thử thách hôm nay" [level=1] [ref=e20]
+        - button "← Quay lại" [ref=e21] [cursor=pointer]
+      - generic [ref=e22]:
+        - generic [ref=e23]: 🔥
+        - paragraph [ref=e24]: Đang tải thử thách hôm nay...
+      - button "Mở trợ lý học tập" [ref=e25]:
+        - img [ref=e26]
+        - generic [ref=e28]: AI
+    - contentinfo [ref=e29]:
+      - generic [ref=e30]:
+        - paragraph [ref=e31]: © 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt Nam trên không gian mạng.
+        - generic [ref=e32]:
+          - button "Điều khoản" [ref=e33] [cursor=pointer]
+          - button "Bảo mật" [ref=e34] [cursor=pointer]
+          - button "Liên hệ" [ref=e35] [cursor=pointer]
+          - button "Trợ giúp" [ref=e36] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e42] [cursor=pointer]:
+    - img [ref=e43]

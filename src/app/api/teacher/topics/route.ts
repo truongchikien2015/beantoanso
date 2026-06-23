@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { TeacherTopic } from "@/lib/db/models/TeacherTopic";
+import { Teacher } from "@/lib/db/models/Teacher";
 import { getTeacherUid } from "@/lib/auth-helpers";
 import { topicLabels } from "@/data/quizQuestions";
 
@@ -12,6 +13,12 @@ export async function GET(req: NextRequest) {
   const { uid } = authResult;
 
   await connectDB();
+
+  // Verify teacher exists in MongoDB
+  const teacher = await Teacher.findOne({ auth_uid: uid, is_active: true }).lean();
+  if (!teacher) {
+    return NextResponse.json({ error: "Tài khoản giáo viên không tồn tại hoặc đã bị khóa" }, { status: 401 });
+  }
 
   const customTopics = await TeacherTopic.find({ created_by: uid, is_active: true })
     .sort({ label: 1 })

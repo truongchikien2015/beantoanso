@@ -20,4 +20,5 @@ const TeacherXpEventSchema = new Schema<ITeacherXpEvent>(
 
 TeacherXpEventSchema.index({ student_id: 1 });
 
-export const TeacherXpEvent: Model<ITeacherXpEvent> = models.TeacherXpEvent || model<ITeacherXpEvent>("TeacherXpEvent", TeacherXpEventSchema);
+export const TeacherXpEvent: Model<ITeacherXpEvent> =
+  models.TeacherXpEvent || model<ITeacherXpEvent>("TeacherXpEvent", TeacherXpEventSchema, "teacher_student_xp_events");

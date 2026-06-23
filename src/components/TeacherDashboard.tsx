@@ -89,6 +89,31 @@ function OverviewTab() {
     const totalScore = results.reduce((s, r) => s + r.total_score, 0);
     const avg = results.length ? Math.round(totalScore / results.length) : 0;
     const top = [...results].sort((a, b) => b.total_score - a.total_score)[0];
+
+    // Worst Topic (most failed)
+    const incorrect = answers.filter((a) => !a.isCorrect);
+    const failedCounts: Record<string, number> = {};
+    for (const ans of incorrect) {
+      failedCounts[ans.topicLabel] = (failedCounts[ans.topicLabel] || 0) + 1;
+    }
+    const sortedFailed = Object.entries(failedCounts).sort((a, b) => b[1] - a[1]);
+    const worstTopic = sortedFailed[0]?.[0] || "Không có";
+
+    // Students at risk (accuracy < 60%)
+    const studentAccuracies: Record<string, { total: number; correct: number }> = {};
+    for (const a of answers) {
+      if (!studentAccuracies[a.nickname]) {
+        studentAccuracies[a.nickname] = { total: 0, correct: 0 };
+      }
+      studentAccuracies[a.nickname].total++;
+      if (a.isCorrect) studentAccuracies[a.nickname].correct++;
+    }
+    const atRisk = Object.entries(studentAccuracies)
+      .map(([name, s]) => ({ name, rate: Math.round((s.correct / s.total) * 100) }))
+      .filter((s) => s.rate < 60)
+      .map((s) => `${s.name} (${s.rate}%)`)
+      .join(", ") || "Không có";
+
     return {
       attempts: results.length,
       players: players.size,
@@ -98,6 +123,8 @@ function OverviewTab() {
       pathsCount: paths.length,
       topicsCount: topics.length > 0 ? topics.length : TOPIC_VALUES.length,
       answerRecords: answers.length,
+      worstTopic,
+      atRisk,
     };
   }, [results, paths, topics, answers]);
 
@@ -129,6 +156,25 @@ function OverviewTab() {
 
   return (
     <>
+      <div className="flex justify-between items-center mb-4 print:hidden">
+        <h2 className="text-xl font-bold text-slate-800">📊 Thống kê tình hình học tập</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={() => window.print()}
+            className="px-4 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-900 transition text-sm font-semibold cursor-pointer"
+          >
+            🖨️ Xuất báo cáo PDF / In
+          </button>
+          <button
+            onClick={exportCsv}
+            disabled={results.length === 0}
+            className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 text-sm font-semibold cursor-pointer"
+          >
+            ⬇️ Xuất dữ liệu Excel/CSV
+          </button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat label="Lượt hoàn thành" value={`${stats.attempts}`} />
         <Stat label="Học sinh" value={`${stats.players}`} accent="emerald" />
@@ -145,6 +191,20 @@ function OverviewTab() {
         <Stat label="Lộ trình" value={`${stats.pathsCount}`} accent="sky" />
         <Stat label="Chủ đề" value={`${stats.topicsCount}`} accent="violet" />
         <Stat label="Câu trả lời" value={`${stats.answerRecords}`} accent="teal" />
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Worst Topic card */}
+        <div className="bg-rose-50 rounded-2xl border-2 border-rose-150 p-4">
+          <p className="text-rose-800 font-bold text-sm">⚠️ Chủ đề học sinh yếu nhất (sai nhiều nhất)</p>
+          <p className="text-xl font-extrabold text-rose-900 mt-1">{stats.worstTopic}</p>
+        </div>
+
+        {/* At risk student card */}
+        <div className="bg-amber-50 rounded-2xl border-2 border-amber-150 p-4">
+          <p className="text-amber-800 font-bold text-sm">🚨 Học sinh có nguy cơ thiếu kỹ năng (độ chính xác &lt; 60%)</p>
+          <p className="text-sm font-extrabold text-amber-900 mt-1 truncate" title={stats.atRisk}>{stats.atRisk}</p>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow border border-slate-200 p-4">

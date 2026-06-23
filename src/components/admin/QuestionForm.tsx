@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { AdminQuestion, TOPIC_VALUES, topicLabels } from "../../lib/store";
+import { useRef } from "react";
+import { AdminQuestion, TOPIC_VALUES, topicLabels, Admin } from "../../lib/store";
 import { QuizTopic } from "../../data/quizQuestions";
+import { getMediaType, getYouTubeEmbedUrl } from "../../lib/mediaUtils";
+import { Upload, Link as LinkIcon, Loader2 } from "lucide-react";
 
 type Draft = Omit<AdminQuestion, "id" | "created_at" | "updated_at">;
 
@@ -47,6 +50,8 @@ export function QuestionForm({ initial, draft: initialDraft, onSave, onCancel, t
       : initialDraft ?? empty,
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
@@ -79,6 +84,61 @@ export function QuestionForm({ initial, draft: initialDraft, onSave, onCancel, t
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) =>
     setDraft((d) => ({ ...d, [k]: v }));
 
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingMedia(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      
+      const adminPassword = Admin.getPassword();
+      const headers: Record<string, string> = {};
+      if (adminPassword) headers["x-admin-password"] = adminPassword;
+
+      const res = await fetch("/api/media/upload", {
+        method: "POST",
+        body: formData,
+        headers,
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        alert(body.error || "Lỗi upload file");
+        return;
+      }
+
+      const result = await res.json();
+      if (result && result.url) {
+        set("image_url", result.url);
+      }
+    } catch (err) {
+      alert("Lỗi kết nối khi upload");
+    } finally {
+      setUploadingMedia(false);
+      if (mediaInputRef.current) mediaInputRef.current.value = "";
+    }
+  };
+
+  const renderMediaPreview = (url: string | undefined | null) => {
+    if (!url) return null;
+    const type = getMediaType(url);
+    
+    if (type === "youtube") {
+      const embedUrl = getYouTubeEmbedUrl(url);
+      if (!embedUrl) return <div className="text-xs text-rose-500 font-medium">Link YouTube không hợp lệ</div>;
+      return (
+        <div className="relative pt-[56.25%] bg-slate-100 rounded-xl overflow-hidden mt-2 border border-slate-200">
+          <iframe className="absolute inset-0 w-full h-full" src={embedUrl} allowFullScreen />
+        </div>
+      );
+    }
+    if (type === "video") return <video src={url} controls className="max-h-40 max-w-full rounded-xl mt-2 border border-slate-200" />;
+    if (type === "audio") return <audio src={url} controls className="w-full mt-2" />;
+    return <img src={url} alt="Media preview" className="max-h-40 max-w-full object-contain rounded-xl mt-2 bg-slate-50 border border-slate-200" />;
+  };
+
   return (
     <div className="fixed inset-0 z-30 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 my-8">
@@ -105,13 +165,26 @@ export function QuestionForm({ initial, draft: initialDraft, onSave, onCancel, t
           </Field>
 
           <Field label="Đường dẫn ảnh/video/âm thanh đa phương tiện (không bắt buộc)">
-            <input
-              type="text"
-              placeholder="Ví dụ: https://example.com/audio.mp3"
-              value={draft.image_url ?? ""}
-              onChange={(e) => set("image_url", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:border-indigo-400 outline-none"
-            />
+            <div className="space-y-2 p-2 bg-slate-50/50 rounded-xl border border-slate-200">
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1 flex items-center">
+                  <LinkIcon size={16} className="absolute left-3 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Ví dụ: https://example.com/audio.mp3"
+                    value={draft.image_url ?? ""}
+                    onChange={(e) => set("image_url", e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 rounded-xl border border-slate-300 focus:border-indigo-400 outline-none bg-white"
+                  />
+                </div>
+                <label className="px-4 py-2 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-medium flex items-center gap-2 cursor-pointer shrink-0 transition-colors">
+                  {uploadingMedia ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                  Tải file
+                  <input ref={mediaInputRef} type="file" accept="image/*,audio/*" className="hidden" onChange={handleMediaUpload} disabled={uploadingMedia} />
+                </label>
+              </div>
+              {renderMediaPreview(draft.image_url)}
+            </div>
           </Field>
 
           <Field label="Chủ đề" error={errors.category}>

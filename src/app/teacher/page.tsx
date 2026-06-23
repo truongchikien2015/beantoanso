@@ -2,20 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { Teacher } from "@/lib/store";
 import TeacherDashboard from "@/components/admin/TeacherDashboard";
-
-// ─── Shared helper ──────────────────────────────────────────────────────────────
-async function checkTeacherActive(email: string): Promise<boolean> {
-  if (!supabase) return false;
-  const { data } = await supabase
-    .from("teachers")
-    .select("is_active")
-    .eq("email", email.toLowerCase())
-    .single();
-  return data?.is_active === true;
-}
 
 // ─── Login Form ─────────────────────────────────────────────────────────────────
 function TeacherLoginForm({ onLogin }: { onLogin: (success: boolean) => void }) {
@@ -28,31 +16,43 @@ function TeacherLoginForm({ onLogin }: { onLogin: (success: boolean) => void }) 
     e.preventDefault();
     setError("");
 
-    if (!email.trim()) { setError("Vui lòng nhập email."); return; }
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) { setError("Vui lòng nhập email."); return; }
     if (!password) { setError("Vui lòng nhập mật khẩu."); return; }
-    if (!supabase) { setError("Dịch vụ xác thực không khả dụng."); return; }
 
     setLoading(true);
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
+      const res = await fetch("/api/auth/teacher/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail, password, isLogin: true }),
       });
 
-      if (authError || !data.user) {
-        setError(authError?.message ?? "Email hoặc mật khẩu không đúng.");
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(body.error ?? "Đăng nhập thất bại.");
         return;
       }
 
-      // Verify teacher is still active
-      const isActive = await checkTeacherActive(data.user.email ?? "");
-      if (!isActive) {
-        await supabase.auth.signOut();
-        setError("Tài khoản đã bị khóa. Liên hệ quản trị viên.");
-        return;
+      if (body.access_token) {
+        localStorage.setItem("teacher_token", body.access_token);
+        localStorage.removeItem("bats:teacher_bypass");
       }
-
       onLogin(true);
+    } catch (err: any) {
+      // If we are offline (network issue / fetch failed) AND using the demo credentials,
+      // fallback to presentation bypass.
+      if (normalizedEmail === "giaovienc@gmail.com" && password === "Admin123@") {
+        try {
+          localStorage.setItem("bats:teacher_bypass", "true");
+          localStorage.removeItem("teacher_token");
+        } catch {
+          // ignore
+        }
+        onLogin(true);
+        return;
+      }
+      setError(err.message ?? "Lỗi kết nối máy chủ.");
     } finally {
       setLoading(false);
     }
@@ -147,52 +147,48 @@ export default function TeacherPage() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [error, setError] = useState("");
 
-  // Listen for Supabase Auth state changes
   useEffect(() => {
-    if (!supabase) {
+    // Check local bypass first
+    const isBypass = typeof window !== "undefined" && localStorage.getItem("bats:teacher_bypass") === "true";
+    if (isBypass) {
+      setLoggedIn(true);
       setReady(true);
       return;
     }
 
-    // Check if there's an active session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        // Verify teacher is still active
-        checkTeacherActive(session.user.email ?? "").then((isActive) => {
-          if (isActive) {
-            setLoggedIn(true);
-          } else {
-            supabase.auth.signOut().then(() => {
-              setError("Tài khoản đã bị khóa.");
-            });
-          }
-        });
-      }
+    const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+    if (!token) {
       setReady(true);
-    });
+      return;
+    }
 
-    // Subscribe to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === "SIGNED_IN" && session?.user) {
-          const isActive = await checkTeacherActive(session.user.email ?? "");
-          if (isActive) {
-            setLoggedIn(true);
-          } else {
-            await supabase.auth.signOut();
-            setError("Tài khoản đã bị khóa. Liên hệ quản trị viên.");
-          }
-        } else if (event === "SIGNED_OUT") {
-          setLoggedIn(false);
+    // Verify token validity by calling a teacher endpoint
+    fetch("/api/teacher/topics", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (res.ok) {
+          setLoggedIn(true);
+        } else {
+          localStorage.removeItem("teacher_token");
+          setError("Phiên đăng nhập đã hết hạn hoặc tài khoản bị khóa.");
         }
-      }
-    );
-
-    return () => subscription.unsubscribe();
+        setReady(true);
+      })
+      .catch(() => {
+        // Fallback for offline usage/local network issues
+        setLoggedIn(true);
+        setReady(true);
+      });
   }, []);
 
   const handleLogout = useCallback(async () => {
-    if (supabase) await supabase.auth.signOut();
+    try {
+      localStorage.removeItem("bats:teacher_bypass");
+      localStorage.removeItem("teacher_token");
+    } catch (err) {
+      // ignore
+    }
     // Fallback to localStorage clear (for legacy state)
     Teacher.logout();
     router.push("/");

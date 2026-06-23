@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hồ sơ - Cú Cú An Toàn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c3c6d7",
+                        "background": "#f7f9fb",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed": "#00174b",
+                        "tertiary-container": "#8b6700",
+                        "surface-container": "#eceef0",
+                        "on-secondary-fixed": "#23005c",
+                        "primary-fixed": "#dbe1ff",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#eeefff",
+                        "secondary-fixed": "#e9ddff",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#ffeed3",
+                        "on-surface-variant": "#434655",
+                        "secondary": "#6b38d4",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "surface-tint": "#0053db",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-background": "#191c1e",
+                        "on-secondary-container": "#fffbff",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#6d5000",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "inverse-surface": "#2d3133",
+                        "primary": "#004ac6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-fixed": "#ffdf9f",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-tertiary-fixed": "#261a00",
+                        "outline": "#737686",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-container": "#8455ef",
+                        "secondary-fixed-dim": "#d0bcff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "auto",
+                        "max-width-content": "1100px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "64px",
+                        "margin-mobile": "16px",
+                        "base": "8px",
+                        "gutter": "20px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Be Vietnam Pro"],
+                        "headline-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-bold": ["Be Vietnam Pro"],
+                        "headline-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "label-bold": ["14px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .chunky-button {
+            border-bottom-width: 4px;
+            border-color: theme('colors.on-primary-fixed-variant');
+            transition: all 0.1s ease-in-out;
+        }
+        .chunky-button:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+            margin-top: 2px;
+        }
+        .chunky-card {
+            border: 1px solid theme('colors.outline-variant');
+            box-shadow: 0 4px 0 0 theme('colors.surface-variant');
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md min-h-screen pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-surface dark:bg-on-surface flex items-center justify-between px-margin-mobile py-base w-full max-w-content mx-auto z-40 sticky">
+<div class="flex items-center gap-sm">
+<img class="w-10 h-10 rounded-full object-cover border-2 border-primary" data-alt="A highly detailed illustration of a cute cartoon owl character, serving as an avatar. The owl is designed with a modern playful aesthetic, featuring large expressive eyes, a soft blue and yellow color palette, and a friendly, encouraging demeanor. The style is bright, trustworthy, and suitable for a children's educational app, set against a clean, light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk5FdCGeduEbGvAEGvB6-cCcdzYlEZQCNWOrc3yoKdQpYs7Q_cCQJDdd1Ghk_xY8HeIa_wwAgQreZRr4YBesaYnR-mxnEirojEfTOb-nm4OblUcLoQj0oL4jRY2iJ6mSs15nAInhjOGqe63qliG2Lq2v1B3emp7rY2KdtUTqIFRUCJcFWAd_ltGBpTL8Z0wau2AcY7Sz4jEpGq4pZWAZPxMS0fbluuCePbjU6-DndNxt42JbB8hy_dkmYhysh1sh19fMOnzkx86HU"/>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed">Hồ sơ</h1>
+</div>
+<button class="text-primary dark:text-primary-fixed hover:opacity-80 active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</header>
+<main class="w-full max-w-content mx-auto px-margin-mobile py-md flex flex-col gap-lg">
+<!-- Profile Header Section -->
+<section class="chunky-card bg-surface-container-lowest rounded-xl p-md flex flex-col md:flex-row items-center gap-md relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-primary-fixed-dim rounded-full opacity-20 blur-2xl"></div>
+<div class="relative w-32 h-32 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover border-4 border-white shadow-md z-10 relative" data-alt="A highly detailed avatar of a young boy named Son. He looks brave and confident, wearing a stylized 'Digital Warrior' badge on his chest. The art style is modern playful, using a soft, inviting color palette of primary blue and white with yellow accents. The lighting is bright and cheerful, emphasizing a trustworthy and encouraging mood for a child's profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEwFIavYK8p74QvsumoZFLbU48uO7ptO5V5D3p5Su9fJ7PfmdxjAOstXcAO0iaHFYzGHedZQSCNUdWHs9nWrtjK9DvQEjQh3-GpUufxyFVWXVBMgj_ViisdAsR6R4zhszamRNI7-_qOvkfZREqiplgriogih8BIqjEy2-E1ANnJkoiHWjQBtT3UCxr45FZj-nqksFQFwZ_shnb2WvCGMgOzj_4j6jRs-wSOZmQkwGGaBJKXFzTLiU2Byr1kbyaoR60t3x9GFyjoT4"/>
+<div class="absolute -bottom-2 -right-2 bg-tertiary-fixed-dim text-on-tertiary-fixed font-label-bold text-label-bold px-3 py-1 rounded-full border-2 border-white z-20 shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">stars</span>
+                    Cấp 5
+                </div>
+</div>
+<div class="flex flex-col items-center md:items-start text-center md:text-left flex-1">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-1">Sơn</h2>
+<p class="font-body-lg text-body-lg text-primary font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+                    Chiến binh An Toàn Số
+                </p>
+<div class="flex items-center gap-2 bg-surface-container py-2 px-4 rounded-full">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">toll</span>
+<span class="font-headline-md text-headline-md text-on-surface">1,250 <span class="font-body-md text-body-md text-on-surface-variant font-normal">điểm</span></span>
+</div>
+</div>
+</section>
+<!-- Stats Section (Bento Grid) -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Progress -->
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-md flex flex-col items-center justify-center text-center">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Kỹ năng đã học</h3>
+<div class="relative w-40 h-40 mb-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle class="text-surface-variant stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-width="12"></circle>
+<circle class="text-primary progress-ring__circle stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-dasharray="251.2" stroke-dashoffset="83.73" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-headline-lg text-headline-lg text-primary">8/12</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Tiếp tục cố gắng nhé!</p>
+</div>
+<!-- Streak -->
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-md flex flex-col items-center justify-center text-center relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-tertiary-fixed to-surface-container-lowest opacity-30"></div>
+<span class="material-symbols-outlined text-[80px] text-tertiary-container mb-2 relative z-10" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface relative z-10 mb-1">5 Ngày</h3>
+<p class="font-body-lg text-body-lg text-on-surface-variant font-bold relative z-10">Liên tiếp học tập</p>
+<div class="mt-4 flex gap-2 relative z-10">
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center"><span class="material-symbols-outlined text-white text-[16px]">check</span></div>
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center"><span class="material-symbols-outlined text-white text-[16px]">check</span></div>
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center"><span class="material-symbols-outlined text-white text-[16px]">check</span></div>
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center"><span class="material-symbols-outlined text-white text-[16px]">check</span></div>
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center"><span class="material-symbols-outlined text-white text-[16px]">check</span></div>
+<div class="w-8 h-8 rounded-full bg-surface-variant border-2 border-dashed border-outline-variant flex items-center justify-center"></div>
+<div class="w-8 h-8 rounded-full bg-surface-variant border-2 border-dashed border-outline-variant flex items-center justify-center"></div>
+</div>
+</div>
+</section>
+<!-- Unlocked Skills Section -->
+<section>
+<div class="flex items-center justify-between mb-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface">Kỹ năng đã mở khóa</h3>
+<button class="font-label-bold text-label-bold text-primary hover:underline">Xem tất cả</button>
+</div>
+<div class="flex flex-col gap-sm">
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4">
+<div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-primary-container text-[28px]" style="font-variation-settings: 'FILL' 1;">password</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface font-bold">Bảo vệ OTP</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Giữ bí mật mã số an toàn</p>
+</div>
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4">
+<div class="w-14 h-14 rounded-full bg-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-error-container text-[28px]" style="font-variation-settings: 'FILL' 1;">link_off</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface font-bold">Nhận diện link giả</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Không nhấn vào đường dẫn lạ</p>
+</div>
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4">
+<div class="w-14 h-14 rounded-full bg-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-secondary-container text-[28px]" style="font-variation-settings: 'FILL' 1;">voice_chat</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface font-bold">Chat với người lạ</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Cẩn thận khi kết bạn online</p>
+</div>
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex items-center gap-4">
+<div class="w-14 h-14 rounded-full bg-tertiary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-tertiary-container text-[28px]" style="font-variation-settings: 'FILL' 1;">fingerprint</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-lg text-body-lg text-on-surface font-bold">Không chia sẻ thông tin cá nhân</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Bảo vệ tên, tuổi, địa chỉ</p>
+</div>
+<span class="material-symbols-outlined text-green-600" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+</div>
+</section>
+<!-- Badges Section -->
+<section>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">Huy hiệu đạt được</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-sm">
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex flex-col items-center text-center">
+<div class="w-20 h-20 mb-3 bg-primary-fixed-dim rounded-full flex items-center justify-center border-4 border-white shadow-sm">
+<span class="material-symbols-outlined text-[40px] text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Người bảo vệ OTP</span>
+</div>
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex flex-col items-center text-center">
+<div class="w-20 h-20 mb-3 bg-error-container rounded-full flex items-center justify-center border-4 border-white shadow-sm">
+<span class="material-symbols-outlined text-[40px] text-on-error-container" style="font-variation-settings: 'FILL' 1;">gpp_bad</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Thợ săn link giả</span>
+</div>
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex flex-col items-center text-center">
+<div class="w-20 h-20 mb-3 bg-secondary-fixed-dim rounded-full flex items-center justify-center border-4 border-white shadow-sm">
+<span class="material-symbols-outlined text-[40px] text-secondary" style="font-variation-settings: 'FILL' 1;">forum</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Bạn chat thông minh</span>
+</div>
+<div class="chunky-card bg-surface-container-lowest rounded-xl p-4 flex flex-col items-center text-center">
+<div class="w-20 h-20 mb-3 bg-tertiary-fixed-dim rounded-full flex items-center justify-center border-4 border-white shadow-sm">
+<span class="material-symbols-outlined text-[40px] text-tertiary" style="font-variation-settings: 'FILL' 1;">escalator_warning</span>
+</div>
+<span class="font-label-bold text-label-bold text-on-surface">Biết nhờ người lớn</span>
+</div>
+</div>
+</section>
+<!-- Certificate Card -->
+<section class="chunky-card bg-gradient-to-r from-primary to-primary-fixed-variant rounded-xl p-md flex flex-col items-center text-center relative overflow-hidden text-white shadow-lg shadow-primary/30">
+<div class="absolute -left-10 -bottom-10 w-40 h-40 bg-white opacity-10 rounded-full blur-xl"></div>
+<div class="absolute top-4 right-4 w-12 h-12 bg-white opacity-20 rounded-full blur-md"></div>
+<span class="material-symbols-outlined text-[48px] mb-2" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<h3 class="font-headline-lg text-headline-lg mb-2 z-10">Chứng nhận</h3>
+<p class="font-body-lg text-body-lg font-bold mb-6 z-10">Chiến binh An Toàn Số</p>
+<div class="bg-white p-2 rounded-lg mb-6 shadow-sm z-10">
+<img class="w-24 h-24 object-contain" data-alt="A highly detailed, clean, and crisp QR code on a plain white background. The QR code has rounded square elements, fitting a modern playful aesthetic, and is meant to look scannable for a digital certificate in a children's educational app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnuFFqs8rQRhREKdKHD2APj9GjrfH67QBKpSsGJcuk4kvhrDT01DBs3h6ZDkaI89Fe7IAwALf6uJbvE0cB811_p61nb5SnJf1WeIFN-8P_lggqLCdHYVWTBGcmW7Mff_XrdJBUzZ4bAbf3UkDUQfiLlHOaMLnocd7ygd-NaV72nOEdwoSaRgAxk4Xb_zR41l7amhdWiE6ekKzrlcmM-nOJvZYt8s5qrRiLlWC6AkzvBJqjn92izX7a0MLDubaqEBW8HpQ4v_A2N_A"/>
+</div>
+<button class="chunky-button bg-surface-container-lowest text-primary font-label-bold text-label-bold py-3 px-8 rounded-full z-10 w-full md:w-auto">
+                Xem chứng nhận
+            </button>
+</section>
+</main>
+<!-- Contextual FAB - Hidden on Profile as per rules -->
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface dark:bg-inverse-surface border-t-4 border-surface-variant dark:border-outline-variant shadow-lg rounded-t-lg md:hidden">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest rounded-xl">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-bold text-label-bold text-[10px] mt-1">Trang chủ</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest rounded-xl">
+<span class="material-symbols-outlined text-[24px]">school</span>
+<span class="font-label-bold text-label-bold text-[10px] mt-1">Luyện kỹ năng</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest rounded-xl">
+<span class="material-symbols-outlined text-[24px]">security</span>
+<span class="font-label-bold text-label-bold text-[10px] mt-1">Quét nguy hiểm</span>
+</button>
+<!-- Active state for Profile -->
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 translate-y-[-2px] shadow-[0_4px_0_0_rgba(0,74,198,1)]">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-bold text-label-bold text-[10px] mt-1">Hồ sơ</span>
+</button>
+</nav>
+<!-- Desktop Nav (Hidden on Mobile) - Standardizing with standard links for demonstration if needed, but per rules focusing on bottom nav for mobile primarily. Adding a basic version to satisfy "TopAppBar" and shell logic if viewed on md+ -->
+<nav class="hidden md:flex fixed top-0 w-full bg-surface z-30 shadow-sm border-b border-surface-variant h-16 items-center justify-center">
+<div class="max-w-content w-full flex justify-end gap-8 px-margin-mobile">
+<a class="text-on-surface-variant font-label-bold hover:text-primary" href="#">Trang chủ</a>
+<a class="text-on-surface-variant font-label-bold hover:text-primary" href="#">Luyện kỹ năng</a>
+<a class="text-on-surface-variant font-label-bold hover:text-primary" href="#">Quét nguy hiểm</a>
+<a class="text-primary font-label-bold border-b-2 border-primary" href="#">Hồ sơ</a>
+</div>
+</nav>
+</body></html>

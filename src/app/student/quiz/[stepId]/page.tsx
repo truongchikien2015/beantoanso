@@ -6,6 +6,7 @@ import { getStudentToken, clearStudentToken } from "@/lib/studentApi";
 import type { StudentStepContent, TeacherQuestion } from "@/types/teacher-content";
 import { topicLabels } from "@/data/quizQuestions";
 import { StudentChatbot } from "@/components/student/StudentChatbot";
+import { getMediaType, getYouTubeEmbedUrl } from "@/lib/mediaUtils";
 
 
 
@@ -51,12 +52,12 @@ function Confetti() {
 function TopicContent({ step }: { step: StudentStepContent }) {
   const label = step.topic_label ?? step.topic ? topicLabels[step.topic as keyof typeof topicLabels] : "Bài học";
   return (
-    <div className="Card p-8 text-center">
+    <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-8 text-center shadow-sm">
       <div className="text-6xl mb-4 animate-bounce-in">📖</div>
       <h2 className="text-2xl font-black text-slate-800 mb-2">{label}</h2>
       <p className="text-slate-500 text-base">Nội dung bài học sẽ được cập nhật sau.</p>
-      <div className="mt-6 p-5 bg-[var(--kid-teal-new)]/10 rounded-2xl text-base text-slate-700">
-        📚 Bài học này giúp bạn hiểu về chủ đề <span className="font-bold text-[var(--kid-coral-new)]">"{label}"</span>
+      <div className="mt-6 p-5 bg-teal-50 border-2 border-teal-100 rounded-2xl text-base text-slate-700 font-bold">
+        📚 Bài học này giúp bạn hiểu về chủ đề <span className="font-black text-rose-500">&ldquo;{label}&rdquo;</span>
       </div>
     </div>
   );
@@ -87,11 +88,33 @@ function QuizQuestion({
   };
 
   return (
-    <div className="card-kid p-6">
+    <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-6 shadow-sm hover:shadow-md transition duration-200 animate-fade-up">
       <p className="text-slate-800 font-black text-xl leading-relaxed mb-5">
-        <span className="text-[var(--kid-coral-new)] mr-2">Câu {index + 1}.</span>
+        <span className="text-rose-500 mr-2">Câu {index + 1}.</span>
         {question.question}
       </p>
+
+      {question.image_url && (
+        <div className="mb-5 overflow-hidden rounded-xl border-[3px] border-slate-100 bg-slate-50 relative flex items-center justify-center min-h-[120px]">
+          {(() => {
+            const url = question.image_url;
+            const type = getMediaType(url);
+            if (type === "youtube") {
+              const embedUrl = getYouTubeEmbedUrl(url);
+              if (!embedUrl) return <p className="text-rose-500 font-bold p-4">Link video bị lỗi</p>;
+              return (
+                <div className="relative w-full pt-[56.25%]">
+                  <iframe className="absolute inset-0 w-full h-full" src={embedUrl} allowFullScreen />
+                </div>
+              );
+            }
+            if (type === "video") return <video src={url} controls className="max-w-full max-h-[300px]" />;
+            if (type === "audio") return <audio src={url} controls className="w-full m-4" />;
+            return <img src={url} alt="Minh họa" className="max-w-full max-h-[300px] object-contain" />;
+          })()}
+        </div>
+      )}
+
       <div className="space-y-3">
         {options.map((opt) => {
           const isSelected = selected === opt.key;
@@ -99,11 +122,11 @@ function QuizQuestion({
             <button
               key={opt.key}
               onClick={() => handleSelect(opt.key)}
-              className={`kid-choice w-full text-left px-5 py-4 transition-all
+              className={`w-full px-5 py-4 text-left border-[3px] rounded-2xl min-h-[58px] font-bold text-sm transition-all duration-200 active:scale-[0.99] cursor-pointer
                 ${bounceSelected === opt.key ? "animate-pop" : ""}
                 ${isSelected
-                  ? "border-[var(--kid-teal-new)] bg-[var(--kid-teal-new)]/10 text-slate-800 font-bold shadow-md"
-                  : "border-slate-200 bg-white text-slate-700 hover:border-[var(--kid-coral-new)] hover:bg-[var(--kid-coral-new)]/5"
+                  ? "border-teal-400 bg-teal-50/30 text-slate-800 shadow-sm"
+                  : "border-slate-100 bg-white text-slate-600 hover:border-teal-300 hover:text-slate-800"
                 }`}
             >
               <span className="mr-3">{opt.emoji}</span>
@@ -278,10 +301,13 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="kid-paper-page flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-3 animate-bounce">📝</div>
-          <p className="text-slate-500">Đang tải...</p>
+      <div className="sd-page flex items-center justify-center">
+        <div className="text-center p-8 bg-white border-[3px] border-slate-200/80 rounded-[28px] shadow-sm max-w-xs w-full animate-bounce-in">
+          <div className="text-5xl mb-4 animate-bounce">📝</div>
+          <p className="text-slate-600 font-black text-lg">Đang tải câu hỏi...</p>
+          <div className="mt-4 w-12 h-1.5 bg-teal-100 rounded-full mx-auto overflow-hidden">
+            <div className="h-full bg-teal-500 rounded-full animate-pulse w-2/3 mx-auto"></div>
+          </div>
         </div>
       </div>
     );
@@ -289,12 +315,15 @@ export default function QuizPage() {
 
   if (error) {
     return (
-      <div className="kid-paper-page flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="text-5xl mb-4">⚠️</div>
-          <p className="text-red-600 mb-4">{error}</p>
-          <button onClick={() => router.push("/student/dashboard?view=1")} className="btn-kid btn-kid-coral">
-            Quay lại
+      <div className="sd-page flex items-center justify-center p-4">
+        <div className="text-center max-w-sm w-full p-8 bg-white border-[3px] border-slate-200/80 rounded-[28px] shadow-sm animate-bounce-in">
+          <div className="text-6xl mb-4">⚠️</div>
+          <p className="text-red-500 font-black text-lg mb-6">{error}</p>
+          <button
+            onClick={() => router.push("/student/dashboard?view=1")}
+            className="w-full py-3.5 px-6 font-black text-white bg-rose-500 hover:bg-rose-600 active:scale-[0.98] border-b-[4px] border-rose-700 rounded-full transition-all text-base cursor-pointer"
+          >
+            Quay lại Bảng học tập
           </button>
         </div>
       </div>
@@ -309,24 +338,31 @@ export default function QuizPage() {
     const totalCount = breakdown?.total ?? 0;
     const unansweredCount = breakdown?.unanswered ?? 0;
     const isExcellent = score >= 90;
-    const isGood = score >= 70 && score < 90;
 
     return (
-      <div className="kid-paper-page">
+      <div className="sd-page">
         {passed && <Confetti />}
-        <header className="kid-paper-header px-4 py-5">
-          <div className="max-w-xl mx-auto flex items-center justify-between">
-            <div />
-            <h1 className="font-black text-white text-lg">✨ Kết quả bài kiểm tra ✨</h1>
-            <div />
+        <main className="max-w-xl mx-auto px-4 py-6 space-y-6">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => router.push("/student/dashboard?view=1")}
+              className="text-slate-500 hover:text-slate-800 font-black text-sm flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              ← Thoát
+            </button>
+            <h1 className="font-black text-slate-800 text-lg flex items-center gap-2">
+              ✨ Kết quả bài học ✨
+            </h1>
+            <div className="w-12" />
           </div>
-        </header>
-
-        <main className="max-w-xl mx-auto px-4 py-6 space-y-4">
           {/* Score card - Celebration Style */}
-          <div className={`Card text-center p-8 ${passed ? "border-4 border-[var(--kid-success)] animate-bounce-in" : "animate-shake"}`}>
+          <div className={`bg-white rounded-[28px] border-[3px] p-8 text-center shadow-sm relative overflow-hidden ${
+            passed 
+              ? "border-emerald-400 bg-emerald-50/10 animate-bounce-in" 
+              : "border-rose-300 bg-rose-50/10 animate-shake"
+          }`}>
             {/* Trophy/Emoji */}
-            <div className={`text-8xl mb-4 ${passed ? "animate-bounce-in" : "animate-shake"}`}>
+            <div className={`text-8xl mb-4 drop-shadow-md ${passed ? "animate-float" : ""}`}>
               {isExcellent ? "🏆" : passed ? "🎉" : "💪"}
             </div>
             
@@ -336,111 +372,115 @@ export default function QuizPage() {
             </h1>
             
             {/* Score - Big & Bold */}
-            <div className={`text-7xl font-black mb-2
-              ${isExcellent ? "text-[var(--kid-success)]" : passed ? "text-[var(--kid-teal-new)]" : "text-[var(--kid-coral-new)]"}`}>
+            <div className={`text-7xl font-black mb-2 tracking-tight
+              ${isExcellent ? "text-emerald-500" : passed ? "text-teal-500" : "text-rose-500"}`}>
               {score}%
             </div>
             
             {/* Stats */}
-            <div className="flex justify-center gap-4 text-base">
-              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--kid-success)]/10 text-[var(--kid-success)] font-bold">
+            <div className="flex justify-center gap-4 text-base mt-4">
+              <span className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-black text-sm">
                 ✓ {correctCount} đúng
               </span>
-              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 text-slate-500 font-bold">
+              <span className="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-50 text-slate-500 border border-slate-100 font-black text-sm">
                 📝 {totalCount} câu
               </span>
             </div>
             
             {unansweredCount > 0 && (
-              <p className="text-sm text-slate-400 mt-2">
+              <p className="text-sm text-slate-400 mt-2 font-bold">
                 ({unansweredCount} câu chưa trả lời)
               </p>
             )}
             
             {/* Encouragement */}
-            <p className="text-base text-slate-500 mt-4">
+            <p className="text-base text-slate-500 mt-4 font-bold">
               {isExcellent ? "🌟 Bạn là ngôi sao sáng nhất!" : 
                passed ? "🎊 Bạn đã hoàn thành bài quiz này!" : 
                "📚 Học lại bài và thử lại nhé!"}
             </p>
             {xpAwarded > 0 && (
-              <p className="mt-3 inline-flex rounded-full bg-[var(--kid-yellow-new)]/30 px-4 py-2 text-base font-black text-amber-800">
-                +{xpAwarded} XP tích lũy
-              </p>
+              <div className="mt-4">
+                <span className="inline-flex rounded-full bg-amber-50 border border-amber-200 px-4 py-1.5 text-base font-black text-amber-700 shadow-sm">
+                  ⭐ +{xpAwarded} XP tích lũy
+                </span>
+              </div>
             )}
           </div>
 
           {/* Answer breakdown - Kid Friendly */}
           {answerBreakdown.length > 0 && (
-            <div className="Card p-6">
-              <h2 className="flex items-center gap-2 font-black text-slate-800 text-lg mb-4">
+            <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-6 shadow-sm">
+              <h2 className="flex items-center gap-2 font-black text-slate-800 text-lg mb-6 border-b-2 border-slate-100 pb-3">
                 📋 Xem lại đáp án
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {answerBreakdown.map((item, index) => (
                   <div
                     key={item.question_id}
-                    className={`p-5 rounded-2xl border-[3px] animate-fade-up ${
+                    className={`p-5 rounded-[22px] border-[3px] transition-all duration-200 ${
                       item.is_correct
-                        ? "bg-[var(--kid-success)]/10 border-[var(--kid-success)]"
-                        : "bg-[var(--kid-coral-new)]/10 border-[var(--kid-coral-new)]/50"
+                        ? "bg-emerald-50/20 border-emerald-200"
+                        : "bg-rose-50/20 border-rose-200"
                     }`}
-                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
                     {/* Header */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-black text-white
-                        ${item.is_correct ? "bg-[var(--kid-success)]" : "bg-[var(--kid-coral-new)]"}`}>
+                    <div className="flex items-start gap-3 mb-4">
+                      <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shadow-sm mt-0.5
+                        ${item.is_correct ? "bg-emerald-500" : "bg-rose-500"}`}>
                         {item.is_correct ? "✓" : "✗"}
                       </span>
                       <div className="flex-1">
-                        <p className="font-bold text-slate-800 text-base">
-                          <span className="text-[var(--kid-teal-new)] mr-1">Câu {index + 1}.</span>
+                        <p className="font-black text-slate-800 text-base leading-relaxed">
+                          <span className={`${item.is_correct ? "text-emerald-500" : "text-rose-500"} mr-1`}>Câu {index + 1}.</span>
                           {item.question}
                         </p>
                       </div>
                       {item.is_correct && (
-                        <span className="text-2xl animate-sparkle">⭐</span>
+                        <span className="text-2xl animate-sparkle shrink-0">⭐</span>
                       )}
                     </div>
 
-                    {/* Options display - Kid Friendly */}
-                    <div className="space-y-2 sm:pl-13">
+                    {/* Options display */}
+                    <div className="space-y-2.5 pl-0 sm:pl-11">
                       {(["A", "B", "C"] as const).map((opt) => {
                         const optionText = opt === "A" ? item.option_a : opt === "B" ? item.option_b : item.option_c;
                         const isSelected = item.selected_option === opt;
                         const isCorrect = item.correct_option === opt;
 
-                        let style = "bg-slate-100 text-slate-500";
+                        let style = "border-slate-100 bg-slate-50 text-slate-500";
                         let icon = "";
                         if (isCorrect) {
-                          style = "bg-[var(--kid-success)]/20 text-[var(--kid-success)] font-bold";
-                          icon = " ✓";
+                          style = "border-emerald-300 bg-emerald-50/40 text-emerald-800 font-bold";
+                          icon = " ✓ (Đúng)";
                         } else if (isSelected && !isCorrect) {
-                          style = "bg-[var(--kid-coral-new)]/20 text-[var(--kid-coral-new)] line-through";
-                          icon = " ✗";
+                          style = "border-rose-300 bg-rose-50/40 text-rose-800 font-bold line-through";
+                          icon = " ✗ (Bạn chọn)";
                         }
 
                         return (
-                          <div key={opt} className={`px-4 py-3 rounded-xl text-base ${style}`}>
-                            <span className="font-black mr-2">{opt}.</span>
-                            {optionText}{icon}
+                          <div key={opt} className={`px-4 py-3 rounded-xl border-2 text-sm font-bold flex items-center justify-between ${style}`}>
+                            <div>
+                              <span className="font-black mr-2">{opt}.</span>
+                              {optionText}
+                            </div>
+                            {icon && <span className="text-xs font-black shrink-0 ml-2">{icon}</span>}
                           </div>
                         );
                       })}
                     </div>
 
-                    {/* Explanation - Friendly Style */}
+                    {/* Explanation */}
                     {item.explanation && (
-                      <div className={`mt-4 p-4 rounded-xl text-base ${
+                      <div className={`mt-4 p-4 rounded-xl border-2 text-sm ${
                         item.is_correct 
-                          ? "bg-[var(--kid-success)]/20 text-[var(--kid-success)]" 
-                          : "bg-[var(--kid-yellow-new)]/30 text-amber-800"
+                          ? "bg-emerald-50/40 border-emerald-100 text-emerald-800 font-bold" 
+                          : "bg-amber-50/40 border-amber-100 text-amber-900 font-bold"
                       }`}>
-                        <p className="font-bold mb-1 flex items-center gap-2">
-                          <span className="text-xl">💡</span> Giải thích:
+                        <p className="font-black mb-1.5 flex items-center gap-1.5">
+                          <span className="text-lg">💡</span> Giải thích:
                         </p>
-                        <p className="leading-relaxed">{item.explanation}</p>
+                        <p className="leading-relaxed font-bold text-slate-600">{item.explanation}</p>
                       </div>
                     )}
                   </div>
@@ -455,7 +495,7 @@ export default function QuizPage() {
           <div className="space-y-3 pt-2">
             <button
               onClick={() => router.push("/student/dashboard?view=1")}
-              className="btn-kid btn-kid-coral w-full justify-center py-4 text-lg"
+              className="w-full py-4 px-6 font-black text-white bg-rose-500 hover:bg-rose-600 active:scale-[0.98] border-b-[4px] border-rose-700 rounded-full transition-all text-lg flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               🏠 Về bảng học tập
             </button>
@@ -469,7 +509,7 @@ export default function QuizPage() {
                   setXpAwarded(0);
                   setCurrentQ(0);
                 }}
-                className="btn-kid btn-kid-teal w-full justify-center py-4 text-lg"
+                className="w-full py-4 px-6 font-black text-white bg-teal-500 hover:bg-teal-600 active:scale-[0.98] border-b-[4px] border-teal-700 rounded-full transition-all text-lg flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
                 🔄 Làm lại
               </button>
@@ -483,22 +523,23 @@ export default function QuizPage() {
   // Topic type without teacher questions — show content placeholder
   if (step.step_type === "topic" && totalQ === 0) {
     return (
-      <div className="kid-paper-page">
-        <header className="kid-paper-header px-4 py-4">
-          <div className="max-w-xl mx-auto flex items-center justify-between">
-            <button onClick={() => router.push("/student/dashboard?view=1")} className="min-h-12 text-white/85 hover:text-white font-bold">
+      <div className="sd-page">
+        <main className="max-w-xl mx-auto px-4 py-6 flex-1 flex flex-col justify-center space-y-6">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => router.push("/student/dashboard?view=1")}
+              className="text-slate-500 hover:text-slate-800 font-black text-sm flex items-center gap-1 transition-colors cursor-pointer"
+            >
               ← Quay lại
             </button>
-            <h1 className="font-semibold">{step.topic_label ?? "Bài học"}</h1>
-            <div className="w-16" />
+            <h1 className="font-black text-slate-800 text-lg">{step.topic_label ?? "Bài học"}</h1>
+            <div className="w-12" />
           </div>
-        </header>
-        <main className="max-w-xl mx-auto px-4 py-6">
           <TopicContent step={step} />
           <button
             onClick={handleCompleteTopic}
             disabled={submitting}
-            className="btn-kid btn-kid-teal w-full justify-center mt-4 py-3"
+            className="w-full py-4 px-6 font-black text-white bg-teal-500 hover:bg-teal-600 active:scale-[0.98] border-b-[4px] border-teal-700 rounded-full transition-all text-lg flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
           >
             {submitting ? "⏳ Đang lưu..." : "Hoàn thành bài học"}
           </button>
@@ -514,41 +555,36 @@ export default function QuizPage() {
   const questions = step.questions ?? [];
 
   return (
-    <div className="kid-paper-page">
-      {/* Header - Adventure Theme */}
-      <header className="kid-paper-header px-4 py-4 sticky top-0 z-10">
-        <div className="max-w-xl mx-auto flex items-center justify-between">
+    <div className="sd-page">
+      <main className="max-w-xl mx-auto px-4 py-6 space-y-6 flex-1 flex flex-col justify-start">
+        <div className="flex items-center justify-between mb-2">
           <button 
             onClick={() => router.push("/student/dashboard?view=1")}
-            className="min-h-12 text-white/85 hover:text-white font-bold text-sm flex items-center gap-1"
+            className="text-slate-500 hover:text-slate-800 font-black text-sm flex items-center gap-1 transition-colors cursor-pointer"
           >
             ← Thoát
           </button>
-          <h1 className="font-black text-white text-lg flex items-center gap-2">
+          <h1 className="font-black text-slate-800 text-lg flex items-center gap-2">
             📝 Bài kiểm tra
           </h1>
-          <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-bold">
-            {answeredCount}/{totalQ}
+          <span className="bg-teal-50 border border-teal-100 text-teal-600 px-3.5 py-1 rounded-full text-xs font-black shrink-0">
+            Câu {answeredCount}/{totalQ}
           </span>
         </div>
-        {/* Progress - Star Style */}
-        <div className="max-w-xl mx-auto mt-3">
-          <div className="w-full h-3 bg-white/30 rounded-full overflow-hidden flex">
+        {/* Progress - Rounded style */}
+        <div className="w-full mt-1">
+          <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200/50">
             {questions.map((q, idx) => (
               <div
                 key={q.id}
-                className={`flex-1 h-full transition-all
-                  ${selectedAnswers[q.id] ? "bg-[var(--kid-success)]" : "bg-white/30"}
-                  ${idx === 0 ? "rounded-l-full" : ""}
-                  ${idx === questions.length - 1 ? "rounded-r-full" : ""}
+                className={`flex-1 h-full transition-all duration-300
+                  ${selectedAnswers[q.id] ? "bg-emerald-400" : "bg-transparent"}
+                  ${idx < questions.length - 1 ? "border-r border-slate-200/40" : ""}
                 `}
               />
             ))}
           </div>
         </div>
-      </header>
-
-      <main className="max-w-xl mx-auto px-4 py-6 space-y-4">
         {/* Current question */}
         {questions[currentQ] && (
           <QuizQuestion
@@ -559,12 +595,12 @@ export default function QuizPage() {
           />
         )}
 
-        {/* Navigation - Kid Friendly */}
-        <div className="flex gap-3">
+        {/* Navigation */}
+        <div className="flex gap-3 mt-2">
           {currentQ > 0 && (
             <button
               onClick={() => setCurrentQ((q) => q - 1)}
-              className="btn-kid btn-kid-yellow flex-1 justify-center py-4 text-base"
+              className="flex-1 py-4 px-6 font-black text-slate-700 bg-amber-400 hover:bg-amber-500 active:scale-[0.98] border-b-[4px] border-amber-600 rounded-full transition-all text-base flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               ← Câu trước
             </button>
@@ -573,7 +609,7 @@ export default function QuizPage() {
             <button
               onClick={() => setCurrentQ((q) => q + 1)}
               disabled={!selectedAnswers[questions[currentQ]?.id]}
-              className="btn-kid btn-kid-coral flex-1 justify-center py-4 text-base disabled:opacity-50"
+              className="flex-1 py-4 px-6 font-black text-white bg-rose-500 hover:bg-rose-600 active:scale-[0.98] border-b-[4px] border-rose-700 rounded-full transition-all text-base flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Câu tiếp →
             </button>
@@ -581,31 +617,96 @@ export default function QuizPage() {
             <button
               onClick={handleSubmit}
               disabled={!allAnswered || submitting}
-              className="btn-kid btn-kid-teal flex-1 justify-center py-4 text-base disabled:opacity-50"
+              className="flex-1 py-4 px-6 font-black text-white bg-teal-500 hover:bg-teal-600 active:scale-[0.98] border-b-[4px] border-teal-700 rounded-full transition-all text-base flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "⏳ Đang nộp..." : "🎯 Nộp bài!"}
             </button>
           )}
         </div>
 
-        {/* Question dots - Star Navigation */}
-        <div className="flex flex-wrap gap-2 justify-center pt-2">
+        {/* Question dots */}
+        <div className="flex flex-wrap gap-2.5 justify-center pt-3 border-t border-slate-200/40">
           {questions.map((q, i) => (
             <button
               key={q.id}
               onClick={() => setCurrentQ(i)}
-              className={`w-10 h-10 rounded-full text-sm font-black transition-all shadow-md
-                ${i === currentQ ? "bg-[var(--kid-coral-new)] text-white scale-110" :
-                  selectedAnswers[q.id] ? "bg-[var(--kid-success)] text-white" :
-                  "bg-white text-slate-500 hover:scale-105"}`}
+              className={`w-11 h-11 rounded-full text-sm font-black transition-all duration-200 shadow-sm flex items-center justify-center cursor-pointer border-[2px]
+                ${i === currentQ ? "bg-rose-500 text-white scale-110 border-rose-600 shadow-md" :
+                  selectedAnswers[q.id] ? "bg-emerald-500 text-white border-emerald-600" :
+                  "bg-white text-slate-500 border-slate-200 hover:scale-105"}`}
             >
               {i + 1}
             </button>
           ))}
         </div>
 
-        <StudentChatbot />
+        <div className="mt-4">
+          <StudentChatbot />
+        </div>
       </main>
+
+      {/* Scoped CSS Styles */}
+      <style>{`
+        /* ─── Page Shell ─── */
+        .sd-page {
+          min-height: 100dvh;
+          background-color: #FFF9F0;
+          background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px);
+          background-size: 24px 24px;
+          color: #2D3436;
+          font-family: var(--font-nunito, 'Nunito'), var(--font-quicksand, 'Quicksand'), sans-serif;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* ─── Animations ─── */
+        @keyframes bounce-in {
+          0% { transform: scale(0.3); opacity: 0; }
+          50% { transform: scale(1.05); opacity: 0.8; }
+          70% { transform: scale(0.9); opacity: 0.9; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-6px); }
+          75% { transform: translateX(6px); }
+        }
+        @keyframes fade-up {
+          from { transform: translateY(15px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pop {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.06); }
+          100% { transform: scale(1); }
+        }
+        @keyframes sparkle {
+          0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+          50% { transform: scale(1.2) rotate(15deg); opacity: 0.9; }
+        }
+        .animate-bounce-in {
+          animation: bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        .animate-shake {
+          animation: shake 0.4s ease-in-out;
+        }
+        .animate-fade-up {
+          animation: fade-up 0.4s ease-out both;
+        }
+        .animate-pop {
+          animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+        .animate-sparkle {
+          animation: sparkle 1.5s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 }

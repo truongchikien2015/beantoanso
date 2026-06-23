@@ -13,6 +13,7 @@ import {
   voiceAnswerAvailable,
   type VoiceAnswerOption,
 } from "../lib/voiceAnswer";
+import { getMediaType, getYouTubeEmbedUrl } from "../lib/mediaUtils";
 
 type Props = {
   topic: any;
@@ -167,6 +168,35 @@ export function MissionScreen({ topic, question, onFinish, onBack }: Props) {
               {voiceStatus === "listening" ? "…" : "🎙️"}
             </button>
           </div>
+
+          {/* Multimedia support */}
+          {question.image_url && (() => {
+            const mediaType = getMediaType(question.image_url);
+            const embedUrl = getYouTubeEmbedUrl(question.image_url);
+            return (
+              <div className="mt-4 w-full rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex justify-center">
+                {mediaType === "youtube" && embedUrl ? (
+                  <div className="relative w-full pt-[56.25%]">
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={embedUrl}
+                      title="Video câu hỏi"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : mediaType === "video" ? (
+                  <video src={question.image_url} controls className="w-full h-auto max-h-60 object-contain" />
+                ) : mediaType === "audio" ? (
+                  <div className="w-full p-4">
+                    <audio src={question.image_url} controls className="w-full" />
+                  </div>
+                ) : (
+                  <img src={question.image_url} alt="Hình ảnh câu hỏi" className="w-full h-auto max-h-60 object-contain" />
+                )}
+              </div>
+            );
+          })()}
+
           {voiceMessage && (
             <p className="mt-3 rounded-2xl bg-sky-50 px-3 py-2 text-sm text-slate-600">
               {voiceMessage}

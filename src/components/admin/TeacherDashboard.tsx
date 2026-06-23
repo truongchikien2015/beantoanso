@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import * as XLSX from "xlsx";
 import {
   TeacherStats,
   StudentAnswers,
@@ -12,15 +13,22 @@ import {
 import { QuestionSetManager } from "./QuestionSetManager";
 import { LearningPathManager } from "./LearningPathManager";
 import { StudentImportManager } from "./StudentImportManager";
+import { TeacherScenarioManager } from "./TeacherScenarioManager";
 
-type TeacherTab = "overview" | "students" | "chart" | "question-sets" | "learning-paths" | "students-manage";
+type TeacherTab = "overview" | "students" | "chart" | "question-sets" | "learning-paths" | "students-manage" | "scenarios";
 
 export default function TeacherDashboard({
   onLogout,
+  initialTab = "overview",
 }: {
   onLogout: () => void;
+  initialTab?: TeacherTab;
 }) {
-  const [tab, setTab] = useState<TeacherTab>("overview");
+  const [tab, setTab] = useState<TeacherTab>(initialTab);
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const allRows = useMemo(() => TeacherStats.aggregate(), []);
+  const stats = useMemo(() => TeacherStats.overview(), []);
 
   const NAV_ITEMS: { key: TeacherTab; label: string; icon: string }[] = [
     { key: "overview", label: "Tổng quan", icon: "📊" },
@@ -28,6 +36,7 @@ export default function TeacherDashboard({
     { key: "chart", label: "Biểu đồ", icon: "📈" },
     { key: "question-sets", label: "Bộ câu hỏi", icon: "📝" },
     { key: "learning-paths", label: "Lộ trình", icon: "🛤️" },
+    { key: "scenarios", label: "Kho tình huống", icon: "💡" },
     { key: "students-manage", label: "QL Học sinh", icon: "👥" },
   ];
 
@@ -73,8 +82,8 @@ export default function TeacherDashboard({
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto min-h-screen">
-        {tab === "overview" && <OverviewTab />}
-        {tab === "students" && <StudentsTab />}
+        {tab === "overview" && <OverviewTab stats={stats} />}
+        {tab === "students" && <StudentsTab allRows={allRows} onPrint={() => setIsPrinting(true)} />}
         {tab === "chart" && <ChartTab />}
         {tab === "question-sets" && (
           <ManagerShell>
@@ -86,12 +95,27 @@ export default function TeacherDashboard({
             <LearningPathManager />
           </ManagerShell>
         )}
+        {tab === "scenarios" && (
+          <ManagerShell>
+            <TeacherScenarioManager />
+          </ManagerShell>
+        )}
         {tab === "students-manage" && (
           <ManagerShell>
             <StudentImportManager />
           </ManagerShell>
         )}
       </main>
+
+      {isPrinting && (
+        <div className="fixed inset-0 bg-white z-[9999] overflow-y-auto printable-report">
+          <PrintableReport
+            rows={allRows}
+            stats={stats}
+            onClose={() => setIsPrinting(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -107,12 +131,111 @@ function ManagerShell({ children }: { children: ReactNode }) {
 }
 
 // === Overview Tab ===
-function OverviewTab() {
-  const stats = useMemo(() => TeacherStats.overview(), []);
+function OverviewTab({ stats }: { stats: any }) {
+  const seedDemoData = () => {
+    const students = [
+      { nickname: "Bé Minh", scores: [80, 70] },
+      { nickname: "Bé Lan", scores: [90, 80] },
+      { nickname: "Bé Nam", scores: [60, 50] },
+      { nickname: "Bé Vy", scores: [100, 90] },
+      { nickname: "Bé Hoàng", scores: [70, 60] },
+      { nickname: "Bé Trang", scores: [50, 40] },
+      { nickname: "Bé Tuấn", scores: [95, 85] },
+      { nickname: "Bé Linh", scores: [80, 80] },
+      { nickname: "Bé Sơn", scores: [40, 30] },
+      { nickname: "Bé Mai", scores: [75, 75] },
+      { nickname: "Bé Hùng", scores: [85, 75] },
+      { nickname: "Bé Yến", scores: [95, 85] },
+      { nickname: "Bé Cường", scores: [55, 45] },
+      { nickname: "Bé Hạnh", scores: [65, 55] },
+      { nickname: "Bé Khoa", scores: [75, 65] },
+      { nickname: "Bé Ngọc", scores: [85, 90] },
+      { nickname: "Bé Đăng", scores: [45, 50] },
+      { nickname: "Bé Quân", scores: [90, 85] },
+      { nickname: "Bé Thảo", scores: [75, 70] },
+      { nickname: "Bé Đức", scores: [60, 65] }
+    ];
+
+    const now = new Date();
+    const finalResults: any[] = [];
+    const studentAnswers: any[] = [];
+
+    students.forEach((s, idx) => {
+      const playerId = `demo-player-${idx}`;
+      const missionScore = s.scores[0];
+      const quizScore = s.scores[1];
+      const totalScore = missionScore + quizScore;
+      
+      let title = "Tân binh";
+      let badge = "🌱";
+      if (totalScore >= 160) { title = "Hiệp sĩ An toàn số"; badge = "🏆"; }
+      else if (totalScore >= 130) { title = "Bạn nhỏ thông minh"; badge = "🌟"; }
+      else if (totalScore >= 90) { title = "Em đã hiểu cơ bản"; badge = "🎖️"; }
+      else { title = "Luyện tập thêm"; badge = "💪"; }
+
+      finalResults.push({
+        id: `res-${idx}`,
+        player_id: playerId,
+        nickname: s.nickname,
+        mission_score: missionScore,
+        quiz_score: quizScore,
+        total_score: totalScore,
+        title,
+        badge,
+        completed_at: new Date(now.getTime() - idx * 2 * 3600000).toISOString()
+      });
+
+      const topics = ["stranger", "phishing", "password", "privacy", "behavior", "screentime", "badcontent"];
+      const topicLabels: Record<string, string> = {
+        stranger: "Người lạ trên mạng",
+        password: "Bảo vệ mật khẩu",
+        privacy: "Quyền riêng tư",
+        behavior: "Ứng xử văn minh",
+        screentime: "Thời gian sử dụng",
+        badcontent: "Nội dung xấu",
+        phishing: "Lừa đảo trực tuyến"
+      };
+
+      topics.forEach((t) => {
+        let isCorrect = Math.random() > 0.3;
+        if (t === "stranger" || t === "phishing") {
+          isCorrect = Math.random() > 0.65; // Lower accuracy for stranger/phishing
+        }
+
+        studentAnswers.push({
+          id: `ans-${idx}-${t}`,
+          playerId,
+          nickname: s.nickname,
+          topicId: t,
+          topicLabel: topicLabels[t],
+          selectedOption: isCorrect ? "B" : "A",
+          correctOption: "B",
+          isCorrect,
+          timestamp: new Date(now.getTime() - idx * 3600000).toISOString()
+        });
+      });
+    });
+
+    localStorage.setItem("bats:final_results:v1", JSON.stringify(finalResults));
+    localStorage.setItem("bats:student_answers:v1", JSON.stringify(studentAnswers));
+    window.location.reload();
+  };
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800">📊 Tổng quan</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-slate-800">📊 Tổng quan</h1>
+        <button
+          onClick={() => {
+            if (confirm("Nạp dữ liệu mẫu 20 học sinh Lớp 5A để thuyết trình demo?")) {
+              seedDemoData();
+            }
+          }}
+          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition shadow-sm cursor-pointer"
+        >
+          ⚡ Nạp Dữ Liệu Demo Lớp 5A
+        </button>
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
@@ -146,15 +269,19 @@ function OverviewTab() {
 }
 
 // === Students Tab ===
-function StudentsTab() {
+function StudentsTab({
+  allRows,
+  onPrint,
+}: {
+  allRows: any[];
+  onPrint: () => void;
+}) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
   const [page, setPage] = useState(0);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const PAGE_SIZE = 20;
-
-  const allRows = useMemo(() => TeacherStats.aggregate(), []);
 
   const { items, total } = useMemo(
     () =>
@@ -169,14 +296,35 @@ function StudentsTab() {
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const handleExport = () => {
-    const blob = TeacherStats.exportCSV(allRows);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `bats-hoc-sinh-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleExportExcel = () => {
+    const data = allRows.map((r) => ({
+      "Tên học sinh": r.nickname,
+      "Điểm nhiệm vụ (XP)": r.missionScore,
+      "Điểm kiểm tra (XP)": r.quizScore,
+      "Tổng điểm (XP)": r.totalScore,
+      "Danh hiệu": r.title,
+      "Độ chính xác trung bình (%)": r.accuracy,
+      "Chủ đề đã học": r.topicsAttempted,
+      "Số câu trả lời đúng": r.correctCount,
+      "Tổng số câu trả lời": r.answerCount,
+      "Ngày hoàn thành gần nhất": new Date(r.completedAt).toLocaleDateString("vi-VN"),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Báo cáo tiến bộ");
+    
+    // Auto-fit columns
+    const max_len = data.reduce((acc, row) => {
+      Object.keys(row).forEach((key, idx) => {
+        const val = row[key as keyof typeof row]?.toString() ?? "";
+        acc[idx] = Math.max(acc[idx] || 0, val.length, key.length);
+      });
+      return acc;
+    }, [] as number[]);
+    worksheet["!cols"] = max_len.map((len) => ({ wch: len + 3 }));
+
+    XLSX.writeFile(workbook, `Bao_cao_Lop_5A_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   const handleSortChange = (newSort: SortOption) => {
@@ -193,13 +341,22 @@ function StudentsTab() {
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-slate-800">👨‍🎓 Học sinh</h1>
-        <button
-          onClick={handleExport}
-          disabled={allRows.length === 0}
-          className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 text-sm"
-        >
-          ⬇️ Xuất CSV
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExportExcel}
+            disabled={allRows.length === 0}
+            className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 text-sm font-bold shadow-sm cursor-pointer transition hover:scale-[1.02] active:scale-95"
+          >
+            📊 Xuất Excel
+          </button>
+          <button
+            onClick={onPrint}
+            disabled={allRows.length === 0}
+            className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 text-sm font-bold shadow-sm cursor-pointer transition hover:scale-[1.02] active:scale-95"
+          >
+            🖨️ In Báo Cáo PDF
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -572,6 +729,102 @@ function StatCard({
       <p className={small ? "text-sm font-medium leading-tight" : "text-2xl font-bold"}>
         {value}
       </p>
+    </div>
+  );
+}
+
+// === Printable Report ===
+function PrintableReport({
+  rows,
+  stats,
+  onClose,
+}: {
+  rows: any[];
+  stats: any;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.print();
+      onClose();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div className="bg-white p-8 max-w-4xl mx-auto text-slate-800 font-sans printable-report">
+      <style>{`
+        @media print {
+          body {
+            background-color: white !important;
+          }
+          body > *:not(.printable-report) {
+            display: none !important;
+          }
+          .printable-report {
+            display: block !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+        }
+      `}</style>
+      <div className="text-center border-b-2 border-indigo-600 pb-4 mb-6">
+        <h1 className="text-2xl font-black text-slate-900 uppercase">BÁO CÁO TIẾN BỘ HỌC TẬP - BÉ AN TOÀN SỐ 🛡️</h1>
+        <p className="text-slate-500 font-bold text-sm mt-1">Lớp học: Lớp 5A | Giáo viên chủ nhiệm: Cô Hoa</p>
+        <p className="text-xs text-slate-400 mt-0.5">Ngày xuất báo cáo: {new Date().toLocaleDateString("vi-VN")}</p>
+      </div>
+
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+          <span className="text-xs text-slate-400 font-bold block">Sĩ số lớp</span>
+          <span className="text-xl font-black text-indigo-700">{rows.length} học sinh</span>
+        </div>
+        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+          <span className="text-xs text-slate-400 font-bold block">Điểm trung bình (XP)</span>
+          <span className="text-xl font-black text-amber-600">{stats.averageScore}</span>
+        </div>
+        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+          <span className="text-xs text-slate-400 font-bold block">Học sinh xuất sắc nhất</span>
+          <span className="text-sm font-black text-emerald-700 block truncate mt-1">
+            {stats.topStudent ? `${stats.topStudent.nickname} (${stats.topStudent.score} XP)` : "—"}
+          </span>
+        </div>
+      </div>
+
+      <h2 className="text-base font-bold text-slate-700 mb-2">📋 Danh sách điểm số & Đánh giá năng lực:</h2>
+      <table className="w-full border-collapse border border-slate-300 text-sm">
+        <thead>
+          <tr className="bg-slate-100">
+            <th className="border border-slate-300 px-3 py-2 text-left">Họ tên</th>
+            <th className="border border-slate-300 px-3 py-2 text-center">Điểm Nhiệm vụ</th>
+            <th className="border border-slate-300 px-3 py-2 text-center">Điểm Kiểm tra</th>
+            <th className="border border-slate-300 px-3 py-2 text-center">Tổng điểm</th>
+            <th className="border border-slate-300 px-3 py-2 text-center">Độ chính xác</th>
+            <th className="border border-slate-300 px-3 py-2 text-left">Danh hiệu</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
+              <td className="border border-slate-300 px-3 py-1.5 font-bold">{r.nickname}</td>
+              <td className="border border-slate-300 px-3 py-1.5 text-center">{r.missionScore}</td>
+              <td className="border border-slate-300 px-3 py-1.5 text-center">{r.quizScore}</td>
+              <td className="border border-slate-300 px-3 py-1.5 text-center font-black text-indigo-700">{r.totalScore}</td>
+              <td className="border border-slate-300 px-3 py-1.5 text-center">{r.accuracy}%</td>
+              <td className="border border-slate-300 px-3 py-1.5 font-medium">{r.title}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="mt-8 flex justify-between text-xs text-slate-400 font-bold border-t border-slate-200 pt-4">
+        <span>Hệ thống giáo dục an toàn trực tuyến Bé An Toàn Số</span>
+        <span>Ký tên Giáo viên chủ nhiệm</span>
+      </div>
     </div>
   );
 }

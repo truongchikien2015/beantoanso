@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ResultScreen } from "../../components/ResultScreen";
 import { Certificate } from "../../components/Certificate";
 import { useAppStore } from "../../lib/globalStore";
-import { Header } from "../../components/Header";
 import { totalXpForPlayer } from "../../lib/xp";
 import { supabase } from "../../lib/supabase";
 import { Results } from "../../lib/store";
@@ -44,6 +43,7 @@ export default function ResultPage() {
         <Certificate
           nickname={nickname}
           totalScore={totalScore}
+          resultId={lastResultId}
           onBack={() => setShowCert(false)}
         />
       </div>
@@ -51,30 +51,21 @@ export default function ResultPage() {
   }
 
   return (
-    <>
-      <Header
-        nickname={nickname}
-        totalScore={totalScore}
-        xp={profileXp || totalXpForPlayer(playerId)}
-        onHome={() => router.push("/")}
-        onLogout={handleLogout}
-      />
-      <ResultScreen
-        nickname={nickname}
-        missionScore={missionScore}
-        missionsDone={Object.keys(missionResults).length}
-        quizCorrect={quiz.correct}
-        quizScore={quiz.score}
-        quizTotal={quiz.total}
-        rank={lastResultId ? Results.rankOf(lastResultId) : -1}
-        resultId={lastResultId}
-        onCertificate={() => setShowCert(true)}
-        onLeaderboard={() => router.push("/leaderboard")}
-        onReplay={() => {
-          useAppStore.getState().resetProgress();
-          router.push("/path-select");
-        }}
-      />
-    </>
+    <ResultScreen
+      nickname={nickname}
+      missionScore={missionScore}
+      missionsDone={Object.keys(missionResults).length}
+      quizCorrect={quiz.correct}
+      quizScore={quiz.score}
+      quizTotal={quiz.total}
+      rank={lastResultId ? Results.rankOf(lastResultId) : -1}
+      resultId={lastResultId}
+      onCertificate={() => setShowCert(true)}
+      onLeaderboard={() => router.push("/leaderboard")}
+      onReplay={() => {
+        useAppStore.getState().resetProgress();
+        router.push("/path-select");
+      }}
+    />
   );
 }

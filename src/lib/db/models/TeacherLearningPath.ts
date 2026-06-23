@@ -21,4 +21,5 @@ const TeacherLearningPathSchema = new Schema<ITeacherLearningPath>(
 
 TeacherLearningPathSchema.index({ created_by: 1, is_active: 1 });
 
-export const TeacherLearningPath: Model<ITeacherLearningPath> = models.TeacherLearningPath || model<ITeacherLearningPath>("TeacherLearningPath", TeacherLearningPathSchema);
+export const TeacherLearningPath: Model<ITeacherLearningPath> =
+  models.TeacherLearningPath || model<ITeacherLearningPath>("TeacherLearningPath", TeacherLearningPathSchema, "teacher_learning_paths");

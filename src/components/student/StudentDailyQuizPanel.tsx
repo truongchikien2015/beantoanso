@@ -73,21 +73,24 @@ export function StudentDailyQuizPanel({ onUnauthorized, onBack, compact = false 
 
   if (loading) {
     return (
-      <section className="card-kid p-6 text-center">
+      <section className="bg-white rounded-[28px] border-[3px] border-slate-200 p-8 text-center animate-fade-up">
         <div className="mb-3 text-5xl animate-bounce">🔥</div>
-        <p className="text-base font-bold text-slate-500">Đang tải 5 câu hôm nay...</p>
+        <p className="text-base font-extrabold text-slate-500">Đang tải thử thách hôm nay...</p>
       </section>
     );
   }
 
   if (error || !daily) {
     return (
-      <section className="card-kid p-6 text-center">
+      <section className="bg-white rounded-[28px] border-[3px] border-red-200 p-8 text-center animate-fade-up">
         <div className="mb-3 text-5xl">⚠️</div>
-        <p className="mb-4 font-bold text-[var(--kid-coral-new)]">{error || "Không tải được thử thách"}</p>
+        <p className="mb-4 font-black text-red-600">{error || "Không tải được thử thách"}</p>
         {onBack && (
-          <button onClick={onBack} className="btn-kid btn-kid-coral">
-            Về bảng học tập
+          <button
+            onClick={onBack}
+            className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-extrabold text-sm rounded-full transition"
+          >
+            Quay lại
           </button>
         )}
       </section>
@@ -95,42 +98,48 @@ export function StudentDailyQuizPanel({ onUnauthorized, onBack, compact = false 
   }
 
   return (
-    <section className={`space-y-4 ${compact ? "" : "mx-auto max-w-2xl"}`}>
-      <div className="card-kid p-5 bg-gradient-to-r from-amber-50 to-cyan-50">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-black text-[var(--kid-coral-new)]">🔥 Thử thách hôm nay</p>
-            <h2 className="mt-1 text-2xl font-black text-slate-800">
-              Làm 5 câu để giữ streak
-            </h2>
-            <p className="text-sm font-bold text-slate-500">
-              Lv.{daily.stats.level} · {daily.stats.total_xp} XP · Streak {daily.stats.current_streak} ngày
+    <section className={`space-y-6 ${compact ? "" : "mx-auto max-w-2xl"}`}>
+      {/* Daily Streak Card Header */}
+      <div className="sd-streak-card-new animate-fade-up">
+        <div className="sd-streak-inner">
+          <div className="sd-streak-details">
+            <span className="sd-streak-badge">THỬ THÁCH HẰNG NGÀY</span>
+            <h3 className="sd-streak-title">Làm 5 câu để giữ chuỗi học</h3>
+            <p className="sd-streak-desc">
+              Cộng điểm XP và duy trì chuỗi ngày liên tiếp của em.
+            </p>
+            <p className="text-xs font-bold text-amber-700 mt-2">
+              Lv.{daily.stats.level} · {daily.stats.total_xp} XP · Chuỗi học {daily.stats.current_streak} ngày
             </p>
           </div>
-          <div className="rounded-2xl bg-white/80 px-4 py-3 text-center shadow-sm">
-            <p className="text-xs font-black uppercase text-slate-400">Đã trả lời</p>
-            <p className="text-2xl font-black text-[var(--kid-teal-new)]">{answeredCount}/{total}</p>
+          <div className="rounded-2xl bg-amber-50 px-4 py-3 text-center border-2 border-amber-200">
+            <p className="text-xs font-black uppercase text-amber-600">Đã trả lời</p>
+            <p className="text-2xl font-black text-amber-700">{answeredCount}/{total}</p>
           </div>
         </div>
         {daily.completed && daily.result && (
-          <div className="mt-4 rounded-2xl bg-white/80 p-4 text-center">
+          <div className="mx-8 mb-6 p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-200 text-center animate-fade-up">
             <p className="text-lg font-black text-slate-800">
               Hôm nay em đã hoàn thành: {daily.result.correct_count}/{daily.result.total} câu đúng
             </p>
-            <p className="text-sm font-bold text-[var(--kid-success)]">
+            <p className="text-sm font-bold text-emerald-600">
               +{daily.result.xp_awarded} XP đã được cộng vào tài khoản
             </p>
           </div>
         )}
       </div>
 
-      <div className="space-y-4">
+      {/* Questions list */}
+      <div className="space-y-6">
         {daily.questions.map((question, index) => {
           const result = resultMap.get(question.id);
           return (
-            <section key={question.id} className="card-kid p-5">
-              <p className="mb-4 text-lg font-black leading-relaxed text-slate-800">
-                <span className="mr-2 text-[var(--kid-coral-new)]">Câu {index + 1}.</span>
+            <section
+              key={question.id}
+              className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-6 hover:shadow-md transition duration-200 animate-fade-up"
+            >
+              <p className="mb-4 text-base font-black leading-relaxed text-slate-800">
+                <span className="mr-2 text-rose-500">Câu {index + 1}.</span>
                 {question.question}
               </p>
               <div className="space-y-3">
@@ -145,14 +154,14 @@ export function StudentDailyQuizPanel({ onUnauthorized, onBack, compact = false 
                       type="button"
                       disabled={daily.completed}
                       onClick={() => setSelected((current) => ({ ...current, [question.id]: optionKey }))}
-                      className={`kid-choice w-full px-5 py-4 text-left transition-all ${
+                      className={`w-full px-5 py-4 text-left border-[3px] rounded-2xl min-h-[58px] font-bold text-sm transition-all duration-200 active:scale-[0.99] ${
                         isCorrect
-                          ? "border-[var(--kid-success)] bg-[var(--kid-success)]/10 text-[var(--kid-success)]"
+                          ? "border-emerald-500 bg-emerald-50/50 text-emerald-700"
                           : isWrong
-                            ? "border-[var(--kid-coral-new)] bg-[var(--kid-coral-new)]/10 text-[var(--kid-coral-new)]"
+                            ? "border-red-400 bg-red-50/50 text-red-700"
                             : isSelected
-                              ? "border-[var(--kid-teal-new)] bg-[var(--kid-teal-new)]/10 font-bold text-slate-800"
-                              : "border-slate-200 bg-white text-slate-700 hover:border-[var(--kid-coral-new)]"
+                              ? "border-teal-400 bg-teal-50/30 text-slate-800 shadow-sm"
+                              : "border-slate-100 bg-white text-slate-600 hover:border-teal-300 hover:text-slate-800"
                       }`}
                     >
                       <span className="mr-2 font-black">{optionKey}.</span>
@@ -164,7 +173,7 @@ export function StudentDailyQuizPanel({ onUnauthorized, onBack, compact = false 
                 })}
               </div>
               {result?.explanation && (
-                <div className="mt-4 rounded-2xl bg-[var(--kid-yellow-new)]/25 p-4 text-sm font-bold text-amber-800">
+                <div className="mt-4 rounded-2xl bg-amber-50 border-2 border-amber-200 p-4 text-sm font-bold text-amber-800">
                   💡 {result.explanation}
                 </div>
               )}
@@ -173,11 +182,12 @@ export function StudentDailyQuizPanel({ onUnauthorized, onBack, compact = false 
         })}
       </div>
 
+      {/* Action Buttons */}
       {!daily.completed && (
         <button
           onClick={handleSubmit}
           disabled={!allAnswered || submitting}
-          className="btn-kid btn-kid-teal w-full justify-center py-4 text-lg disabled:opacity-50"
+          className="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white text-lg font-black rounded-3xl shadow-md hover:shadow-lg active:scale-98 transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {submitting ? "⏳ Đang nộp..." : "🎯 Nộp 5 câu hôm nay"}
         </button>
@@ -186,9 +196,9 @@ export function StudentDailyQuizPanel({ onUnauthorized, onBack, compact = false 
       {daily.completed && onBack && (
         <button
           onClick={onBack}
-          className="btn-kid btn-kid-coral w-full justify-center py-4 text-lg"
+          className="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white text-lg font-black rounded-3xl shadow-md hover:shadow-lg active:scale-98 transition duration-200 flex items-center justify-center gap-2"
         >
-          🏠 Về bảng học tập
+          🏠 Quay lại bảng học tập
         </button>
       )}
     </section>

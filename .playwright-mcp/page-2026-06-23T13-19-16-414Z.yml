@@ -1,0 +1,50 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - button "Logo Bé An Toàn Số" [ref=e5]:
+          - img "Logo" [ref=e6]
+          - generic [ref=e7]: Bé An Toàn Số
+        - generic [ref=e8]: 👨‍👩‍👧‍👦 Cổng Phụ Huynh
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]: 🛡️ Theo dõi hành trình học tập của con
+        - heading "Đồng hành cùng con an toàn số" [level=1] [ref=e13]
+        - paragraph [ref=e14]: Tra cứu kết quả học tập, phát hiện điểm yếu kỹ năng và nhận các gợi ý hướng dẫn con tự bảo vệ tại nhà.
+        - generic [ref=e15]:
+          - generic [ref=e16]:
+            - generic [ref=e17]: 2,500+
+            - generic [ref=e18]: Học sinh
+          - generic [ref=e19]:
+            - generic [ref=e20]: "7"
+            - generic [ref=e21]: Chủ đề kỹ năng
+          - generic [ref=e22]:
+            - generic [ref=e23]: 14k+
+            - generic [ref=e24]: Bài tập hoàn thành
+      - generic [ref=e26]:
+        - heading "Tra cứu tiến độ của con" [level=2] [ref=e27]
+        - paragraph [ref=e28]: Nhập mã liên kết hiển thị trên trang cá nhân hoặc bản đồ học tập của con.
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e31]: Mã liên kết của con
+            - 'textbox "Ví dụ: PH-XXXXXXXX" [ref=e32]': PH-D1U6OH3QI1
+            - paragraph [ref=e33]: "* Mã hiển thị tại Trang cá nhân hoặc Bản đồ học tập của con."
+          - button "Đang tra cứu..." [disabled] [ref=e34]:
+            - generic [ref=e35]:
+              - img [ref=e36]
+              - text: Đang tra cứu...
+    - contentinfo [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - heading "Bé An Toàn Số" [level=4] [ref=e41]
+          - paragraph [ref=e42]: © 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt trên không gian mạng.
+        - generic [ref=e43]:
+          - link "Điều khoản" [ref=e44] [cursor=pointer]:
+            - /url: "#"
+          - link "Bảo mật" [ref=e45] [cursor=pointer]:
+            - /url: "#"
+          - link "Liên hệ" [ref=e46] [cursor=pointer]:
+            - /url: "#"
+  - button "Open Next.js Dev Tools" [ref=e52] [cursor=pointer]:
+    - img [ref=e53]
+  - alert [ref=e56]

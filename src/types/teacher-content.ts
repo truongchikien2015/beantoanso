@@ -29,6 +29,7 @@ export interface TeacherQuestion {
   option_c: string;
   correct_option: "A" | "B" | "C";
   explanation: string | null;
+  image_url?: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -62,6 +63,7 @@ export interface TeacherStudent {
   email: string | null;
   class_name: string | null;
   student_code: string;
+  parent_access_code: string | null;
   password_hash: string;
   assigned_path_id: string | null;
   assigned_at: string | null;
@@ -115,6 +117,7 @@ export interface CreateQuestionInput {
   option_c: string;
   correct_option: "A" | "B" | "C";
   explanation?: string;
+  image_url?: string | null;
 }
 
 export interface UpdateQuestionInput {
@@ -124,6 +127,7 @@ export interface UpdateQuestionInput {
   option_c?: string;
   correct_option?: "A" | "B" | "C";
   explanation?: string;
+  image_url?: string | null;
   is_active?: boolean;
 }
 
@@ -202,6 +206,7 @@ export interface ExcelQuestionRow {
   option_c: string;
   correct_option: string;
   explanation?: string;
+  image_url?: string;
 }
 
 export interface ImportQuestionInput {
@@ -211,6 +216,7 @@ export interface ImportQuestionInput {
   option_c: string;
   correct_option: "A" | "B" | "C";
   explanation?: string;
+  image_url?: string | null;
 }
 
 export interface QuestionImportResult {
@@ -250,6 +256,7 @@ export interface StudentQuizQuestion {
   options: [string, string, string];
   correct_option: "A" | "B" | "C";
   explanation: string | null;
+  image_url?: string | null;
 }
 
 export interface StudentQuizAnswer {
@@ -314,6 +321,7 @@ export interface StudentSession {
   class_name: string | null;
   student_code: string;
   assigned_path_id: string | null;
+  parent_access_code?: string | null;
 }
 
 export interface StudentDashboardData {

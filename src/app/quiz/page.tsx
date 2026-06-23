@@ -4,9 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { QuizScreen } from "../../components/QuizScreen";
 import { useAppStore } from "../../lib/globalStore";
-import { Header } from "../../components/Header";
 import { totalXpForPlayer } from "../../lib/xp";
-import { supabase } from "../../lib/supabase";
 import { getBadge } from "../../data/gameData";
 import { Results, FinalResult } from "../../lib/store";
 
@@ -46,46 +44,53 @@ export default function QuizPage() {
     setLastResultId(saved.id);
 
     try {
-      const { error } =
-        (await supabase?.from("results").upsert(saved, { onConflict: "id" })) ??
-        {};
-      if (error) {
-        console.warn("Failed to publish share result:", error);
+      const res = await fetch("/api/student/results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: saved.id,
+          player_id: saved.player_id,
+          nickname: saved.nickname,
+          mission_score: saved.mission_score,
+          quiz_score: saved.quiz_score,
+          total_score: saved.total_score,
+          title: saved.title,
+          badge: saved.badge,
+        }),
+      });
+      if (!res.ok) {
+        console.warn("Failed to publish share result");
       }
     } catch (err) {
       console.warn("Failed to publish share result:", err);
     }
 
-    // Sync XP to Supabase for logged in members
-    supabase?.auth.getSession().then(async ({ data: { session } }) => {
-      const user = session?.user;
-      if (user) {
-        try {
-          const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-          if (profile) {
-            const newXp = (profile.xp || 0) + total_score;
-            const newLevel = Math.floor(newXp / 100) + 1;
-            const newTotalScore = (profile.total_score || 0) + total_score;
-
-            await supabase.from('profiles').update({
-              xp: newXp,
-              level: newLevel,
-              total_score: newTotalScore,
-              updated_at: new Date().toISOString()
-            }).eq('id', user.id);
-            setProfileXp(newXp);
-          }
-        } catch (err) {
-          console.error("Failed to sync progress:", err);
+    // Sync XP to MongoDB for logged in students
+    const token = typeof window !== "undefined" ? localStorage.getItem("student_token") : null;
+    if (token) {
+      try {
+        const res = await fetch("/api/student/progress", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ xp: total_score, source: "quiz" }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok && body.stats) {
+          setProfileXp(body.stats.total_xp);
         }
+      } catch (err) {
+        console.error("Failed to sync progress:", err);
       }
-    });
+    }
 
     router.push("/result");
   };
 
   const handleLogout = async () => {
-    await supabase?.auth.signOut();
+    localStorage.removeItem("student_token");
     useAppStore.getState().logout();
     router.push("/");
   };
@@ -93,15 +98,6 @@ export default function QuizPage() {
   if (!nickname) return null;
 
   return (
-    <>
-      <Header
-        nickname={nickname}
-        totalScore={missionScore}
-        xp={profileXp || totalXpForPlayer(playerId)}
-        onHome={() => router.push("/")}
-        onLogout={handleLogout}
-      />
-      <QuizScreen onFinish={handleFinishQuiz} />
-    </>
+    <QuizScreen onFinish={handleFinishQuiz} />
   );
 }

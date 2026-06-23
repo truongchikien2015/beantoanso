@@ -16,7 +16,14 @@ import { ClassifyGame } from "../components/ClassifyGame";
 import { getBadge } from "../data/gameData";
 import { Admin, Results, Player, FinalResult } from "../lib/store";
 import { totalXpForPlayer } from "../lib/xp";
-import { supabase } from "../lib/supabase";
+import { fetchStudentSession, getStudentToken } from "../lib/studentApi";
+import { sfx } from "../lib/sound";
+
+import { ChatSimulation } from "../components/simulations/ChatSimulation";
+import { EmailSimulation } from "../components/simulations/EmailSimulation";
+import { EntryQuiz } from "../components/EntryQuiz";
+import { AiMascot } from "../components/AiMascot";
+import { HelpModal } from "../components/HelpModal";
 
 type Screen =
   | "home"
@@ -32,7 +39,9 @@ type Screen =
   | "lessons"
   | "daily"
   | "classify"
-  | "teacher";
+  | "teacher"
+  | "chat-sim"
+  | "email-sim";
 
 type SaveData = {
   nickname: string;
@@ -93,39 +102,63 @@ export default function App() {
     total: number;
   } | null>(null);
   const [lastResultId, setLastResultId] = useState<string | undefined>();
+  const [showEntryQuiz, setShowEntryQuiz] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   useEffect(() => {
     // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        supabase.from('profiles').select('*').eq('id', session.user.id).single().then(({ data: profile }) => {
-          setNickname(profile?.full_name || session.user.email);
-          setGender(profile?.gender || "other");
-          setBirthYear(profile?.birth_year || 2010);
-          setProfileXp(profile?.xp || 0);
-          setPlayerId(session.user.id);
-          setScreen("path-select");
+    const token = getStudentToken();
+    if (token) {
+      fetchStudentSession()
+        .then(({ student, assigned_path }) => {
+          if (student) {
+            setUser(student);
+            setNickname(student.nickname);
+            setGender(student.gender || "other");
+            setBirthYear(student.birthYear || 2010);
+            setProfileXp(student.xp || 0);
+            setPlayerId(student.id);
+            if (assigned_path) {
+              setActivePath(assigned_path);
+            }
+            setScreen("path-select");
+
+            const hasEntryQuiz = localStorage.getItem("bats:entry_weaknesses");
+            if (!hasEntryQuiz) {
+              setShowEntryQuiz(true);
+            }
+          }
+        })
+        .catch((err) => {
+          console.error("Session verification failed:", err);
+          localStorage.removeItem("student_token");
         });
-      } else {
-        const saved = loadSave();
-        if (saved?.nickname) {
-          setNickname(saved.nickname);
-          setGender(saved.gender || "");
-          setBirthYear(saved.birthYear);
-          setPlayerId(saved.playerId);
-          setMissionResults(saved.missionResults || {});
-          if (saved.quiz) setQuiz(saved.quiz);
-          if (saved.lastResultId) setLastResultId(saved.lastResultId);
-          setScreen("path-select");
+    } else {
+      const saved = loadSave();
+      if (saved?.nickname) {
+        setNickname(saved.nickname);
+        setGender(saved.gender || "");
+        setBirthYear(saved.birthYear);
+        setPlayerId(saved.playerId);
+        setMissionResults(saved.missionResults || {});
+        if (saved.quiz) setQuiz(saved.quiz);
+        if (saved.lastResultId) setLastResultId(saved.lastResultId);
+        setScreen("path-select");
+
+        const hasEntryQuiz = localStorage.getItem("bats:entry_weaknesses");
+        if (!hasEntryQuiz) {
+          setShowEntryQuiz(true);
         }
       }
-    });
+    }
 
-    // Fetch all topics from Supabase
-    supabase.from('topics').select('*').eq('is_active', true).order('topic_order', { ascending: true }).then(({ data }) => {
-      if (data) setAllTopics(data);
-    });
+    // Fetch all topics from MongoDB
+    fetch("/api/student/topics")
+      .then((res) => res.json())
+      .then((body) => {
+        if (body.data) setAllTopics(body.data);
+      })
+      .catch((err) => console.error("Failed to fetch topics:", err));
   }, []);
 
   useEffect(() => {
@@ -160,6 +193,11 @@ export default function App() {
     setLastResultId(undefined);
     setActivePath(null);
     setTopics([]);
+    
+    const hasEntryQuiz = localStorage.getItem("bats:entry_weaknesses");
+    if (!hasEntryQuiz) {
+      setShowEntryQuiz(true);
+    }
     setScreen("path-select");
   };
 
@@ -183,46 +221,45 @@ export default function App() {
     const age = birthYear ? currentYear - birthYear : 99; // Default to adult if missing
     const userGender = gender || 'all';
 
-    // Fetch random question matching age and gender
-    const { data, error } = await supabase
-      .from('questions')
-      .select('*')
-      .eq('topic_slug', topic.slug)
-      .lte('min_age', age)
-      .gte('max_age', age)
-      .in('target_gender', ['all', userGender]);
-
-    if (error) {
-      console.error("Supabase Error fetching questions:", error);
-      alert(`Lỗi khi lấy câu hỏi: ${error.message}`);
-      return;
-    }
-    
-    if (data && data.length > 0) {
-      const randomQ = data[Math.floor(Math.random() * data.length)];
-      setActiveTopic(topic);
-      setActiveQuestion(randomQ);
-      setScreen("mission");
-    } else {
-      // Fallback: fetch any question for this topic if specific age/gender has no questions
-      const { data: fallbackData } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('topic_slug', topic.slug);
-        
-      if (fallbackData && fallbackData.length > 0) {
-        const randomQ = fallbackData[Math.floor(Math.random() * fallbackData.length)];
+    // Fetch random question matching age and gender from MongoDB API
+    try {
+      const res = await fetch(`/api/student/questions?topic_slug=${encodeURIComponent(topic.slug)}&age=${age}&gender=${userGender}`);
+      if (!res.ok) {
+        throw new Error(`Lỗi HTTP: ${res.status}`);
+      }
+      const data = await res.json();
+      
+      if (data && data.length > 0) {
+        const randomQ = data[Math.floor(Math.random() * data.length)];
         setActiveTopic(topic);
         setActiveQuestion(randomQ);
         setScreen("mission");
       } else {
-        const { data: allData, error: allErr } = await supabase.from('questions').select('id').limit(1);
-        if (allErr || !allData || allData.length === 0) {
-          alert("⚠️ Database chưa có câu hỏi nào! Hãy chạy lệnh: node scripts/seed.mjs");
+        // Fallback: fetch any question for this topic if specific age/gender has no questions
+        const fallbackRes = await fetch(`/api/student/questions?topic_slug=${encodeURIComponent(topic.slug)}`);
+        if (!fallbackRes.ok) {
+          throw new Error(`Lỗi HTTP: ${fallbackRes.status}`);
+        }
+        const fallbackData = await fallbackRes.json();
+        
+        if (fallbackData && fallbackData.length > 0) {
+          const randomQ = fallbackData[Math.floor(Math.random() * fallbackData.length)];
+          setActiveTopic(topic);
+          setActiveQuestion(randomQ);
+          setScreen("mission");
         } else {
-          alert(`Chưa có câu hỏi cho chủ đề: ${topic.label}`);
+          const generalRes = await fetch("/api/student/questions");
+          const generalData = await generalRes.json().catch(() => []);
+          if (Array.isArray(generalData) && generalData.length > 0) {
+            alert(`Chưa có câu hỏi cho chủ đề: ${topic.label}`);
+          } else {
+            alert("⚠️ Database chưa có câu hỏi nào! Hãy chạy lệnh: node scripts/seed.mjs");
+          }
         }
       }
+    } catch (err: any) {
+      console.error("Error fetching questions:", err);
+      alert(`Lỗi khi lấy câu hỏi: ${err.message}`);
     }
   };
 
@@ -253,23 +290,23 @@ export default function App() {
     });
     setLastResultId(saved.id);
 
-    // Sync XP to Supabase for logged in members
+    // Sync XP for logged in students
     if (user) {
       try {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (profile) {
-          const newXp = (profile.xp || 0) + total_score;
-          // Every 100 XP = 1 Level
-          const newLevel = Math.floor(newXp / 100) + 1;
-          const newTotalScore = (profile.total_score || 0) + total_score;
-
-          await supabase.from('profiles').update({
-            xp: newXp,
-            level: newLevel,
-            total_score: newTotalScore,
-            updated_at: new Date().toISOString()
-          }).eq('id', user.id);
-          setProfileXp(newXp);
+        const token = localStorage.getItem("student_token");
+        if (token) {
+          const res = await fetch("/api/student/progress", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ xp: total_score, source: "quiz" }),
+          });
+          const body = await res.json().catch(() => ({}));
+          if (res.ok && body.stats) {
+            setProfileXp(body.stats.total_xp);
+          }
         }
       } catch (err) {
         console.error("Failed to sync progress:", err);
@@ -289,7 +326,7 @@ export default function App() {
   const handleHome = () => setScreen(nickname ? (activePath ? "map" : "path-select") : "home");
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem("student_token");
     Player.clear();
     setUser(null);
     setNickname("");
@@ -354,11 +391,47 @@ export default function App() {
 
   if (screen === "path-select") {
     return (
-      <LearningPathSelector
-        nickname={nickname}
-        onSelect={handleSelectPath}
-        onBack={() => setScreen("home")}
-      />
+      <div className="min-h-screen bg-gradient-to-b from-sky-50 via-pink-50 to-amber-50">
+        <Header
+          nickname={nickname}
+          onHome={handleHome}
+          onLogout={handleLogout}
+        />
+        <LearningPathSelector
+          nickname={nickname}
+          onSelect={handleSelectPath}
+          onBack={() => setScreen("home")}
+          onSelectChatSim={() => setScreen("chat-sim")}
+          onSelectEmailSim={() => setScreen("email-sim")}
+          onSelectClassify={() => setScreen("classify")}
+        />
+        {showEntryQuiz && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[150] overflow-y-auto">
+            <div className="w-full max-w-md">
+              <EntryQuiz
+                onComplete={() => setShowEntryQuiz(false)}
+                onClose={() => setShowEntryQuiz(false)}
+              />
+            </div>
+          </div>
+        )}
+        {nickname && (
+          <>
+            <AiMascot />
+            <button
+              onClick={() => {
+                sfx.click();
+                setShowHelpModal(true);
+              }}
+              className="fixed bottom-6 left-6 z-[100] w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 border-4 border-white shadow-xl flex items-center justify-center text-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer animate-pulse"
+              title="Con cần giúp đỡ khẩn cấp!"
+            >
+              🚨
+            </button>
+          </>
+        )}
+        <HelpModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      </div>
     );
   }
 
@@ -366,8 +439,6 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-b from-sky-50 via-pink-50 to-amber-50">
       <Header
         nickname={nickname}
-        totalScore={totalScore}
-        xp={user ? profileXp : (playerId ? totalXpForPlayer(playerId) : 0)}
         onHome={handleHome}
         onLogout={handleLogout}
       />
@@ -406,9 +477,90 @@ export default function App() {
         <Certificate
           nickname={nickname}
           totalScore={totalScore}
+          resultId={lastResultId}
           onBack={() => setScreen("result")}
         />
       )}
+      {screen === "chat-sim" && (
+        <div className="py-8">
+          <ChatSimulation
+            onBack={() => setScreen("path-select")}
+            onComplete={async (simScore) => {
+              if (user) {
+                try {
+                  const token = localStorage.getItem("student_token");
+                  if (token) {
+                    const res = await fetch("/api/student/progress", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ xp: simScore, source: "simulation_chat" }),
+                    });
+                    const body = await res.json().catch(() => ({}));
+                    if (res.ok && body.stats) {
+                      setProfileXp(body.stats.total_xp);
+                    }
+                  }
+                } catch (err) {
+                  console.error("Failed to sync progress:", err);
+                }
+              }
+            }}
+          />
+        </div>
+      )}
+      {screen === "email-sim" && (
+        <div className="py-8">
+          <EmailSimulation
+            onBack={() => setScreen("path-select")}
+            onComplete={async (simScore) => {
+              if (user) {
+                try {
+                  const token = localStorage.getItem("student_token");
+                  if (token) {
+                    const res = await fetch("/api/student/progress", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ xp: simScore, source: "simulation_email" }),
+                    });
+                    const body = await res.json().catch(() => ({}));
+                    if (res.ok && body.stats) {
+                      setProfileXp(body.stats.total_xp);
+                    }
+                  }
+                } catch (err) {
+                  console.error("Failed to sync progress:", err);
+                }
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* Floating AI Mascot and Urgent Help Button */}
+      {nickname && (
+        <>
+          <AiMascot />
+          <button
+            onClick={() => {
+              sfx.click();
+              setShowHelpModal(true);
+            }}
+            className="fixed bottom-6 left-6 z-[100] w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 border-4 border-white shadow-xl flex items-center justify-center text-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer animate-pulse"
+            title="Con cần giúp đỡ khẩn cấp!"
+          >
+            🚨
+          </button>
+        </>
+      )}
+
+      {/* Help Modal */}
+      <HelpModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
     </div>
   );
 }

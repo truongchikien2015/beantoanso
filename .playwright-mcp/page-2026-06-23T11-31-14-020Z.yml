@@ -1,0 +1,16 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4] [cursor=pointer]:
+        - img [ref=e6]
+        - generic [ref=e8]: Bé An Toàn Số
+      - navigation [ref=e9]:
+        - button "Khóa học" [ref=e10] [cursor=pointer]
+        - button "Thử thách" [ref=e11] [cursor=pointer]
+        - button "Bảng xếp hạng" [ref=e12] [cursor=pointer]
+        - button "Về chúng tôi" [ref=e13] [cursor=pointer]
+      - generic [ref=e14]:
+        - button "Đăng nhập" [ref=e15] [cursor=pointer]
+        - button "Đăng ký" [ref=e16] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e22] [cursor=pointer]:
+    - img [ref=e23]

@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
     email: s.email,
     class_name: s.class_name,
     student_code: s.student_code,
+    parent_access_code: s.parent_access_code ?? null,
     assigned_path_id: s.assigned_path_id?.toString() ?? null,
     assigned_at: s.assigned_at,
     is_active: s.is_active,
@@ -84,6 +85,7 @@ export async function POST(req: NextRequest) {
         email: s.email ?? null,
         class_name: s.class_name ?? null,
         student_code: s.student_code,
+        parent_access_code: null,
         password_hash: hash,
         is_active: true,
       });

@@ -6,12 +6,15 @@ import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
 import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
 import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
 import { TeacherStudentProgress } from "@/lib/db/models/TeacherStudentProgress";
+import { Question } from "@/lib/db/models/Question";
+import { Topic } from "@/lib/db/models/Topic";
 import { getStudentId } from "@/lib/auth-helpers";
 import {
   XP_PER_CORRECT_ANSWER,
   XP_TOPIC_COMPLETE,
   awardStudentXp,
 } from "@/lib/server/studentRewards";
+import { corsOptions, jsonWithCors, withCors } from "@/lib/cors";
 import mongoose from "mongoose";
 
 function toObjectId(id: string): mongoose.Types.ObjectId {
@@ -23,11 +26,33 @@ function toObjectId(id: string): mongoose.Types.ObjectId {
   return new mongoose.Types.ObjectId(hash.substring(0, 24));
 }
 
+async function resolvePublicTopic(stepId: string) {
+  if (mongoose.Types.ObjectId.isValid(stepId)) {
+    return Topic.findById(stepId).lean();
+  }
+
+  return Topic.findOne({ slug: stepId, is_active: true }).lean();
+}
+
+async function getPublicTopicQuestions(topicSlug: string) {
+  return Question.find({
+    topic_slug: topicSlug,
+    is_active: true,
+  })
+    .select("_id question option_a option_b option_c correct_option explanation")
+    .sort({ created_at: 1 })
+    .lean();
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return corsOptions(req);
+}
+
 export async function POST(req: NextRequest) {
   await connectDB();
 
   const session = getStudentId(req);
-  if (session instanceof NextResponse) return session;
+  if (session instanceof NextResponse) return withCors(req, session);
 
   const { studentId } = session;
 
@@ -40,71 +65,87 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return jsonWithCors(req, { error: "Invalid JSON" }, { status: 400 });
   }
 
   const { path_id, step_id, score, answers } = body;
   if (!path_id || !step_id || score === undefined) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    return jsonWithCors(req, { error: "Missing required fields" }, { status: 400 });
   }
 
   const pathObjectId = toObjectId(path_id);
   const stepObjectId = toObjectId(step_id);
   const studentObjectId = toObjectId(studentId);
-
-  // Verify step belongs to this path
-  const step = await TeacherLearningPathStep.findOne({
-    _id: stepObjectId,
-  }).lean();
-
-  if (!step || step.path_id.toString() !== path_id) {
-    return NextResponse.json({ error: "Bước không hợp lệ" }, { status: 400 });
-  }
+  const publicTopic = await resolvePublicTopic(step_id);
+  const isPublicStep = Boolean(publicTopic);
 
   let questionsForScoring: Array<{ id: string; correct_option: string }> = [];
-  if (answers) {
-    if (step.step_type === "question_set" && step.question_set_id) {
-      const questions = await TeacherQuestion.find({
-        set_id: step.question_set_id,
-        is_active: true,
-      })
-        .select("_id correct_option")
-        .lean();
+  let fullQuestions: any[] = [];
+  let step: any = null;
 
-      questionsForScoring = questions.map((q) => ({
-        id: q._id.toString(),
-        correct_option: q.correct_option,
-      }));
-    } else if (step.step_type === "topic" && step.topic_id) {
-      const student = await TeacherStudent.findOne({
-        _id: studentObjectId,
-      })
-        .select("created_by")
-        .lean();
+  if (publicTopic) {
+    const topicQuestions = await getPublicTopicQuestions(publicTopic.slug);
 
-      if (student) {
-        const sets = await TeacherQuestionSet.find({
-          created_by: student.created_by,
-          topic_id: step.topic_id,
+    questionsForScoring = topicQuestions.map((q) => ({
+      id: q._id.toString(),
+      correct_option: q.correct_option,
+    }));
+
+    fullQuestions = topicQuestions;
+  } else {
+    // Verify step belongs to this path
+    step = await TeacherLearningPathStep.findOne({
+      _id: stepObjectId,
+    }).lean();
+
+    if (!step || step.path_id.toString() !== path_id) {
+      return jsonWithCors(req, { error: "Bước không hợp lệ" }, { status: 400 });
+    }
+
+    if (answers) {
+      if (step.step_type === "question_set" && step.question_set_id) {
+        const questions = await TeacherQuestion.find({
+          set_id: step.question_set_id,
           is_active: true,
         })
-          .select("_id")
+          .select("_id correct_option")
           .lean();
 
-        const setIds = sets.map((set) => set._id);
-        if (setIds.length > 0) {
-          const questions = await TeacherQuestion.find({
-            set_id: { $in: setIds },
+        questionsForScoring = questions.map((q) => ({
+          id: q._id.toString(),
+          correct_option: q.correct_option,
+        }));
+      } else if (step.step_type === "topic" && step.topic_id) {
+        const student = await TeacherStudent.findOne({
+          _id: studentObjectId,
+        })
+          .select("created_by")
+          .lean();
+
+        if (student) {
+          const sets = await TeacherQuestionSet.find({
+            created_by: student.created_by,
+            topic_id: step.topic_id,
             is_active: true,
           })
-            .select("_id correct_option")
-            .limit(20)
+            .select("_id")
             .lean();
 
-          questionsForScoring = questions.map((q) => ({
-            id: q._id.toString(),
-            correct_option: q.correct_option,
-          }));
+          const setIds = sets.map((set) => set._id);
+          if (setIds.length > 0) {
+            const questions = await TeacherQuestion.find({
+              set_id: { $in: setIds },
+              is_active: true,
+            })
+              .select("_id correct_option")
+              .limit(20)
+              .lean();
+
+            questionsForScoring = questions.map((q) => ({
+              id: q._id.toString(),
+              correct_option: q.correct_option,
+            }));
+          }
         }
       }
     }
@@ -116,13 +157,15 @@ export async function POST(req: NextRequest) {
 
     for (const answer of answers) {
       if (!validQuestionIds.has(answer.question_id)) {
-        return NextResponse.json(
+        return jsonWithCors(
+          req,
           { error: `Câu hỏi không hợp lệ: ${answer.question_id}` },
           { status: 400 }
         );
       }
       if (!["A", "B", "C"].includes(answer.selected_option)) {
-        return NextResponse.json(
+        return jsonWithCors(
+          req,
           { error: "Lựa chọn không hợp lệ. Chỉ chấp nhận A, B, hoặc C." },
           { status: 400 }
         );
@@ -145,46 +188,50 @@ export async function POST(req: NextRequest) {
 
   if (answers && questionsForScoring.length > 0) {
     // Get full question data for breakdown
-    let fullQuestions: any[] = [];
+    let dbQuestions: any[] = [];
 
-    if (step.step_type === "question_set" && step.question_set_id) {
-      fullQuestions = await TeacherQuestion.find({
-        set_id: step.question_set_id,
-        is_active: true,
-      })
-        .select("question option_a option_b option_c correct_option explanation")
-        .lean();
-    } else if (step.step_type === "topic" && step.topic_id) {
-      const student = await TeacherStudent.findOne({
-        _id: studentObjectId,
-      })
-        .select("created_by")
-        .lean();
-
-      if (student) {
-        const sets = await TeacherQuestionSet.find({
-          created_by: student.created_by,
-          topic_id: step.topic_id,
+    if (isPublicStep) {
+      dbQuestions = fullQuestions;
+    } else if (step) {
+      if (step.step_type === "question_set" && step.question_set_id) {
+        dbQuestions = await TeacherQuestion.find({
+          set_id: step.question_set_id,
           is_active: true,
         })
-          .select("_id")
+          .select("question option_a option_b option_c correct_option explanation")
+          .lean();
+      } else if (step.step_type === "topic" && step.topic_id) {
+        const student = await TeacherStudent.findOne({
+          _id: studentObjectId,
+        })
+          .select("created_by")
           .lean();
 
-        const setIds = sets.map((set) => set._id);
-        if (setIds.length > 0) {
-          fullQuestions = await TeacherQuestion.find({
-            set_id: { $in: setIds },
+        if (student) {
+          const sets = await TeacherQuestionSet.find({
+            created_by: student.created_by,
+            topic_id: step.topic_id,
             is_active: true,
           })
-            .select("question option_a option_b option_c correct_option explanation")
-            .limit(20)
+            .select("_id")
             .lean();
+
+          const setIds = sets.map((set) => set._id);
+          if (setIds.length > 0) {
+            dbQuestions = await TeacherQuestion.find({
+              set_id: { $in: setIds },
+              is_active: true,
+            })
+              .select("question option_a option_b option_c correct_option explanation")
+              .limit(20)
+              .lean();
+          }
         }
       }
     }
 
     const correctMap = new Map(questionsForScoring.map((q) => [q.id, q.correct_option]));
-    const questionMap = new Map(fullQuestions.map((q) => [q._id.toString(), q]));
+    const questionMap = new Map(dbQuestions.map((q) => [q._id ? q._id.toString() : q.id, q]));
 
     for (const answer of answers) {
       const q = questionMap.get(answer.question_id);
@@ -253,7 +300,7 @@ export async function POST(req: NextRequest) {
       completed_at: progressDoc.completed_at,
     };
 
-    return NextResponse.json({
+    return jsonWithCors(req, {
       success: true,
       progress,
       stats,
@@ -279,12 +326,13 @@ export async function POST(req: NextRequest) {
     { upsert: true, new: true }
   ).lean();
 
-  const xpAwarded = step.step_type === "topic" ? XP_TOPIC_COMPLETE : 0;
+  const isTopicType = isPublicStep || (step && step.step_type === "topic");
+  const xpAwarded = isTopicType ? XP_TOPIC_COMPLETE : 0;
   const stats = await awardStudentXp({
     studentId,
-    source: step.step_type === "topic" ? "topic_complete" : "step_quiz",
+    source: isTopicType ? "topic_complete" : "step_quiz",
     xp: xpAwarded,
-    metadata: { path_id, step_id, score: progressDoc.score, step_type: step.step_type },
+    metadata: { path_id, step_id, score: progressDoc.score, step_type: isTopicType ? "topic" : (step?.step_type ?? "quiz") },
   });
 
   const progress = {
@@ -296,5 +344,5 @@ export async function POST(req: NextRequest) {
     completed_at: progressDoc.completed_at,
   };
 
-  return NextResponse.json({ success: true, progress, stats, xp_awarded: xpAwarded });
+  return jsonWithCors(req, { success: true, progress, stats, xp_awarded: xpAwarded });
 }

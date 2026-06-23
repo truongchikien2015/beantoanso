@@ -1,7 +1,6 @@
 // Student API client — shared fetch helper for student-facing pages
 // Uses base64 session token stored in localStorage
 
-import { supabase } from "@/lib/supabase";
 import type {
   StudentSession,
   StudentDashboardData,
@@ -26,18 +25,11 @@ function getStudentHeaders(token: string): HeadersInit {
 }
 
 /**
- * Resolve an auth token for student API calls. Teacher-created students use the
- * base64 student_token; self-registered students authenticate via Supabase Auth,
- * so we fall back to their Supabase session access token.
+ * Resolve an auth token for student API calls.
+ * All students (teacher-created and self-registered) now use the custom JWT token in localStorage.
  */
 export async function resolveStudentAuthToken(): Promise<string | null> {
-  const studentToken = getStudentToken();
-  if (studentToken) return studentToken;
-  if (supabase) {
-    const { data } = await supabase.auth.getSession();
-    return data.session?.access_token ?? null;
-  }
-  return null;
+  return getStudentToken();
 }
 
 // ─── In-memory token store (client-side) ─────────────────────────────────────
@@ -142,8 +134,14 @@ export async function submitStudentDailyQuiz(
 
 // ─── Session info ─────────────────────────────────────────────────────────────
 
-export async function fetchStudentSession(): Promise<StudentSession> {
-  return studentFetch<StudentSession>("/api/student/login");
+export async function fetchStudentSession(): Promise<{
+  student: StudentSession & { gender?: string; birthYear?: number; xp?: number };
+  assigned_path: any;
+}> {
+  return studentFetch<{
+    student: StudentSession & { gender?: string; birthYear?: number; xp?: number };
+    assigned_path: any;
+  }>("/api/student/login");
 }
 
 // ─── Student chatbot ──────────────────────────────────────────────────────────

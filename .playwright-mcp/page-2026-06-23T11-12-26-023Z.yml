@@ -1,0 +1,85 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4] [cursor=pointer]:
+        - img [ref=e6]
+        - generic [ref=e8]: Bé An Toàn Số
+      - navigation [ref=e9]:
+        - button "Khóa học" [ref=e10] [cursor=pointer]
+        - button "Thử thách" [ref=e11] [cursor=pointer]
+        - button "Bảng xếp hạng" [ref=e12] [cursor=pointer]
+        - button "Về chúng tôi" [ref=e13] [cursor=pointer]
+      - generic [ref=e14]:
+        - button "Đăng nhập" [ref=e15] [cursor=pointer]
+        - button "Đăng ký" [ref=e16] [cursor=pointer]
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - button "← Trang chủ" [ref=e20] [cursor=pointer]
+      - heading "📚 Học cùng Robot An Toàn" [level=1] [ref=e21]
+    - paragraph [ref=e23]: 🛡️ Đọc trước các bí kíp rồi vào làm Quiz để chinh phục điểm cao nhé!
+    - generic [ref=e24]:
+      - button "💬 Bài 1 Người lạ nhắn tin Trên Internet, em có thể được nhắn tin bởi những người em không quen biết. Hãy luôn cẩn thận! Đọc bài 📖 ➔" [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - generic [ref=e28]: 💬
+            - generic [ref=e29]:
+              - generic [ref=e30]: Bài 1
+              - heading "Người lạ nhắn tin" [level=3] [ref=e31]
+          - paragraph [ref=e32]: Trên Internet, em có thể được nhắn tin bởi những người em không quen biết. Hãy luôn cẩn thận!
+        - generic [ref=e33]: Đọc bài 📖 ➔
+      - button "🎁 Bài 2 Link lạ và lừa đảo Nhiều quảng cáo, link \"trúng thưởng\" trên mạng là giả nhằm lừa em bấm vào. Đọc bài 📖 ➔" [ref=e34] [cursor=pointer]:
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - generic [ref=e37]: 🎁
+            - generic [ref=e38]:
+              - generic [ref=e39]: Bài 2
+              - heading "Link lạ và lừa đảo" [level=3] [ref=e40]
+          - paragraph [ref=e41]: Nhiều quảng cáo, link "trúng thưởng" trên mạng là giả nhằm lừa em bấm vào.
+        - generic [ref=e42]: Đọc bài 📖 ➔
+      - button "🔐 Bài 3 Mật khẩu và tài khoản Mật khẩu là chìa khóa bảo vệ tài khoản của em. Hãy giữ thật cẩn thận! Đọc bài 📖 ➔" [ref=e43] [cursor=pointer]:
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - generic [ref=e46]: 🔐
+            - generic [ref=e47]:
+              - generic [ref=e48]: Bài 3
+              - heading "Mật khẩu và tài khoản" [level=3] [ref=e49]
+          - paragraph [ref=e50]: Mật khẩu là chìa khóa bảo vệ tài khoản của em. Hãy giữ thật cẩn thận!
+        - generic [ref=e51]: Đọc bài 📖 ➔
+      - button "🛡️ Bài 4 Bảo vệ thông tin cá nhân Một số thông tin của em rất quan trọng và cần được bảo vệ trên mạng. Đọc bài 📖 ➔" [ref=e52] [cursor=pointer]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - generic [ref=e55]: 🛡️
+            - generic [ref=e56]:
+              - generic [ref=e57]: Bài 4
+              - heading "Bảo vệ thông tin cá nhân" [level=3] [ref=e58]
+          - paragraph [ref=e59]: Một số thông tin của em rất quan trọng và cần được bảo vệ trên mạng.
+        - generic [ref=e60]: Đọc bài 📖 ➔
+      - button "💖 Bài 5 Ứng xử văn minh trên mạng Trên mạng, em vẫn là một con người tử tế và lịch sự. Đọc bài 📖 ➔" [ref=e61] [cursor=pointer]:
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - generic [ref=e64]: 💖
+            - generic [ref=e65]:
+              - generic [ref=e66]: Bài 5
+              - heading "Ứng xử văn minh trên mạng" [level=3] [ref=e67]
+          - paragraph [ref=e68]: Trên mạng, em vẫn là một con người tử tế và lịch sự.
+        - generic [ref=e69]: Đọc bài 📖 ➔
+      - button "⏰ Bài 6 Thời gian dùng màn hình Internet vui nhưng dùng quá nhiều sẽ hại sức khỏe và việc học của em. Đọc bài 📖 ➔" [ref=e70] [cursor=pointer]:
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - generic [ref=e73]: ⏰
+            - generic [ref=e74]:
+              - generic [ref=e75]: Bài 6
+              - heading "Thời gian dùng màn hình" [level=3] [ref=e76]
+          - paragraph [ref=e77]: Internet vui nhưng dùng quá nhiều sẽ hại sức khỏe và việc học của em.
+        - generic [ref=e78]: Đọc bài 📖 ➔
+      - button "⚠️ Bài 7 Nội dung xấu và tin giả Không phải mọi thứ em thấy trên mạng đều thật và phù hợp với em. Đọc bài 📖 ➔" [ref=e79] [cursor=pointer]:
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]: ⚠️
+            - generic [ref=e83]:
+              - generic [ref=e84]: Bài 7
+              - heading "Nội dung xấu và tin giả" [level=3] [ref=e85]
+          - paragraph [ref=e86]: Không phải mọi thứ em thấy trên mạng đều thật và phù hợp với em.
+        - generic [ref=e87]: Đọc bài 📖 ➔
+  - button "Open Next.js Dev Tools" [ref=e93] [cursor=pointer]:
+    - img [ref=e94]

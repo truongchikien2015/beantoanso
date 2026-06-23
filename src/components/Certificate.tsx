@@ -1,35 +1,46 @@
+import { QRCodeSVG } from "qrcode.react";
 import { getBadge } from "../data/gameData";
 
 type Props = {
   nickname: string;
   totalScore: number;
   onBack: () => void;
+  resultId?: string;
 };
 
-export function Certificate({ nickname, totalScore, onBack }: Props) {
+export function Certificate({ nickname, totalScore, onBack, resultId }: Props) {
   const badge = getBadge(totalScore);
   const today = new Date().toLocaleDateString("vi-VN", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
+  
+  // Stable certificate ID based on nickname and total score
   const certId = `BATS-${Math.abs(
-    Array.from(nickname).reduce((a, c) => a + c.charCodeAt(0), 0) * 7 +
-      Date.now() % 100000,
+    Array.from(nickname).reduce((a, c) => a + c.charCodeAt(0), 0) * 17 +
+      totalScore * 31
   )
     .toString(36)
     .toUpperCase()
     .slice(0, 10)}`;
 
+  const verifyUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/share/result/${resultId || certId}`
+    : `https://betoan-sao.com/share/result/${resultId || certId}`;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 print:p-0 print:max-w-none">
-      <div className="flex justify-between mb-4 print:hidden">
-        <button onClick={onBack} className="text-indigo-600 hover:underline">
-          ← Quay lại
+      <div className="flex justify-between mb-6 print:hidden items-center gap-4">
+        <button
+          onClick={onBack}
+          className="py-2.5 px-5 font-black text-slate-600 bg-white border-[3px] border-slate-200 hover:border-slate-300 active:scale-[0.98] rounded-full transition-all text-sm flex items-center gap-1.5 cursor-pointer shadow-sm"
+        >
+          ← Quay lại Bảng học tập
         </button>
         <button
           onClick={() => window.print()}
-          className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition"
+          className="py-2.5 px-5 font-black text-white bg-teal-500 hover:bg-teal-600 active:scale-[0.98] border-b-[4px] border-teal-700 rounded-full transition-all text-sm flex items-center gap-1.5 cursor-pointer shadow-sm"
         >
           🖨️ In chứng nhận
         </button>
@@ -50,21 +61,21 @@ export function Certificate({ nickname, totalScore, onBack }: Props) {
         <div className="relative z-10 h-full flex flex-col items-center px-6 sm:px-16 py-8 sm:py-10 text-center">
           {/* Brand */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[var(--kid-coral-new)] to-[var(--kid-teal-new)] flex items-center justify-center text-white shadow-md">
               <span className="text-xl">🛡️</span>
             </div>
             <div className="text-left leading-tight">
               <p className="tracking-[0.3em] text-slate-500 uppercase">
                 Học viện
               </p>
-              <p className="text-slate-800 tracking-wide">
+              <p className="text-slate-800 tracking-wide font-black">
                 Bé An Toàn Số
               </p>
             </div>
           </div>
 
           {/* Title */}
-          <p className="mt-6 sm:mt-8 tracking-[0.4em] uppercase text-teal-700">
+          <p className="mt-6 sm:mt-8 tracking-[0.4em] uppercase text-teal-700 font-black">
             Chứng nhận hoàn thành
           </p>
           <div className="mt-1 h-[2px] w-24 bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
@@ -85,18 +96,18 @@ export function Certificate({ nickname, totalScore, onBack }: Props) {
           </h1>
 
           {/* Description */}
-          <p className="mt-5 sm:mt-7 max-w-2xl text-slate-600 leading-relaxed">
+          <p className="mt-5 sm:mt-7 max-w-2xl text-slate-600 leading-relaxed font-bold">
             đã xuất sắc hoàn thành khóa học{" "}
-            <span className="text-slate-800">
+            <span className="text-slate-800 font-extrabold">
               Bé An Toàn Số – Sử dụng Internet An Toàn
             </span>
             <br className="hidden sm:block" />
             với danh hiệu{" "}
-            <span className="text-amber-600">{badge.title}</span> và{" "}
-            <span className="text-amber-600">{totalScore} điểm</span>
+            <span className="text-amber-600 font-extrabold">{badge.title}</span> và{" "}
+            <span className="text-amber-600 font-extrabold">{totalScore} điểm</span>
           </p>
 
-          <p className="mt-3 text-slate-500">Ngày cấp: {today}</p>
+          <p className="mt-3 text-slate-500 font-bold">Ngày cấp: {today}</p>
 
           {/* Footer: signatures + seal */}
           <div className="mt-auto pt-6 sm:pt-8 w-full grid grid-cols-3 items-end gap-4">
@@ -116,9 +127,25 @@ export function Certificate({ nickname, totalScore, onBack }: Props) {
         </div>
 
         {/* Bottom strip */}
-        <div className="absolute left-0 right-0 bottom-0 z-10 px-6 sm:px-10 py-3 flex flex-wrap justify-between gap-2 text-slate-400 border-t border-slate-100 bg-white/70">
-          <span>Mã chứng nhận: {certId}</span>
-          <span>Xác thực tại: beantoan.so/verify</span>
+        <div className="absolute left-0 right-0 bottom-0 z-10 px-6 sm:px-10 py-3 flex items-center justify-between text-slate-400 border-t border-slate-100 bg-white/70">
+          <div className="flex flex-col items-start leading-tight text-left text-[10px] font-bold">
+            <span>Mã chứng nhận: {certId}</span>
+            <span className="opacity-80">Quét để xác thực online hoặc truy cập:</span>
+            <span className="text-[9px] text-teal-600 font-mono select-all truncate max-w-[220px] sm:max-w-none">{verifyUrl}</span>
+          </div>
+          {/* Real Scannable QR Code */}
+          <div className="flex items-center gap-2">
+            <span className="text-[8px] text-slate-400 font-bold hidden sm:inline">Xác thực ➔</span>
+            <div className="w-10 h-10 border border-slate-200 rounded p-0.5 bg-white shrink-0 flex items-center justify-center">
+              <QRCodeSVG
+                value={verifyUrl}
+                size={32}
+                bgColor="#ffffff"
+                fgColor="#1e293b"
+                level="M"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

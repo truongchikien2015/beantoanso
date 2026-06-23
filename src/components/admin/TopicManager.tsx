@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Admin, CustomTopic } from "../../lib/store";
-import { supabase } from "../../lib/supabase";
 
 const mapTopic = (row: any): CustomTopic => ({
   id: row.id,
@@ -58,15 +57,23 @@ export function TopicManager({ onLogout, onHome }: Props) {
   const [confirmDelete, setConfirmDelete] = useState<CustomTopic | null>(null);
 
   const refresh = async () => {
-    if (!supabase) return;
     setIsLoading(true);
-    const { data, error } = await supabase.from('topics').select('*').order('topic_order', { ascending: true });
-    if (error) {
-      console.error(error);
-    } else if (data) {
-      setTopics(data.map(mapTopic));
+    try {
+      const adminPassword = Admin.getPassword();
+      const res = await fetch("/api/admin/topics", {
+        headers: {
+          "x-admin-password": adminPassword,
+        },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok && body.data) {
+        setTopics(body.data.map(mapTopic));
+      }
+    } catch (err) {
+      console.error("Failed to load topics:", err);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -181,10 +188,25 @@ export function TopicManager({ onLogout, onHome }: Props) {
                       <td className="px-4 py-3">
                         <button
                           onClick={async () => {
-                            if (!supabase) return;
-                            const { error } = await supabase.from('topics').update({ is_active: !t.isActive }).eq('id', t.id);
-                            if (error) alert("Lỗi: " + error.message);
-                            else refresh();
+                            const adminPassword = Admin.getPassword();
+                            try {
+                              const res = await fetch(`/api/admin/topics/${t.id}`, {
+                                method: "PATCH",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  "x-admin-password": adminPassword,
+                                },
+                                body: JSON.stringify({ is_active: !t.isActive }),
+                              });
+                              if (!res.ok) {
+                                const body = await res.json().catch(() => ({}));
+                                alert("Lỗi: " + (body.error ?? "Thao tác thất bại"));
+                              } else {
+                                refresh();
+                              }
+                            } catch (e: any) {
+                              alert("Lỗi kết nối: " + e.message);
+                            }
                           }}
                           className={`px-2 py-1 rounded-full text-xs ${
                             t.isActive
@@ -229,7 +251,7 @@ export function TopicManager({ onLogout, onHome }: Props) {
             setEditing(null);
           }}
           onSave={async (data) => {
-            if (!supabase) return;
+            const adminPassword = Admin.getPassword();
             const dbData = {
               slug: data.slug,
               label: data.label,
@@ -239,16 +261,40 @@ export function TopicManager({ onLogout, onHome }: Props) {
               is_active: data.isActive
             };
 
-            if (editing) {
-              const { error } = await supabase.from('topics').update(dbData).eq('id', editing.id);
-              if (error) alert("Lỗi: " + error.message);
-            } else {
-              const { error } = await supabase.from('topics').insert(dbData);
-              if (error) alert("Lỗi: " + error.message);
+            try {
+              if (editing) {
+                const res = await fetch(`/api/admin/topics/${editing.id}`, {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-admin-password": adminPassword,
+                  },
+                  body: JSON.stringify(dbData),
+                });
+                if (!res.ok) {
+                  const body = await res.json().catch(() => ({}));
+                  alert("Lỗi: " + (body.error ?? "Cập nhật thất bại"));
+                }
+              } else {
+                const res = await fetch("/api/admin/topics", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-admin-password": adminPassword,
+                  },
+                  body: JSON.stringify(dbData),
+                });
+                if (!res.ok) {
+                  const body = await res.json().catch(() => ({}));
+                  alert("Lỗi: " + (body.error ?? "Tạo thất bại"));
+                }
+              }
+              setCreating(false);
+              setEditing(null);
+              refresh();
+            } catch (e: any) {
+              alert("Lỗi kết nối: " + e.message);
             }
-            setCreating(false);
-            setEditing(null);
-            refresh();
           }}
         />
       )}
@@ -259,11 +305,23 @@ export function TopicManager({ onLogout, onHome }: Props) {
           message={`"${confirmDelete.label}" sẽ bị xóa vĩnh viễn.`}
           onCancel={() => setConfirmDelete(null)}
           onConfirm={async () => {
-            if (!supabase) return;
-            const { error } = await supabase.from('topics').delete().eq('id', confirmDelete.id);
-            if (error) alert("Lỗi: " + error.message);
-            setConfirmDelete(null);
-            refresh();
+            const adminPassword = Admin.getPassword();
+            try {
+              const res = await fetch(`/api/admin/topics/${confirmDelete.id}`, {
+                method: "DELETE",
+                headers: {
+                  "x-admin-password": adminPassword,
+                },
+              });
+              if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                alert("Lỗi: " + (body.error ?? "Xóa thất bại"));
+              }
+              setConfirmDelete(null);
+              refresh();
+            } catch (e: any) {
+              alert("Lỗi kết nối: " + e.message);
+            }
           }}
         />
       )}

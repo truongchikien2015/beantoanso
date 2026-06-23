@@ -60,17 +60,27 @@ export default async function ShareResultPage({ params, searchParams }: Props) {
 
   return (
     <main className="min-h-screen bg-kid-page px-4 py-10">
-      <section className="mx-auto max-w-2xl rounded-[32px] border-4 border-white bg-white/90 p-6 text-center shadow-2xl">
+      <section className="mx-auto max-w-2xl rounded-[32px] border-4 border-white bg-white/90 p-8 text-center shadow-2xl relative overflow-hidden">
+        {/* Verification ribbon */}
+        <div className="absolute top-4 right-[-24px] bg-emerald-500 text-white font-black text-[9px] uppercase tracking-widest py-1 px-8 rotate-45 shadow-sm">
+          ĐÃ XÁC THỰC ✓
+        </div>
+
         <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-[28px] bg-gradient-to-br from-amber-300 via-pink-300 to-sky-400 text-6xl shadow-inner">
           {result.badge}
         </div>
-        <p className="text-sm font-black uppercase tracking-[0.18em] text-sky-600">
-          Bé An Toàn Số
+
+        <div className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full px-3 py-1 text-xs font-black mb-4">
+          🛡️ Hệ thống chứng nhận chính hãng
+        </div>
+
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-600">
+          Học viện Bé An Toàn Số
         </p>
         <h1 className="mt-2 text-3xl font-black text-indigo-700">
           {result.nickname} đã hoàn thành hành trình!
         </h1>
-        <p className="mt-2 text-lg font-bold text-amber-700">{result.title}</p>
+        <p className="mt-2 text-base font-extrabold text-amber-700">Danh hiệu: {result.title}</p>
 
         <div className="mt-6 grid grid-cols-3 gap-3">
           <Stat label="Tổng điểm" value={result.total_score} />

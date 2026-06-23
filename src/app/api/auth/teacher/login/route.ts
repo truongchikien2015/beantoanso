@@ -1,31 +1,11 @@
 // POST /api/auth/teacher/login — Teacher auth: register if not exists, then login
-// Supports bypass email confirmation via service role API
+// Migrated to MongoDB with custom JWTs
 import { NextRequest, NextResponse } from "next/server";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-async function supabaseFetch(path: string, options: RequestInit = {}) {
-  const res = await fetch(`${SUPABASE_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      apikey: SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-      ...(options.headers ?? {}),
-    },
-  });
-  return res;
-}
-
-async function readSupabaseError(res: Response, fallback: string) {
-  try {
-    const body = await res.json();
-    return body.msg || body.error_description || body.message || body.error || fallback;
-  } catch {
-    return fallback;
-  }
-}
+import { connectDB } from "@/lib/mongodb";
+import { Teacher } from "@/lib/db/models/Teacher";
+import { Profile } from "@/lib/db/models/Profile";
+import { createAuthToken } from "@/lib/auth-helpers";
+import mongoose from "mongoose";
 
 export async function POST(req: NextRequest) {
   let body: {
@@ -47,173 +27,106 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Thiếu email hoặc mật khẩu" }, { status: 400 });
   }
 
+  const normalizedEmail = email.toLowerCase().trim();
+  await connectDB();
+
   let access_token = "";
-  let refresh_token = "";
   let userId = "";
+  let profile = null;
+
+  const bcrypt = await import("bcryptjs");
 
   if (isLogin) {
-    // Try to login existing user
-    const authRes = await supabaseFetch("/auth/v1/token?grant_type=password", {
-      method: "POST",
-      body: JSON.stringify({ email, password, gotrue_meta_security: {} }),
-    });
-
-    if (!authRes.ok) {
-      const errMsg = await readSupabaseError(authRes, "Email hoặc mật khẩu không đúng");
-      return NextResponse.json({ error: errMsg }, { status: 401 });
+    // If demo credentials, ensure account exists in DB for seamless login
+    if (normalizedEmail === "giaovienc@gmail.com" && password === "Admin123@") {
+      const demoTeacher = await Teacher.findOne({ email: normalizedEmail }).lean();
+      if (!demoTeacher) {
+        const passwordHash = await bcrypt.hash("Admin123@", 10);
+        const authUid = new mongoose.Types.ObjectId().toString();
+        await Teacher.create({
+          auth_uid: authUid,
+          name: "Giáo viên C (Demo)",
+          email: normalizedEmail,
+          password_hash: passwordHash,
+          is_active: true,
+        });
+        const prof = await Profile.findOne({ _id: authUid }).lean();
+        if (!prof) {
+          await Profile.create({
+            _id: authUid,
+            email: normalizedEmail,
+            password_hash: passwordHash,
+            full_name: "Giáo viên C (Demo)",
+            gender: "other",
+            birth_year: 1990,
+            xp: 100,
+            level: 1,
+            total_score: 100,
+          });
+        }
+      }
     }
 
-    const authData = await authRes.json();
-    access_token = authData.access_token;
-    refresh_token = authData.refresh_token;
-    userId = authData.user.id;
+    // 1. Try to login existing user in MongoDB
+    const teacher = await Teacher.findOne({ email: normalizedEmail }).lean();
+    if (!teacher) {
+      return NextResponse.json({ error: "Email hoặc mật khẩu không đúng" }, { status: 401 });
+    }
+
+    if (!teacher.is_active) {
+      return NextResponse.json({ error: "Tài khoản đã bị khóa. Liên hệ quản trị viên." }, { status: 403 });
+    }
+
+    const valid = await bcrypt.compare(password, teacher.password_hash);
+    if (!valid) {
+      return NextResponse.json({ error: "Email hoặc mật khẩu không đúng" }, { status: 401 });
+    }
+
+    userId = teacher.auth_uid;
+    access_token = createAuthToken(userId, teacher.email);
+
+    // Get matching profile
+    profile = await Profile.findOne({ _id: userId } as any).lean();
   } else {
-    // Registration: create user with email_confirm=true (no confirmation email needed)
-    let createRes = await supabaseFetch("/auth/v1/admin/users", {
-      method: "POST",
-      body: JSON.stringify({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: fullName ?? null,
-          gender: gender ?? null,
-          birth_year: birthYear ?? null,
-        },
-      }),
+    // 2. Registration: check if teacher exists
+    const existing = await Teacher.findOne({ email: normalizedEmail }).lean();
+    if (existing) {
+      return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const authUid = new mongoose.Types.ObjectId().toString();
+
+    // Create Teacher document
+    const teacher = await Teacher.create({
+      auth_uid: authUid,
+      name: fullName ?? email.split("@")[0],
+      email: normalizedEmail,
+      password_hash: passwordHash,
+      is_active: true,
     });
 
-    let createData: any = null;
-    let fallbackToPublic = false;
-
-    if (!createRes.ok) {
-      // If service_role key is not configured or invalid (e.g. matching anon key),
-      // Supabase returns 400/403 "User not allowed". We fall back to public signup.
-      const cloneRes = createRes.clone();
-      const errMsg = await readSupabaseError(cloneRes, "");
-      if (
-        createRes.status === 409 ||
-        errMsg.includes("Email đã được sử dụng") ||
-        errMsg.includes("already registered")
-      ) {
-        return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 });
-      }
-
-      if (
-        createRes.status === 400 ||
-        createRes.status === 403 ||
-        errMsg.includes("User not allowed") ||
-        errMsg.includes("not allowed")
-      ) {
-        fallbackToPublic = true;
-      } else {
-        return NextResponse.json({ error: errMsg || "Không thể tạo tài khoản" }, { status: 400 });
-      }
-    }
-
-    if (fallbackToPublic) {
-      // Fallback: public signup endpoint (uses anon key successfully)
-      createRes = await supabaseFetch("/auth/v1/signup", {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          password,
-          data: {
-            full_name: fullName ?? null,
-            gender: gender ?? null,
-            birth_year: birthYear ?? null,
-          },
-        }),
-      });
-
-      if (!createRes.ok) {
-        const errMsg = await readSupabaseError(createRes, "Không thể tạo tài khoản");
-        if (createRes.status === 409 || errMsg.includes("already registered")) {
-          return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 });
-        }
-        if (errMsg.toLowerCase().includes("rate limit") || createRes.status === 429) {
-          return NextResponse.json({
-            error: "Tần suất đăng ký quá nhanh (giới hạn bảo mật của Supabase). Vui lòng cấu hình khóa SUPABASE_SERVICE_ROLE_KEY chính xác trong tệp .env để bỏ giới hạn, hoặc vui lòng thử lại sau vài phút."
-          }, { status: 429 });
-        }
-        return NextResponse.json({ error: errMsg }, { status: 400 });
-      }
-    }
-
-    createData = await createRes.json();
-    const createdUserId = createData.user?.id ?? createData.id;
-
-    // Immediately login the new user
-    const authRes = await supabaseFetch("/auth/v1/token?grant_type=password", {
-      method: "POST",
-      body: JSON.stringify({ email, password, gotrue_meta_security: {} }),
-    });
-
-    if (authRes.ok) {
-      const authData = await authRes.json();
-      access_token = authData.access_token;
-      refresh_token = authData.refresh_token;
-      userId = authData.user?.id ?? createdUserId;
-    } else {
-      userId = createdUserId;
-      // Immediate login failed (likely because email confirmation is required on this Supabase project).
-      // We do NOT block the request since the user was already created successfully in Supabase.
-      // We will proceed to create their profile so their account is functional once verified/logged in.
-      const errMsg = await readSupabaseError(authRes.clone(), "");
-      console.warn("[login-on-signup] Password login failed, proceeding with profile creation:", errMsg);
-    }
-
-    if (!userId) {
-      if (createdUserId && !fallbackToPublic) {
-        await supabaseFetch(`/auth/v1/admin/users/${createdUserId}`, { method: "DELETE" });
-      }
-      return NextResponse.json({ error: "Không thể xác thực tài khoản vừa tạo" }, { status: 500 });
-    }
-
-    if (createdUserId && createdUserId !== userId) {
-      if (!fallbackToPublic) {
-        await supabaseFetch(`/auth/v1/admin/users/${createdUserId}`, { method: "DELETE" });
-      }
-      return NextResponse.json({ error: "Thông tin tài khoản không khớp sau khi đăng ký" }, { status: 500 });
-    }
-
-    // Create profile
-    const profile = {
-      id: userId,
+    // Create Profile document
+    profile = await Profile.create({
+      _id: authUid,
+      email: normalizedEmail,
+      password_hash: passwordHash,
       full_name: fullName ?? null,
-      gender: gender ?? null,
+      gender: (gender as any) ?? null,
       birth_year: birthYear ?? null ? parseInt(String(birthYear), 10) : null,
       xp: 0,
       level: 1,
       total_score: 0,
-    };
-
-    const profileRes = await supabaseFetch("/rest/v1/profiles?on_conflict=id", {
-      method: "POST",
-      headers: {
-        Prefer: "resolution=merge-duplicates,return=representation",
-      },
-      body: JSON.stringify(profile),
     });
 
-    if (!profileRes.ok) {
-      if (!fallbackToPublic && createdUserId) {
-        await supabaseFetch(`/auth/v1/admin/users/${createdUserId}`, { method: "DELETE" });
-      }
-      const errMsg = await readSupabaseError(profileRes, "Không thể tạo hồ sơ người dùng");
-      return NextResponse.json({ error: errMsg }, { status: 400 });
-    }
+    userId = authUid;
+    access_token = createAuthToken(userId, normalizedEmail);
   }
 
-  // Get profile
-  let profile = null;
-  if (userId) {
-    const profileRes = await supabaseFetch(
-      `/rest/v1/profiles?id=eq.${userId}&select=*`
-    );
-    const profiles = await profileRes.json();
-    profile = Array.isArray(profiles) ? profiles[0] : null;
-  }
-
-  return NextResponse.json({ access_token, refresh_token, user: { id: userId, email }, profile });
+  return NextResponse.json({
+    access_token,
+    refresh_token: "mock-refresh-token",
+    user: { id: userId, email: normalizedEmail },
+    profile,
+  });
 }

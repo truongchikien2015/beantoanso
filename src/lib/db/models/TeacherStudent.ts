@@ -6,6 +6,7 @@ export interface ITeacherStudent {
   email: string | null;
   class_name: string | null;
   student_code: string;
+  parent_access_code: string | null;
   password_hash: string;
   assigned_path_id: Types.ObjectId | null;
   assigned_at: Date | null;
@@ -21,6 +22,7 @@ const TeacherStudentSchema = new Schema<ITeacherStudent>(
     email: { type: String, default: null },
     class_name: { type: String, default: null },
     student_code: { type: String, required: true, unique: true },
+    parent_access_code: { type: String, default: null },
     password_hash: { type: String, required: true },
     assigned_path_id: { type: Schema.Types.ObjectId, ref: "TeacherLearningPath", default: null },
     assigned_at: { type: Date, default: null },
@@ -30,6 +32,7 @@ const TeacherStudentSchema = new Schema<ITeacherStudent>(
 );
 
 TeacherStudentSchema.index({ created_by: 1 });
-TeacherStudentSchema.index({ student_code: 1 });
+TeacherStudentSchema.index({ parent_access_code: 1 }, { unique: true, sparse: true });
 
-export const TeacherStudent: Model<ITeacherStudent> = models.TeacherStudent || model<ITeacherStudent>("TeacherStudent", TeacherStudentSchema);
+export const TeacherStudent: Model<ITeacherStudent> =
+  models.TeacherStudent || model<ITeacherStudent>("TeacherStudent", TeacherStudentSchema, "teacher_students");

@@ -3,6 +3,8 @@ import "../styles/fonts.css";
 import "../styles/tailwind.css";
 import "../styles/theme.css";
 import "./globals.css";
+import { AppLayout } from "../components/AppLayout";
+import { FloatFeedbackButton } from "../components/FloatFeedbackButton";
 
 export const metadata: Metadata = {
   title: "Bé An Toàn Số 🛡️",
@@ -27,7 +29,8 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-kid-page">
-        {children}
+        <AppLayout>{children}</AppLayout>
+        <FloatFeedbackButton />
       </body>
     </html>
   );

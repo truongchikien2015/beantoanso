@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MissionScreen } from "../../components/MissionScreen";
 import { useAppStore } from "../../lib/globalStore";
-import { Header } from "../../components/Header";
 import { totalXpForPlayer } from "../../lib/xp";
 import { supabase } from "../../lib/supabase";
 
@@ -56,25 +55,16 @@ export default function MissionPage() {
   if (!nickname || !activeTopic || !activeQuestion) return null;
 
   return (
-    <>
-      <Header
-        nickname={nickname}
-        totalScore={totalScore}
-        xp={profileXp || totalXpForPlayer(playerId)}
-        onHome={() => router.push("/")}
-        onLogout={handleLogout}
-      />
-      <MissionScreen
-        topic={activeTopic}
-        question={activeQuestion}
-        onFinish={handleFinishMission}
-        onBack={() => {
-          isReturningToMap.current = true;
-          setActiveTopic(null);
-          setActiveQuestion(null);
-          router.push(mapHref);
-        }}
-      />
-    </>
+    <MissionScreen
+      topic={activeTopic}
+      question={activeQuestion}
+      onFinish={handleFinishMission}
+      onBack={() => {
+        isReturningToMap.current = true;
+        setActiveTopic(null);
+        setActiveQuestion(null);
+        router.push(mapHref);
+      }}
+    />
   );
 }

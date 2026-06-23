@@ -3,6 +3,8 @@
 import { useState, useRef } from "react";
 import { sfx } from "../lib/sound";
 import { AuthModal } from "./AuthModal";
+import { AiSafetyScanner } from "./AiSafetyScanner";
+import { NewsFeed } from "./NewsFeed";
 
 export function HomeScreen({
   onStart,
@@ -25,8 +27,7 @@ export function HomeScreen({
   const [birthYear, setBirthYear] = useState<string>("2014");
   const [showAuth, setShowAuth] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
-
-  const founderRef = useRef<HTMLDivElement>(null);
+  const [showQuickStart, setShowQuickStart] = useState(false);
 
   const canStart = name.trim().length > 0;
 
@@ -34,6 +35,7 @@ export function HomeScreen({
     if (!canStart) return;
     sfx.start();
     onStart(name.trim(), "other", parseInt(birthYear || "2014", 10));
+    setShowQuickStart(false);
   };
 
   const handleAuthSuccess = (user: any, profile: any) => {
@@ -51,336 +53,307 @@ export function HomeScreen({
     setShowAuth(true);
   };
 
-  const handleScrollToFounder = (e: React.MouseEvent) => {
-    e.preventDefault();
-    sfx.click();
-    founderRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleLessonClick = (topic: string) => {
-    sfx.click();
-    window.location.href = `/lessons?topic=${topic}`;
-  };
-
   return (
-    <div className="kid-paper-page min-h-screen overflow-x-hidden flex flex-col font-sans">
-      {/* ── 1. Header ── */}
-      <header className="bg-white sticky top-0 z-50 border-b border-slate-100 shadow-sm/50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => { sfx.click(); window.location.href = "/"; }}>
-            <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"></path>
-            </svg>
-            <span className="text-[var(--kid-ink)] font-black text-xl flex items-center gap-1 tracking-tight">
-              Bé An Toàn Số
-            </span>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
-            <a href="#lessons" onClick={(e) => { e.preventDefault(); sfx.click(); onLessons(); }} className="hover:text-emerald-700 transition-colors">Khóa học</a>
-            <a href="#daily" onClick={(e) => { e.preventDefault(); sfx.click(); onDaily(); }} className="hover:text-emerald-700 transition-colors">Thử thách</a>
-            <a href="#leaderboard" onClick={(e) => { e.preventDefault(); sfx.click(); onLeaderboard(); }} className="hover:text-emerald-700 transition-colors">Vinh danh</a>
-            <a href="#about" onClick={handleScrollToFounder} className="hover:text-emerald-700 transition-colors">Về tác giả</a>
-          </nav>
-
-          {/* Auth Action Buttons */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => openAuth("login")}
-              className="px-5 py-2 text-sm font-bold text-slate-700 hover:text-emerald-700 bg-white border border-slate-200 hover:border-emerald-600 rounded-full transition-all cursor-pointer"
-            >
-              Đăng nhập
-            </button>
-            <button
-              onClick={() => openAuth("register")}
-              className="px-5 py-2 text-sm font-bold text-white bg-emerald-800 hover:bg-emerald-900 rounded-full shadow-sm hover:shadow transition-all cursor-pointer"
-            >
-              Đăng ký
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#fafbfc] text-slate-900 flex flex-col font-sans">
 
       {/* ── 2. Hero Section ── */}
-      <section className="relative pt-12 pb-12 px-6 max-w-6xl mx-auto flex flex-col items-center flex-1">
-        {/* Mascot Avatars */}
-        <div className="mb-6 flex items-center justify-center gap-4">
-          <div className="w-14 h-14 bg-sky-100 border-2 border-white shadow-md rounded-full flex items-center justify-center text-2xl -rotate-6 animate-float">
-            👦
-          </div>
-          <div className="w-14 h-14 bg-emerald-100 border-2 border-white shadow-md rounded-full flex items-center justify-center text-2xl rotate-6 animate-float delay-150">
-            🤖
-          </div>
-        </div>
-
-        {/* Heading */}
-        <h1 className="text-4xl md:text-5xl font-black text-slate-800 tracking-tight leading-tight text-center max-w-2xl">
-          Học Internet <span className="text-rose-500 font-extrabold">an toàn</span> cùng em
-        </h1>
-
-        {/* Subtitle */}
-        <p className="text-slate-400 text-sm font-bold mt-4 text-center max-w-lg leading-relaxed">
-          Nhập tên, chọn lộ trình, rồi bắt đầu bài học đầu tiên. Khám phá thế giới số một cách vui vẻ và an toàn!
-        </p>
-
-        {/* ── 3. Quick Start Card ── */}
-        <div className="max-w-md w-full bg-white rounded-3xl border border-slate-100 p-6 shadow-xl/50 mt-8 mb-16 relative">
-          <h2 className="text-center font-black text-slate-800 text-lg mb-6">
-            Bắt đầu nhanh
-          </h2>
-
-          <div className="space-y-4">
-            {/* Tên của em */}
-            <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">
-                Tên của em
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleStart()}
-                maxLength={30}
-                placeholder="Ví dụ: Bé Minh"
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-slate-700 font-bold transition-all placeholder:text-slate-300"
-                autoComplete="given-name"
-              />
-            </div>
-
-            {/* Năm sinh */}
-            <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">
-                Năm sinh
-              </label>
-              <input
-                type="number"
-                value={birthYear}
-                onChange={(e) => setBirthYear(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleStart()}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-slate-100 focus:border-rose-400 focus:ring-4 focus:ring-rose-100 outline-none text-slate-700 font-bold transition-all placeholder:text-slate-300"
-                placeholder="2014"
-                min={1990}
-                max={new Date().getFullYear()}
-              />
-            </div>
-
-            {/* Bắt đầu học Button */}
-            <button
-              onClick={handleStart}
-              disabled={!canStart}
-              className="w-full py-4 bg-rose-300 hover:bg-rose-400 text-white font-black text-lg rounded-2xl border-b-4 border-rose-500/30 transition-all transform active:translate-y-0.5 disabled:opacity-50 disabled:transform-none cursor-pointer mt-4"
-            >
-              Bắt đầu học
-            </button>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 my-4">
-              <div className="flex-1 h-px bg-slate-100" />
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">hoặc</span>
-              <div className="flex-1 h-px bg-slate-100" />
-            </div>
-
-            {/* Đăng nhập để lưu điểm Button */}
-            <button
-              onClick={() => openAuth("login")}
-              className="w-full py-3.5 bg-[#4ECDC4] hover:bg-[#3dbdb3] text-white font-black text-base rounded-2xl border-b-4 border-[#35ada4]/30 transition-all transform active:translate-y-0.5 cursor-pointer"
-            >
-              Đăng nhập để lưu điểm
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 4. Founder Section ── */}
-      <section id="about" ref={founderRef} className="w-full bg-[#f4f7fe]/70 py-16 border-y border-slate-100">
-        <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-12 gap-10 items-center">
-          {/* Graduation Image & floating badge */}
-          <div className="md:col-span-5 flex flex-col items-center relative">
-            <div className="relative p-2 bg-gradient-to-tr from-rose-200 to-amber-100 rounded-[36px] shadow-lg max-w-sm w-full">
-              <img
-                src="/images/graduation_author.png"
-                alt="Chân dung tác giả"
-                className="w-full rounded-[30px] object-cover shadow-inner"
-              />
-            </div>
-            {/* Floating author tag */}
-            <div className="absolute -bottom-4 right-4 bg-white border border-slate-100 shadow-md py-2.5 px-4 rounded-2xl flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#4ECDC4] flex items-center justify-center text-lg shadow-sm">
-                🤖
-              </div>
-              <div className="leading-tight">
-                <p className="text-[10px] text-slate-400 font-extrabold leading-none">Tác giả</p>
-                <p className="text-xs text-slate-700 font-extrabold leading-tight">Trương Chí Kiên</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Narrative Content */}
-          <div className="md:col-span-7 flex flex-col items-start">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 border border-rose-100 text-rose-500 rounded-full text-xs font-black mb-4">
-              ❤️ Tâm sự từ người sáng lập
+      <section className="relative min-h-[calc(80vh-72px)] flex items-center py-10 px-6 max-w-6xl mx-auto w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center w-full">
+          {/* Left Column: Heading, description, and action buttons */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-blue-50 border border-blue-100 text-blue-700 rounded-full text-xs font-black uppercase tracking-wider">
+              🛡️ Dành cho học sinh Tiểu học & THCS
             </span>
-            <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight leading-tight mb-6">
-              Xây dựng không gian mạng <span className="text-emerald-800">an toàn cho trẻ em</span>
-            </h2>
-            <div className="space-y-4 text-slate-500 text-sm font-bold leading-relaxed">
-              <p>
-                Xin chào! Mình là Trương Chí Kiên. Nhận thấy trẻ em ngày nay tiếp xúc với Internet từ rất sớm nhưng lại thiếu các kỹ năng tự bảo vệ, mình đã tạo ra &quot;Bé An Toàn Số&quot; với mong muốn đóng góp một phần nhỏ bé cho cộng đồng.
-              </p>
-              <p>
-                Trang web được thiết kế như một trò chơi tương tác, nơi các em có thể hóa thân thành những &quot;Hiệp sĩ không gian mạng&quot;, trải qua các thử thách để học cách nhận biết lừa đảo, bảo vệ thông tin cá nhân và ứng xử văn minh trên môi trường số.
-              </p>
-            </div>
-            {/* Hashtags */}
-            <div className="flex flex-wrap gap-2 mt-6">
-              <span className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-400 rounded-full text-xs font-extrabold hover:border-slate-300 hover:text-slate-600 transition-colors">
-                #GiaoDucTuoiTeens
-              </span>
-              <span className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-400 rounded-full text-xs font-extrabold hover:border-slate-300 hover:text-slate-600 transition-colors">
-                #AnToanMang
-              </span>
-              <span className="px-3.5 py-1.5 bg-white border border-slate-200 text-slate-400 rounded-full text-xs font-extrabold hover:border-slate-300 hover:text-slate-600 transition-colors">
-                #HocMaChoi
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ── 5. Lessons Section ── */}
-      <section id="lessons" className="w-full py-20 max-w-5xl mx-auto px-6">
-        <h2 className="text-center text-3xl font-black text-slate-800 tracking-tight mb-2">
-          Khám phá các <span className="text-rose-400">bài học thú vị</span>
-        </h2>
-        <p className="text-center text-slate-400 text-sm font-bold max-w-md mx-auto leading-relaxed mb-12">
-          Mỗi bài học chỉ vài phút. Đúng hay sai đều có giải thích dễ hiểu. Học mà chơi - chơi mà học.
-        </p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight font-nunito">
+              Học Internet <span className="text-teal-400">an toàn</span> <br /> cùng Bé An Toàn Số
+            </h1>
 
-        {/* Cards Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Card 1: Password */}
-          <div
-            onClick={() => handleLessonClick("password")}
-            className="bg-[#ecf3fe]/80 border border-slate-100/50 rounded-[32px] p-8 flex flex-col justify-between hover:scale-[1.02] hover:shadow-lg transition-all cursor-pointer"
-          >
-            <div>
-              <div className="flex justify-between items-start mb-6">
-                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl text-slate-600">
-                  💬
-                </div>
-                <span className="px-3 py-1 bg-rose-100 text-rose-500 rounded-full text-[10px] font-black uppercase tracking-wider">
-                  Cobalt
-                </span>
-              </div>
-              <h3 className="text-slate-850 font-black text-xl mb-3">An toàn mật khẩu</h3>
-              <p className="text-slate-400 text-sm font-semibold leading-relaxed mb-6">
-                Học cách tạo mật khẩu siêu mạnh như một chiếc két sắt không thể phá vỡ, bảo vệ tài khoản khỏi những kẻ xấu trên mạng.
-              </p>
-            </div>
-            <button className="self-start px-5 py-2.5 bg-emerald-800 hover:bg-emerald-900 text-white font-extrabold text-xs rounded-full flex items-center gap-1.5 transition-all cursor-pointer">
-              Học ngay <span className="text-sm">→</span>
-            </button>
-          </div>
+            <p className="text-slate-500 text-base md:text-lg font-bold max-w-xl leading-relaxed">
+              Biến hành trình khám phá không gian mạng của con thành một cuộc phiêu lưu thú vị, an toàn và bổ ích cùng người bạn đồng hành Cú Cú.
+            </p>
 
-          {/* Card 2: Phishing */}
-          <div
-            onClick={() => handleLessonClick("phishing")}
-            className="bg-[#ecf3fe]/80 border border-slate-100/50 rounded-[32px] p-8 flex flex-col justify-between hover:scale-[1.02] hover:shadow-lg transition-all cursor-pointer"
-          >
-            <div>
-              <div className="flex justify-between items-start mb-6">
-                <div className="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl">
-                  <svg className="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"></path>
-                  </svg>
-                </div>
-                <span className="px-3 py-1 bg-slate-200/60 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-wider">
-                  Quan trọng
-                </span>
-              </div>
-              <h3 className="text-slate-850 font-black text-xl mb-3">Nhận biết lừa đảo</h3>
-              <p className="text-slate-400 text-sm font-semibold leading-relaxed mb-6">
-                Trang bị &apos;kính lúp&apos; kỹ thuật số để soi rõ những trò lừa đảo tinh vi, link độc hại và người lạ đáng ngờ.
-              </p>
-            </div>
-            {/* Visual element: fishing hook */}
-            <div className="w-full bg-white/70 border border-slate-100 rounded-2xl py-6 flex items-center justify-center text-slate-300">
-              <svg className="w-12 h-12 text-slate-200" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.063 1.063L12 12.75M12 12.75l-.625.625M12 12.75l.625.625M12 3v13.5A3.75 3.75 0 118.25 12.75a.75.75 0 010 1.5A2.25 2.25 0 0010.5 16.5m0 0V3m0 0h1.5m-1.5 0h-1.5"></path>
-              </svg>
+            {/* CTA Actions */}
+            <div className="flex flex-wrap gap-4 pt-2">
+              <button
+                onClick={() => { sfx.click(); setShowQuickStart(true); }}
+                className="bg-blue-600 text-white rounded-full px-6 py-3 font-bold flex items-center gap-2 hover:bg-blue-700 active:scale-95 transition-all cursor-pointer shadow-md shadow-blue-200/40"
+              >
+                🚀 Bắt đầu hành trình ngay
+              </button>
+              <button
+                onClick={() => { sfx.click(); onLessons(); }}
+                className="bg-white border border-slate-200 text-slate-700 rounded-full px-6 py-3 font-bold flex items-center gap-2 hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
+              >
+                <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8 5v14l11-7z"></path>
+                </svg>
+                Xem giới thiệu
+              </button>
             </div>
           </div>
 
-          {/* Card 3: Behavior (Full width) */}
-          <div
-            onClick={() => handleLessonClick("behavior")}
-            className="md:col-span-2 bg-[#ecf3fe]/80 border border-slate-100/50 rounded-[28px] p-6 flex items-center justify-between hover:scale-[1.01] hover:shadow-lg transition-all cursor-pointer mt-2"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-850 flex items-center justify-center text-xl text-white">
-                💬
+          {/* Right Column: AI Safety Scanner & Mascot */}
+          <div className="lg:col-span-5 flex flex-col justify-center items-stretch gap-6 relative mt-6 lg:mt-0 w-full">
+            <div className="flex items-center gap-4 bg-sky-50 border border-sky-100 rounded-[24px] p-4 shadow-sm">
+              <div className="w-14 h-14 shrink-0 bg-white rounded-2xl overflow-hidden border border-sky-200 p-1 flex items-center justify-center">
+                <img
+                  src="/images/owl_mascot.png"
+                  alt="Cú Cú - Mascot Bé An Toàn Số"
+                  className="w-full h-full object-contain animate-float"
+                />
               </div>
               <div className="text-left">
-                <h3 className="text-slate-850 font-black text-lg leading-tight">Ứng xử văn minh</h3>
-                <p className="text-slate-400 text-xs font-semibold mt-1">
-                  Trở thành công dân số lịch sự, biết cách giao tiếp và tôn trọng người khác online.
-                </p>
+                <h4 className="font-extrabold text-sky-950 text-sm">🤖 Bạn Cú Cú AI khuyên:</h4>
+                <p className="text-[11px] text-sky-800 font-bold leading-normal mt-0.5">Dán tin nhắn nghi vấn hoặc link lạ xuống máy quét bên dưới để Cú bảo vệ con nhé!</p>
               </div>
             </div>
-            <button className="w-10 h-10 rounded-full bg-white hover:bg-slate-50 shadow-sm flex items-center justify-center text-slate-700 text-lg border border-slate-100 transition-all cursor-pointer">
-              →
-            </button>
+            <AiSafetyScanner />
           </div>
         </div>
       </section>
 
-      {/* ── 6. Stats Pill ── */}
-      <section className="w-full max-w-4xl mx-auto px-6 mb-20">
-        <div className="bg-[#4ECDC4] rounded-[36px] py-8 px-10 grid grid-cols-2 divide-x divide-white/20 text-white shadow-xl shadow-teal-200/30">
-          {/* Stat 1 */}
-          <div className="flex flex-col items-center justify-center">
-            <svg className="w-7 h-7 text-white/90 mb-2" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A12.318 12.318 0 0112 19.5c-1.21 0-2.386-.175-3.5-.502V18c0-1.105.895-2 2-2h2a2 2 0 012 2v1.128zm0-11.37a3.375 3.375 0 100-6.75 3.375 3.375 0 000 6.75fcM12 12.75a3.375 3.375 0 100-6.75 3.375 3.375 0 000 6.75zm0 0a3 3 0 01-3 3H8.25m3-3a3 3 0 00-3-3H7.5"></path>
-            </svg>
-            <span className="text-3xl md:text-4xl font-black tracking-tight leading-none mb-1">
-              2,500+
-            </span>
-            <span className="text-xs md:text-sm font-black text-white/90">
-              Học sinh tham gia
-            </span>
+      {/* ── 3. Mobile App Section ── */}
+      <section className="w-full bg-gradient-to-br from-[#e0f2fe]/80 to-[#bae6fd]/20 py-20 border-t border-b border-slate-100">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Mockup & QR scan */}
+          <div className="lg:col-span-5 flex flex-col items-center">
+            <div className="relative p-6 bg-white card-kid rounded-[40px] shadow-xl max-w-sm w-full border border-slate-100/50 transition-all hover:scale-102">
+              <div className="aspect-square bg-slate-50 rounded-3xl overflow-hidden shadow-inner border border-slate-100">
+                <img
+                  src="/images/mobile_mockup.png"
+                  alt="Bé An Toàn Số Mobile App Mockup"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* QR scanner tag */}
+              <div className="absolute -bottom-6 -right-6 bg-white border border-slate-200/80 p-3 rounded-2xl shadow-lg flex flex-col items-center max-w-[120px] z-10">
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://github.com/truongchikien2015/beantoanso"
+                  alt="QR Code"
+                  className="w-14 h-14"
+                />
+                <span className="text-[9px] font-black text-slate-500 uppercase mt-1 leading-none">Quét để tải app</span>
+              </div>
+            </div>
+
+            {/* Download tags */}
+            <div className="flex gap-4 mt-12">
+              <div className="bg-slate-900 text-white rounded-lg px-4 py-2 flex items-center gap-2 cursor-pointer shadow-md">
+                <span className="text-xl">🍎</span>
+                <div className="text-left leading-none">
+                  <p className="text-[8px] uppercase font-bold text-slate-400">Download on the</p>
+                  <p className="text-xs font-bold font-nunito mt-0.5">App Store</p>
+                </div>
+              </div>
+              <div className="bg-slate-900 text-white rounded-lg px-4 py-2 flex items-center gap-2 cursor-pointer shadow-md">
+                <span className="text-xl">🤖</span>
+                <div className="text-left leading-none">
+                  <p className="text-[8px] uppercase font-bold text-slate-400">Get it on</p>
+                  <p className="text-xs font-bold font-nunito mt-0.5">Google Play</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Stat 2 */}
-          <div className="flex flex-col items-center justify-center">
-            <svg className="w-7 h-7 text-white/90 mb-2" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"></path>
-            </svg>
-            <span className="text-3xl md:text-4xl font-black tracking-tight leading-none mb-1">
-              50+
-            </span>
-            <span className="text-xs md:text-sm font-black text-white/90">
-              Bài học tương tác
-            </span>
+          {/* Right Column: Features List */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left">
+            <h2 className="text-3xl md:text-4xl font-black text-blue-900 tracking-tight leading-tight mb-4 font-nunito">
+              Mang cả thế giới an toàn vào túi <br /> của con
+            </h2>
+            <p className="text-slate-500 text-base font-bold mb-8 max-w-xl leading-relaxed">
+              Ứng dụng di động giúp trẻ học mọi lúc, mọi nơi thông qua các công cụ bảo vệ thông minh nhất.
+            </p>
+
+            {/* Features layout list */}
+            <div className="space-y-6 w-full max-w-xl">
+              {/* Feature 1 */}
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-blue-200">
+                  🎮
+                </div>
+                <div className="text-left">
+                  <h4 className="font-extrabold text-slate-800 text-base mb-1 font-nunito">Học qua trò chơi</h4>
+                  <p className="text-sm text-slate-500 font-semibold leading-relaxed">Biến kiến thức bảo mật khô khan thành những thử thách game hấp dẫn.</p>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-teal-200">
+                  🔍
+                </div>
+                <div className="text-left">
+                  <h4 className="font-extrabold text-slate-800 text-base mb-1 font-nunito">Quét mối nguy hiểm</h4>
+                  <p className="text-sm text-slate-500 font-semibold leading-relaxed">Công cụ tự động phát hiện các liên kết và trang web độc hại dành riêng cho trẻ.</p>
+                </div>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-purple-200">
+                  🦉
+                </div>
+                <div className="text-left">
+                  <h4 className="font-extrabold text-slate-800 text-base mb-1 font-nunito">Hỏi đáp cùng AI</h4>
+                  <p className="text-sm text-slate-500 font-semibold leading-relaxed">Người bạn AI Cú Cú luôn sẵn sàng giải đáp mọi thắc mắc về an toàn mạng 24/7.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 7. Footer ── */}
-      <footer className="w-full bg-[#f4f7fe]/70 py-10 border-t border-slate-100 mt-auto">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <h4 className="font-black text-slate-800 text-base mb-1">Bé An Toàn Số</h4>
-            <p className="text-xs text-slate-400 font-extrabold">
-              © 2024 Bé An Toàn Số - Học tập an toàn cùng Trương Chí Kiên
+      {/* ── 4. Lessons Cards ── */}
+      <section id="lessons" className="w-full py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-center text-3xl font-black text-blue-900 tracking-tight mb-2 font-nunito">
+            Khám phá lộ trình học thú vị
+          </h2>
+          <p className="text-center text-slate-500 text-base font-bold max-w-lg mx-auto leading-relaxed mb-12">
+            Nội dung được thiết kế bởi các chuyên gia giáo dục hàng đầu, phù hợp với từng độ tuổi của trẻ.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Card 1: Password */}
+            <div className="bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 flex flex-col justify-between transition-transform hover:-translate-y-1">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl text-blue-600 mb-6">
+                  🔐
+                </div>
+                <h3 className="font-black text-slate-800 text-lg mb-3 font-nunito">An toàn bảo mật</h3>
+                <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-6">
+                  Học cách tạo mật khẩu siêu mạnh và bảo vệ thông tin cá nhân như một hiệp sĩ số thực thụ.
+                </p>
+              </div>
+              <button 
+                onClick={() => { sfx.click(); onLessons(); }}
+                className="bg-white border border-slate-200 text-slate-600 rounded-full py-2 px-5 font-bold hover:bg-slate-50 active:scale-95 transition-all text-xs self-start"
+              >
+                Tìm hiểu thêm
+              </button>
+            </div>
+
+            {/* Card 2: Phishing */}
+            <div className="bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 flex flex-col justify-between transition-transform hover:-translate-y-1">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center text-2xl text-teal-600 mb-6">
+                  🔍
+                </div>
+                <h3 className="font-black text-slate-800 text-lg mb-3 font-nunito">Nhận diện lừa đảo</h3>
+                <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-6">
+                  Trang bị kính lúp kỹ thuật số để soi rõ những chiêu trò lừa đảo tinh vi trên mạng xã hội.
+                </p>
+              </div>
+              <button 
+                onClick={() => { sfx.click(); onLessons(); }}
+                className="bg-white border border-slate-200 text-slate-600 rounded-full py-2 px-5 font-bold hover:bg-slate-50 active:scale-95 transition-all text-xs self-start"
+              >
+                Tìm hiểu thêm
+              </button>
+            </div>
+
+            {/* Card 3: Behavior */}
+            <div className="bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 flex flex-col justify-between transition-transform hover:-translate-y-1">
+              <div>
+                <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl text-purple-600 mb-6">
+                  👥
+                </div>
+                <h3 className="font-black text-slate-800 text-lg mb-3 font-nunito">Ứng xử văn minh</h3>
+                <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-6">
+                  Trở thành công dân số lịch sự, biết cách giao tiếp và tôn trọng người khác trên không gian mạng.
+                </p>
+              </div>
+              <button 
+                onClick={() => { sfx.click(); onLessons(); }}
+                className="bg-white border border-slate-200 text-slate-600 rounded-full py-2 px-5 font-bold hover:bg-slate-50 active:scale-95 transition-all text-xs self-start"
+              >
+                Tìm hiểu thêm
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5. Royal Blue Stats Section ── */}
+      <section className="w-full max-w-5xl mx-auto px-6 py-10">
+        <div className="bg-[#004aad] rounded-[36px] py-12 px-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-center text-white shadow-xl shadow-blue-900/10">
+          <div className="md:col-span-7 text-left space-y-2">
+            <h3 className="text-2xl md:text-3xl font-black font-nunito">
+              Mạng lưới học tập an toàn ngày <br /> càng lớn mạnh
+            </h3>
+            <p className="text-blue-100 text-sm font-semibold leading-relaxed max-w-md">
+              Tham gia cùng hàng nghìn bạn nhỏ khác trong hành trình trở thành Hiệp sĩ An toàn số.
             </p>
           </div>
-          <div className="flex flex-wrap gap-x-6 gap-y-2 justify-center text-xs text-slate-400 font-extrabold">
-            <a href="#" className="hover:text-slate-600 transition-colors">Chính sách bảo mật</a>
-            <a href="#" className="hover:text-slate-600 transition-colors">Điều khoản sử dụng</a>
-            <a href="#" className="hover:text-slate-600 transition-colors">Liên hệ quảng cáo</a>
-            <a href="#" className="hover:text-slate-600 transition-colors">Hỗ trợ phụ huynh</a>
+          
+          <div className="md:col-span-5 grid grid-cols-2 gap-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10 text-center">
+              <span className="text-3xl font-black font-nunito block">2,500+</span>
+              <span className="text-[10px] uppercase font-bold text-blue-200 mt-1 block">Học sinh tham gia</span>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10 text-center">
+              <span className="text-3xl font-black font-nunito block">50+</span>
+              <span className="text-[10px] uppercase font-bold text-blue-200 mt-1 block">Bài học tương tác</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 6. Overlapping Avatars & Final CTA ── */}
+      <section className="w-full py-20 bg-gradient-to-t from-slate-50 to-white flex flex-col items-center text-center px-6">
+        {/* Kid avatars overlap */}
+        <div className="flex items-center justify-center -space-x-4 mb-6">
+          <div className="w-14 h-14 bg-sky-100 border-4 border-white rounded-full flex items-center justify-center text-2xl shadow-md z-10">👦</div>
+          <div className="w-14 h-14 bg-pink-100 border-4 border-white rounded-full flex items-center justify-center text-2xl shadow-md z-25">👧</div>
+          <div className="w-14 h-14 bg-amber-100 border-4 border-white rounded-full flex items-center justify-center text-2xl shadow-md z-20">👦</div>
+        </div>
+
+        <h2 className="text-3xl md:text-4xl font-black text-blue-900 font-nunito leading-tight mb-3">
+          Sẵn sàng để bắt đầu cuộc phiêu lưu số?
+        </h2>
+        <p className="text-slate-500 text-sm font-bold max-w-xl leading-relaxed mb-8">
+          Hoàn toàn miễn phí và luôn luôn như vậy. Đăng ký tài khoản ngay hôm nay để nhận huy hiệu &apos;Người mới bắt đầu&apos;.
+        </p>
+
+        <button
+          onClick={() => { sfx.click(); setShowQuickStart(true); }}
+          className="bg-[#005fb8] text-white rounded-full px-8 py-4 font-black text-base hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-200/40 cursor-pointer"
+        >
+          Bắt đầu hành trình ngay
+        </button>
+        <span className="text-[10px] text-slate-400 font-extrabold mt-4 block">
+          * Không cần thẻ tín dụng • Đăng ký trong 30 giây
+        </span>
+      </section>
+
+      {/* ── 7. Footer (Mockup Details) ── */}
+      <footer className="w-full bg-[#f8fafc] py-8 border-t border-slate-100 mt-auto">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            <h4 className="font-extrabold text-blue-900 text-base mb-1 font-nunito">Bé An Toàn Số</h4>
+            <p className="text-xs text-slate-400 font-extrabold">
+              © 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt trên không gian mạng.
+            </p>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="flex gap-x-5 text-xs text-slate-400 font-extrabold">
+              <a href="#" className="hover:text-slate-600 transition-colors">Điều khoản</a>
+              <a href="#" className="hover:text-slate-600 transition-colors">Bảo mật</a>
+              <a href="#" className="hover:text-slate-600 transition-colors">Liên hệ</a>
+              <a href="#" className="hover:text-slate-600 transition-colors">Trợ giúp</a>
+            </div>
+            
+            {/* Share and contact buttons */}
+            <div className="flex gap-3">
+              <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition shadow-sm border border-slate-200/50">
+                📎
+              </button>
+              <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition shadow-sm border border-slate-200/50">
+                ✉️
+              </button>
+            </div>
           </div>
         </div>
       </footer>
@@ -392,6 +365,126 @@ export function HomeScreen({
         onSuccess={handleAuthSuccess}
         initialTab={authTab}
       />
+
+      {/* ── 8. News Feed (Articles & Categories) ── */}
+      <NewsFeed />
+
+      {/* ── 9. Về chúng tôi (About Us Static Section) ── */}
+      <section id="about" className="py-20 px-6 max-w-6xl mx-auto w-full border-t border-slate-100 scroll-mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-center">
+          {/* Left Column: Chân dung tác giả */}
+          <div className="md:col-span-5 flex flex-col items-center relative">
+            <div className="relative p-2 bg-white card-kid rounded-[36px] max-w-xs w-full shadow-lg border border-slate-200/50">
+              <img
+                src="/images/graduation_author.png"
+                alt="Chân dung tác giả Trương Chí Kiên"
+                className="w-full rounded-[30px] object-cover shadow-inner"
+              />
+            </div>
+            {/* Author tag */}
+            <div className="absolute -bottom-4 right-4 bg-white card-kid py-2.5 px-4.5 rounded-2xl flex items-center gap-2 border border-slate-200 shadow-md">
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-lg shadow-sm text-white font-bold">
+                🎓
+              </div>
+              <div className="leading-tight text-left">
+                <p className="text-[10px] text-slate-400 font-black leading-none">Tác giả</p>
+                <p className="text-xs text-blue-900 font-black leading-tight mt-0.5">Trương Chí Kiên</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Narrative Content */}
+          <div className="md:col-span-7 flex flex-col items-start text-left">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-rose-50 border border-rose-100 text-rose-500 rounded-full text-xs font-black mb-4">
+              ❤️ Tâm sự từ người sáng lập
+            </span>
+            <h2 className="text-2xl md:text-3xl font-black text-blue-900 tracking-tight leading-tight mb-6 font-nunito">
+              Xây dựng không gian mạng <span className="text-blue-600 font-black">an toàn cho trẻ em</span>
+            </h2>
+            <div className="space-y-4 text-slate-700 text-base font-semibold leading-relaxed">
+              <p>
+                Xin chào! Mình là Trương Chí Kiên. Nhận thấy trẻ em ngày nay tiếp xúc với Internet từ rất sớm nhưng lại thiếu các kỹ năng tự bảo vệ, mình đã tạo ra &quot;Bé An Toàn Số&quot; với mong muốn đóng góp một phần nhỏ bé cho cộng đồng.
+              </p>
+              <p>
+                Trang web được thiết kế như một trò chơi tương tác, nơi các em có thể hóa thân thành những &quot;Hiệp sĩ không gian mạng&quot;, trải qua các thử thách để học cách nhận biết lừa đảo, bảo vệ thông tin cá nhân và ứng xử văn minh trên môi trường số.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Guest Play Quick Start Modal overlay */}
+      {showQuickStart && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-up">
+          <div className="bg-white card-kid rounded-[36px] p-6 max-w-sm w-full relative shadow-2xl border-4 border-slate-800 animate-bounce-in">
+            {/* Close button */}
+            <button 
+              onClick={() => { sfx.click(); setShowQuickStart(false); }}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition font-bold"
+            >
+              ✕
+            </button>
+
+            <h2 className="font-black text-slate-800 text-xl mb-1 flex items-center gap-2 font-nunito mt-2 text-left">
+              🎮 Bắt đầu hành trình
+            </h2>
+            <p className="text-xs font-bold text-slate-400 mb-6 text-left">Nhập thông tin của con để cùng Cú Cú khám phá!</p>
+
+            <div className="space-y-4 text-left">
+              {/* Tên của em */}
+              <div>
+                <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">
+                  Tên của em
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleStart()}
+                  maxLength={30}
+                  placeholder="Ví dụ: Bé Minh"
+                  className="input-kid padding-left-4 text-base py-3 focus:border-blue-600"
+                  autoComplete="given-name"
+                />
+              </div>
+
+              {/* Năm sinh */}
+              <div>
+                <label className="block text-xs font-black text-slate-500 uppercase tracking-wider mb-2">
+                  Năm sinh
+                </label>
+                <input
+                  type="number"
+                  value={birthYear}
+                  onChange={(e) => setBirthYear(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleStart()}
+                  className="input-kid padding-left-4 text-base py-3 focus:border-blue-600"
+                  placeholder="2014"
+                  min={1990}
+                  max={new Date().getFullYear()}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="pt-2 flex flex-col gap-3">
+                <button
+                  onClick={handleStart}
+                  disabled={!canStart}
+                  className="btn-kid bg-blue-600 text-white border-blue-800 hover:bg-blue-700 w-full justify-center text-base"
+                >
+                  🚀 Bắt đầu học ngay
+                </button>
+                <button
+                  onClick={() => { setShowQuickStart(false); openAuth("login"); }}
+                  className="btn-kid bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100 w-full justify-center text-sm"
+                >
+                  🔑 Hoặc Đăng nhập lưu điểm
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

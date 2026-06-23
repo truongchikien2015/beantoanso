@@ -15,17 +15,17 @@ export default function StudentLoginPage() {
   }, [router]);
 
   return (
-    <div className="app-page flex flex-col">
+    <div className="sd-page">
       {/* Header - Game Start Style */}
       <header className="pt-12 pb-6 text-center animate-bounce-in">
         {/* Mascot */}
         <div className="text-7xl mb-4 animate-float">🎓</div>
         
-        {/* Gradient title */}
-        <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[var(--kid-coral-new)] to-[var(--kid-teal-new)]">
+        {/* Title */}
+        <h1 className="text-3xl font-black text-slate-800">
           Cổng học sinh
         </h1>
-        <p className="text-slate-500 mt-2 font-semibold text-base max-w-xs mx-auto">
+        <p className="text-slate-500 mt-2 font-bold text-base max-w-xs mx-auto">
           🛡️ Bé An Toàn Số - Học cách sử dụng Internet an toàn!
         </p>
       </header>
@@ -45,10 +45,64 @@ export default function StudentLoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="text-center pb-8 text-sm text-slate-400">
-        <p>Bé An Toàn Số · Internet an toàn cho học sinh tiểu học</p>
-        <p className="text-xs mt-1">🎮 Học mà chơi, chơi mà học!</p>
+      <footer className="sd-footer">
+        <div className="sd-footer-inner">
+          <p className="sd-footer-copy">© 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt Nam trên không gian mạng.</p>
+          <div className="sd-footer-links">
+            <button onClick={() => router.push("/terms")} className="sd-footer-link bg-transparent border-none cursor-pointer">Điều khoản</button>
+            <button onClick={() => router.push("/privacy")} className="sd-footer-link bg-transparent border-none cursor-pointer">Bảo mật</button>
+            <button onClick={() => router.push("/contact")} className="sd-footer-link bg-transparent border-none cursor-pointer">Liên hệ</button>
+            <button onClick={() => router.push("/help")} className="sd-footer-link bg-transparent border-none cursor-pointer">Trợ giúp</button>
+          </div>
+        </div>
       </footer>
+
+      {/* Scoped CSS Styles */}
+      <style>{`
+        /* ─── Page Shell ─── */
+        .sd-page {
+          min-height: 100dvh;
+          background-color: #FFF9F0;
+          background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px);
+          background-size: 24px 24px;
+          color: #2D3436;
+          font-family: var(--font-nunito, 'Nunito'), var(--font-quicksand, 'Quicksand'), sans-serif;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* ─── Footer ─── */
+        .sd-footer {
+          background-color: #ffffff;
+          border-top: 2px solid #f1f5f9;
+          padding: 1.5rem;
+          margin-top: auto;
+        }
+        .sd-footer-inner {
+          max-width: 900px;
+          margin: 0 auto;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: #64748b;
+        }
+        .sd-footer-links {
+          display: flex;
+          gap: 1.25rem;
+        }
+        .sd-footer-link {
+          color: #64748b;
+          transition: color 0.2s;
+          text-decoration: none;
+        }
+        .sd-footer-link:hover {
+          color: #2563eb;
+        }
+      `}</style>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { HomeScreen } from "../components/HomeScreen";
 import { useAppStore } from "../lib/globalStore";
-import { supabase } from "../lib/supabase";
+import { fetchStudentSession } from "../lib/studentApi";
 
 export default function HomePage() {
   const router = useRouter();
@@ -20,27 +20,32 @@ export default function HomePage() {
   const nickname = useAppStore((state) => state.nickname);
 
   useEffect(() => {
-    if (!supabase) {
-      if (nickname) {
-        router.push("/path-select");
-      }
-      return;
-    }
+    const token = typeof window !== "undefined" ? localStorage.getItem("student_token") : null;
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const pathId = params?.get("path");
+    const redirectUrl = pathId ? `/path-select?path=${pathId}` : "/path-select";
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        supabase.from('profiles').select('*').eq('id', session.user.id).single().then(({ data: profile }) => {
-          setNickname(profile?.full_name || session.user.email);
-          setGender(profile?.gender || "other");
-          if (profile?.birth_year) setBirthYear(profile.birth_year);
-          setProfileXp(profile?.xp || 0);
-          setPlayerId(session.user.id);
-          router.push("/path-select");
+    if (token) {
+      fetchStudentSession()
+        .then(({ student }) => {
+          if (student) {
+            setNickname(student.nickname);
+            setGender(student.gender || "other");
+            if (student.birthYear) setBirthYear(student.birthYear);
+            setProfileXp(student.xp || 0);
+            setPlayerId(student.id);
+            router.push(redirectUrl);
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem("student_token");
+          if (nickname) {
+            router.push(redirectUrl);
+          }
         });
-      } else if (nickname) {
-        router.push("/path-select");
-      }
-    });
+    } else if (nickname) {
+      router.push(redirectUrl);
+    }
   }, [nickname, router, setBirthYear, setGender, setNickname, setPlayerId, setProfileXp]);
 
   const handleStart = (name: string, pGender: string, pBirthYear: number) => {
@@ -51,7 +56,15 @@ export default function HomePage() {
       setPlayerId("p-" + Math.random().toString(36).slice(2));
     }
     useAppStore.getState().resetProgress();
-    router.push("/path-select");
+    
+    // Read path from URL search params on client side
+    const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const pathId = params?.get("path");
+    if (pathId) {
+      router.push(`/path-select?path=${pathId}`);
+    } else {
+      router.push("/path-select");
+    }
   };
 
   return (

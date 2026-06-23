@@ -28,4 +28,5 @@ const StudentAnswerSchema = new Schema<IStudentAnswer>(
 StudentAnswerSchema.index({ player_id: 1 });
 StudentAnswerSchema.index({ timestamp: -1 });
 
-export const StudentAnswer: Model<IStudentAnswer> = models.StudentAnswer || model<IStudentAnswer>("StudentAnswer", StudentAnswerSchema);
+export const StudentAnswer: Model<IStudentAnswer> =
+  models.StudentAnswer || model<IStudentAnswer>("StudentAnswer", StudentAnswerSchema, "student_answers");

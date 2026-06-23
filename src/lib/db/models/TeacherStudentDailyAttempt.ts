@@ -35,4 +35,4 @@ const TeacherStudentDailyAttemptSchema = new Schema<ITeacherStudentDailyAttempt>
 TeacherStudentDailyAttemptSchema.index({ student_id: 1, attempt_date: 1 }, { unique: true });
 
 export const TeacherStudentDailyAttempt: Model<ITeacherStudentDailyAttempt> = models.TeacherStudentDailyAttempt ||
-  model<ITeacherStudentDailyAttempt>("TeacherStudentDailyAttempt", TeacherStudentDailyAttemptSchema);
+  model<ITeacherStudentDailyAttempt>("TeacherStudentDailyAttempt", TeacherStudentDailyAttemptSchema, "teacher_student_daily_attempts");

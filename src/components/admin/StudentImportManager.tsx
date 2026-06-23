@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
-import { supabase } from "@/lib/supabase";
 import { parseStudentFile, validateAndPrepareImport } from "@/lib/excelParser";
-import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound } from "lucide-react";
+import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound, Users, Copy, Share2 } from "lucide-react";
 
 const SAMPLE_HEADERS = ["nickname", "email", "class_name", "student_code", "password"];
 
@@ -30,6 +29,10 @@ export function StudentImportManager() {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState("");
   const [resetSuccess, setResetSuccess] = useState("");
+
+  const [parentLinkTarget, setParentLinkTarget] = useState<{ id: string; nickname: string; parent_access_code: string | null } | null>(null);
+  const [parentLinkLoading, setParentLinkLoading] = useState(false);
+  const [parentLinkCopied, setParentLinkCopied] = useState(false);
 
   // Multi-select state for bulk assign
   const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
@@ -128,10 +131,7 @@ export function StudentImportManager() {
         return;
       }
 
-      const { data: sessionData } = supabase
-        ? await supabase.auth.getSession()
-        : { data: { session: null } };
-      const token = sessionData.session?.access_token;
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
 
       // Call API to import
       const res = await fetch("/api/teacher/students", {
@@ -253,6 +253,53 @@ export function StudentImportManager() {
     }, 1200);
   };
 
+  const handleParentLinkAction = async (action: "ensure" | "regenerate") => {
+    if (!parentLinkTarget) return;
+    setParentLinkLoading(true);
+    clearError();
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      const res = await fetch(`/api/teacher/students/${parentLinkTarget.id}/parent-link`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error || "Lỗi thao tác mã phụ huynh");
+
+      // Update local target state with the generated code
+      setParentLinkTarget({
+        ...parentLinkTarget,
+        parent_access_code: body.parent_access_code,
+      });
+
+      // Update Zustand store in-memory for instant reactive UI updates
+      useTeacherContentStore.setState((state) => ({
+        students: state.students.map((st) =>
+          st.id === parentLinkTarget.id
+            ? { ...st, parent_access_code: body.parent_access_code }
+            : st
+        ),
+      }));
+
+      // Refresh student list from Zustand store
+      await fetchStudents();
+    } catch (err: any) {
+      alert(err.message || "Lỗi hệ thống khi tạo mã phụ huynh");
+    } finally {
+      setParentLinkLoading(false);
+    }
+  };
+
+  const copyToClipboard = (text: string, type: "code" | "link") => {
+    navigator.clipboard.writeText(text);
+    setParentLinkCopied(true);
+    setTimeout(() => setParentLinkCopied(false), 2000);
+  };
+
   // Bulk select handlers
   const toggleStudentSelect = (studentId: string) => {
     setSelectedStudents(prev => {
@@ -276,10 +323,7 @@ export function StudentImportManager() {
     setBulkAssignLoading(true);
     setBulkAssignSuccess("");
     try {
-      const { data: sessionData } = supabase
-        ? await supabase.auth.getSession()
-        : { data: { session: null } };
-      const token = sessionData.session?.access_token;
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
       const res = await fetch(`/api/teacher/learning-paths/${assignPathId}/assign-students`, {
         method: "POST",
         headers: {
@@ -554,19 +598,20 @@ export function StudentImportManager() {
 
         {viewMode === "list" && filteredStudents.length > 0 && (
           <div className="overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-sm">
-            <div className="hidden grid-cols-[44px_1.2fr_0.55fr_0.7fr_1.2fr_132px] gap-3 bg-sky-50 px-4 py-3 text-xs font-bold uppercase tracking-wide text-sky-900 md:grid">
+            <div className="hidden grid-cols-[44px_1.1fr_0.5fr_0.6fr_1fr_1.1fr_132px] gap-3 bg-sky-50 px-4 py-3 text-xs font-bold uppercase tracking-wide text-sky-900 md:grid">
               <span></span>
               <span>Học sinh</span>
               <span>Lớp</span>
-              <span>Mã</span>
+              <span>Mã HS</span>
               <span>Lộ trình</span>
+              <span>Mã Phụ Huynh</span>
               <span className="text-right">Thao tác</span>
             </div>
             <div className="divide-y divide-sky-50">
               {filteredStudents.map(student => {
                 const path = learningPaths.find(p => p.id === student.assigned_path_id);
                 return (
-                  <div key={student.id} className={`grid gap-3 px-4 py-3 transition hover:bg-sky-50/50 md:grid-cols-[44px_1.2fr_0.55fr_0.7fr_1.2fr_132px] md:items-center ${selectedStudents.has(student.id) ? "bg-indigo-50/70" : ""}`}>
+                  <div key={student.id} className={`grid gap-3 px-4 py-3 transition hover:bg-sky-50/50 md:grid-cols-[44px_1.1fr_0.5fr_0.6fr_1fr_1.1fr_132px] md:items-center ${selectedStudents.has(student.id) ? "bg-indigo-50/70" : ""}`}>
                     <div className="flex items-center justify-between md:block">
                       <input
                         type="checkbox"
@@ -583,6 +628,9 @@ export function StudentImportManager() {
                         )}
                         <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
                           <KeyRound size={14} />
+                        </button>
+                        <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
+                          <Users size={14} />
                         </button>
                         <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
                           <Trash2 size={14} />
@@ -604,6 +652,38 @@ export function StudentImportManager() {
                         <span className="text-xs text-slate-400">Chưa gán lộ trình</span>
                       )}
                     </div>
+                    <div className="flex items-center gap-1.5 md:block">
+                      <span className="text-xs font-bold text-slate-400 md:hidden">Mã phụ huynh: </span>
+                      {student.parent_access_code ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })}
+                            className="inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700 border border-indigo-200 font-mono hover:bg-indigo-100 transition cursor-pointer"
+                            title="Xem chi tiết và quản lý mã phụ huynh"
+                          >
+                            {student.parent_access_code}
+                          </button>
+                          <button
+                            onClick={() => {
+                              const origin = typeof window !== "undefined" ? window.location.origin : "";
+                              navigator.clipboard.writeText(`${origin}/parent?code=${student.parent_access_code}`);
+                              alert("Đã sao chép liên kết phụ huynh!");
+                            }}
+                            className="text-slate-400 hover:text-indigo-600 p-1"
+                            title="Sao chép liên kết phụ huynh"
+                          >
+                            <Copy size={12} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })}
+                          className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline"
+                        >
+                          + Tạo mã
+                        </button>
+                      )}
+                    </div>
                     <div className="hidden justify-end gap-1 md:flex">
                       {!student.assigned_path_id && learningPaths.length > 0 && (
                         <button onClick={() => { setAssignTarget(student.id); setAssignPathId(""); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
@@ -613,13 +693,16 @@ export function StudentImportManager() {
                       <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
                         <KeyRound size={14} />
                       </button>
+                      <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
+                        <Users size={14} />
+                      </button>
                       <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
                         <Trash2 size={14} />
                       </button>
                     </div>
 
                     {assignTarget === student.id && (
-                      <div className="rounded-xl border border-sky-100 bg-sky-50/60 p-3 md:col-span-6">
+                      <div className="rounded-xl border border-sky-100 bg-sky-50/60 p-3 md:col-span-7">
                         <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
                           <select className="Input w-full text-sm" value={assignPathId} onChange={e => setAssignPathId(e.target.value)}>
                             <option value="">-- Chọn lộ trình --</option>
@@ -669,6 +752,38 @@ export function StudentImportManager() {
                         })()}
                       </div>
                     )}
+                    <div className="mt-2 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-1.5">
+                      <span className="text-xs text-slate-400 font-medium">Mã phụ huynh:</span>
+                      {student.parent_access_code ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })}
+                            className="inline-flex items-center rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-bold text-indigo-700 border border-indigo-200 font-mono hover:bg-indigo-100 transition cursor-pointer"
+                            title="Xem chi tiết và quản lý mã phụ huynh"
+                          >
+                            {student.parent_access_code}
+                          </button>
+                          <button
+                            onClick={() => {
+                              const origin = typeof window !== "undefined" ? window.location.origin : "";
+                              navigator.clipboard.writeText(`${origin}/parent?code=${student.parent_access_code}`);
+                              alert("Đã sao chép liên kết phụ huynh!");
+                            }}
+                            className="text-slate-400 hover:text-indigo-600 p-0.5"
+                            title="Sao chép liên kết phụ huynh"
+                          >
+                            <Copy size={11} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })}
+                          className="text-xs font-semibold text-sky-600 hover:text-sky-800 underline"
+                        >
+                          + Tạo mã
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     {!student.assigned_path_id && learningPaths.length > 0 && (
@@ -678,6 +793,9 @@ export function StudentImportManager() {
                     )}
                     <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
                       <KeyRound size={14} />
+                    </button>
+                    <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
+                      <Users size={14} />
                     </button>
                     <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
                       <Trash2 size={14} />
@@ -847,6 +965,133 @@ export function StudentImportManager() {
                   </>
                 )}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Parent Link Modal */}
+      {parentLinkTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={(e) => { if (e.target === e.currentTarget && !parentLinkLoading) setParentLinkTarget(null); }}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                <Users size={18} className="text-indigo-600" />
+                Mã liên kết Phụ huynh
+              </h3>
+              <button onClick={() => setParentLinkTarget(null)} className="Btn Btn--ghost Btn--sm" disabled={parentLinkLoading}>
+                <X size={14} />
+              </button>
+            </div>
+
+            <p className="text-sm text-slate-500">
+              Học sinh: <strong className="text-slate-800">{parentLinkTarget.nickname}</strong>
+            </p>
+
+            <div className="space-y-4">
+              {parentLinkTarget.parent_access_code ? (
+                <>
+                  <div className="space-y-2">
+                    <span className="text-xs font-semibold text-gray-500 block">Mã phụ huynh (Parent Access Code)</span>
+                    <div className="flex gap-2 items-center">
+                      <span className="font-mono font-bold text-lg bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-100 flex-1 text-sky-800 select-all text-center">
+                        {parentLinkTarget.parent_access_code}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard(parentLinkTarget.parent_access_code!, "code")}
+                        className="Btn Btn--secondary Btn--sm flex items-center gap-1"
+                        title="Copy mã"
+                      >
+                        <Copy size={14} /> Copy
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="text-xs font-semibold text-gray-500 block">Link xem trực tiếp cho phụ huynh</span>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="text"
+                        readOnly
+                        value={typeof window !== "undefined" ? `${window.location.origin}/parent?code=${parentLinkTarget.parent_access_code}` : `/parent?code=${parentLinkTarget.parent_access_code}`}
+                        className="Input font-mono text-xs flex-1 bg-slate-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const origin = typeof window !== "undefined" ? window.location.origin : "";
+                          copyToClipboard(`${origin}/parent?code=${parentLinkTarget.parent_access_code}`, "link");
+                        }}
+                        className="Btn Btn--secondary Btn--sm flex items-center gap-1"
+                        title="Copy link"
+                      >
+                        <Share2 size={14} /> Copy
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const origin = typeof window !== "undefined" ? window.location.origin : "";
+                        const message = `Xin chào phụ huynh, đây là thông tin tra cứu tiến độ học tập an toàn số của con (${parentLinkTarget.nickname}) trên hệ thống Bé An Toàn Số:\n\n- Mã liên kết của con: ${parentLinkTarget.parent_access_code}\n- Link tra cứu trực tiếp: ${origin}/parent?code=${parentLinkTarget.parent_access_code}\n\nPhụ huynh chỉ cần truy cập vào đường dẫn trên hoặc vào trang chủ mục Cổng Phụ Huynh để theo dõi kết quả của con nhé!`;
+                        copyToClipboard(message, "link");
+                      }}
+                      className="Btn Btn--outline w-full justify-center text-xs font-semibold py-2 text-indigo-700 border-indigo-200 hover:bg-indigo-50 flex items-center gap-1.5"
+                    >
+                      <Share2 size={14} /> Copy tin nhắn gửi phụ huynh
+                    </button>
+                  </div>
+
+                  {parentLinkCopied && (
+                    <div className="text-xs text-emerald-600 font-bold text-center animate-pulse">
+                      ✓ Đã copy thành công!
+                    </div>
+                  )}
+
+                  <div className="pt-2 border-t border-slate-100 flex gap-2 justify-between">
+                    <button
+                      type="button"
+                      disabled={parentLinkLoading}
+                      onClick={() => handleParentLinkAction("regenerate")}
+                      className="Btn Btn--outline Btn--sm text-amber-600 border-amber-200 hover:bg-amber-50 text-xs"
+                    >
+                      {parentLinkLoading ? "Đang tạo lại..." : "Tạo lại mã mới"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setParentLinkTarget(null)}
+                      className="Btn Btn--primary Btn--sm text-xs"
+                    >
+                      Hoàn tất
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-amber-600 font-medium">
+                    * Lưu ý: Khi tạo mã mới, mã và liên kết cũ của phụ huynh sẽ hết hiệu lực ngay lập tức.
+                  </p>
+                </>
+              ) : (
+                <div className="text-center py-6 space-y-4">
+                  <div className="text-slate-400 text-sm">
+                    Học sinh này chưa được tạo mã liên kết phụ huynh.
+                  </div>
+                  <button
+                    type="button"
+                    disabled={parentLinkLoading}
+                    onClick={() => handleParentLinkAction("ensure")}
+                    className="Btn Btn--primary w-full justify-center py-2 flex items-center gap-2"
+                  >
+                    {parentLinkLoading ? "Đang tạo..." : <><Users size={16} /> Tạo mã phụ huynh</>}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

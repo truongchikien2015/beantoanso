@@ -1,17 +1,17 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
-import { supabase } from "@/lib/supabase";
 import { topicLabels, QuizTopic } from "@/data/quizQuestions";
 import type { TeacherQuestionSet, TeacherQuestion, ImportQuestionInput, QuestionImportResult, TeacherTopic } from "@/types/teacher-content";
-import { Plus, Trash2, Edit2, Check, X, ChevronDown, ChevronUp, Upload, FileSpreadsheet, AlertCircle, Download, Tag, Settings } from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X, ChevronDown, ChevronUp, Upload, FileSpreadsheet, AlertCircle, Download, Tag, Settings, Image as ImageIcon, Link as LinkIcon, Loader2 } from "lucide-react";
 import { parseQuestionFile, validateAndPrepareQuestionImport, buildQuestionImportSummary, generateQuestionTemplate } from "@/lib/excelParser";
+import { getMediaType, getYouTubeEmbedUrl } from "@/lib/mediaUtils";
 
 export function QuestionSetManager() {
   const {
     questionSets, questions, loading, error, topics, fetchQuestionSets, createQuestionSet,
     updateQuestionSet, deleteQuestionSet, fetchQuestionsForSet,
-    createQuestion, updateQuestion, deleteQuestion, clearError,
+    createQuestion, updateQuestion, deleteQuestion, clearError, uploadMedia,
     fetchTopics, createTopic, updateTopic, deleteTopic,
   } = useTeacherContentStore();
 
@@ -34,7 +34,7 @@ export function QuestionSetManager() {
   const [newSetDesc, setNewSetDesc] = useState("");
 
   // New question form
-  const [newQ, setNewQ] = useState({ question: "", option_a: "", option_b: "", option_c: "", correct: "A" as "A" | "B" | "C", explanation: "" });
+  const [newQ, setNewQ] = useState({ question: "", option_a: "", option_b: "", option_c: "", correct: "A" as "A" | "B" | "C", explanation: "", image_url: "" });
 
   // Edit set form
   const [editTitle, setEditTitle] = useState("");
@@ -42,7 +42,7 @@ export function QuestionSetManager() {
   const [editDesc, setEditDesc] = useState("");
 
   // Edit question form
-  const [editQ, setEditQ] = useState<{ question: string; option_a: string; option_b: string; option_c: string; correct: "A" | "B" | "C"; explanation: string } | null>(null);
+  const [editQ, setEditQ] = useState<{ question: string; option_a: string; option_b: string; option_c: string; correct: "A" | "B" | "C"; explanation: string; image_url: string; } | null>(null);
 
   // Excel import state
   const [showImportModal, setShowImportModal] = useState<string | null>(null);
@@ -52,6 +52,8 @@ export function QuestionSetManager() {
   const [importLoading, setImportLoading] = useState(false);
   const [importResult, setImportResult] = useState<QuestionImportResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
 
   // Combined topic options (default + custom)
   const allTopicOptions = [
@@ -140,14 +142,15 @@ export function QuestionSetManager() {
       option_c: newQ.option_c.trim(),
       correct_option: newQ.correct,
       explanation: newQ.explanation.trim() || undefined,
+      image_url: newQ.image_url.trim() || undefined,
     });
-    setNewQ({ question: "", option_a: "", option_b: "", option_c: "", correct: "A", explanation: "" });
+    setNewQ({ question: "", option_a: "", option_b: "", option_c: "", correct: "A", explanation: "", image_url: "" });
     setShowQuestionForm(null);
   };
 
   const startEditQuestion = (q: TeacherQuestion) => {
     setEditingQuestionId(q.id);
-    setEditQ({ question: q.question, option_a: q.option_a, option_b: q.option_b, option_c: q.option_c, correct: q.correct_option, explanation: q.explanation ?? "" });
+    setEditQ({ question: q.question, option_a: q.option_a, option_b: q.option_b, option_c: q.option_c, correct: q.correct_option, explanation: q.explanation ?? "", image_url: q.image_url ?? "" });
   };
 
   const handleUpdateQuestion = async () => {
@@ -159,6 +162,7 @@ export function QuestionSetManager() {
       option_c: editQ.option_c.trim(),
       correct_option: editQ.correct,
       explanation: editQ.explanation.trim() || undefined,
+      image_url: editQ.image_url.trim() || undefined,
     });
     setEditingQuestionId(null);
     setEditQ(null);
@@ -177,6 +181,45 @@ export function QuestionSetManager() {
   const handleNewQCorrect = (v: "A" | "B" | "C") => setNewQ(q => ({ ...q, correct: v }));
   const handleNewQExplanation = (v: string) => setNewQ(q => ({ ...q, explanation: v }));
   const handleNewQQuestion = (v: string) => setNewQ(q => ({ ...q, question: v }));
+  const handleNewQImageUrl = (v: string) => setNewQ(q => ({ ...q, image_url: v }));
+
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingMedia(true);
+    try {
+      const result = await uploadMedia(file);
+      if (result && result.url) {
+        if (isEdit && editQ) {
+          setEditQ({ ...editQ, image_url: result.url });
+        } else {
+          handleNewQImageUrl(result.url);
+        }
+      }
+    } finally {
+      setUploadingMedia(false);
+      if (mediaInputRef.current) mediaInputRef.current.value = "";
+    }
+  };
+
+  const renderMediaPreview = (url: string | undefined | null) => {
+    if (!url) return null;
+    const type = getMediaType(url);
+    
+    if (type === "youtube") {
+      const embedUrl = getYouTubeEmbedUrl(url);
+      if (!embedUrl) return <div className="text-xs text-red-500">Link YouTube không hợp lệ</div>;
+      return (
+        <div className="relative pt-[56.25%] bg-slate-100 rounded overflow-hidden">
+          <iframe className="absolute inset-0 w-full h-full" src={embedUrl} allowFullScreen />
+        </div>
+      );
+    }
+    if (type === "video") return <video src={url} controls className="max-h-40 max-w-full rounded" />;
+    if (type === "audio") return <audio src={url} controls className="w-full" />;
+    return <img src={url} alt="Media" className="max-h-40 max-w-full object-contain rounded bg-slate-50" />;
+  };
 
   // Excel import handlers
   const handleDownloadTemplate = () => {
@@ -213,10 +256,7 @@ export function QuestionSetManager() {
 
     setImportLoading(true);
     try {
-      const { data: sessionData } = supabase
-        ? await supabase.auth.getSession()
-        : { data: { session: null } };
-      const token = sessionData.session?.access_token;
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
       const res = await fetch(`/api/teacher/question-sets/${setId}/import-questions`, {
         method: "POST",
         headers: {
@@ -444,7 +484,7 @@ export function QuestionSetManager() {
                       <Upload size={12} /> Nhập Excel
                     </button>
                     <button
-                      onClick={() => { setShowQuestionForm(set.id); setNewQ({ question: "", option_a: "", option_b: "", option_c: "", correct: "A", explanation: "" }); }}
+                      onClick={() => { setShowQuestionForm(set.id); setNewQ({ question: "", option_a: "", option_b: "", option_c: "", correct: "A", explanation: "", image_url: "" }); }}
                       className="Btn Btn--outline Btn--sm text-xs"
                     >
                       <Plus size={12} /> Thêm câu hỏi
@@ -470,6 +510,22 @@ export function QuestionSetManager() {
                       ))}
                     </div>
                     <input className="Input w-full text-sm" placeholder="Giải thích (tùy chọn)" value={newQ.explanation} onChange={e => handleNewQExplanation(e.target.value)} />
+                    
+                    <div className="space-y-2 p-2 bg-white/50 rounded border border-green-200">
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1 flex items-center">
+                          <LinkIcon size={14} className="absolute left-2 text-gray-400" />
+                          <input className="Input w-full text-sm pl-7" placeholder="URL media (ảnh, audio, YouTube)" value={newQ.image_url} onChange={e => handleNewQImageUrl(e.target.value)} />
+                        </div>
+                        <label className="Btn Btn--outline Btn--sm flex items-center gap-1 cursor-pointer shrink-0">
+                          {uploadingMedia ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                          Tải file
+                          <input type="file" accept="image/*,audio/*" className="hidden" onChange={e => handleMediaUpload(e)} disabled={uploadingMedia} />
+                        </label>
+                      </div>
+                      {renderMediaPreview(newQ.image_url)}
+                    </div>
+
                     <div className="flex gap-1">
                       <button onClick={() => handleCreateQuestion(set.id)} className="Btn Btn--primary Btn--sm">Thêm</button>
                       <button onClick={() => setShowQuestionForm(null)} className="Btn Btn--secondary Btn--sm">Hủy</button>
@@ -487,6 +543,20 @@ export function QuestionSetManager() {
                           <input className={"Input text-sm " + (editQ.correct === "B" ? "border-green-500" : "")} placeholder="Đáp án B" value={editQ.option_b} onChange={e => setEditQ(eq => eq ? { ...eq, option_b: e.target.value } : null)} />
                           <input className={"Input text-sm " + (editQ.correct === "C" ? "border-green-500" : "")} placeholder="Đáp án C" value={editQ.option_c} onChange={e => setEditQ(eq => eq ? { ...eq, option_c: e.target.value } : null)} />
                         </div>
+                        <div className="space-y-2 p-2 bg-slate-50 rounded border border-slate-200">
+                          <div className="flex items-center gap-2">
+                            <div className="relative flex-1 flex items-center">
+                              <LinkIcon size={14} className="absolute left-2 text-gray-400" />
+                              <input className="Input w-full text-sm pl-7" placeholder="URL media (ảnh, audio, YouTube)" value={editQ.image_url} onChange={e => setEditQ(eq => eq ? { ...eq, image_url: e.target.value } : null)} />
+                            </div>
+                            <label className="Btn Btn--outline Btn--sm flex items-center gap-1 cursor-pointer shrink-0">
+                              {uploadingMedia ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                              Tải file
+                              <input type="file" accept="image/*,audio/*" className="hidden" onChange={e => handleMediaUpload(e, true)} disabled={uploadingMedia} />
+                            </label>
+                          </div>
+                          {renderMediaPreview(editQ.image_url)}
+                        </div>
                         <div className="flex gap-1">
                           <span className="text-xs text-gray-600">Đúng:</span>
                           {(["A", "B", "C"] as const).map(o => (
@@ -502,7 +572,10 @@ export function QuestionSetManager() {
                     ) : (
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 text-xs leading-relaxed">{q.question}</p>
+                          <div className="flex items-start gap-2">
+                            {q.image_url && <ImageIcon size={14} className="text-blue-500 mt-0.5 shrink-0" />}
+                            <p className="font-medium text-gray-900 text-xs leading-relaxed">{q.question}</p>
+                          </div>
                           <div className="mt-1 space-y-0.5 text-xs text-gray-600">
                             <p className={q.correct_option === "A" ? "text-green-600 font-medium" : ""}>A. {q.option_a}</p>
                             <p className={q.correct_option === "B" ? "text-green-600 font-medium" : ""}>B. {q.option_b}</p>

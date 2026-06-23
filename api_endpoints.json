@@ -1,0 +1,450 @@
+[
+  {
+    "path": "/api/admin/backup-restore",
+    "file": "src/app/api/admin/backup-restore/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/admin/learning-paths",
+    "file": "src/app/api/admin/learning-paths/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/admin/learning-paths/[id]",
+    "file": "src/app/api/admin/learning-paths/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/admin/questions",
+    "file": "src/app/api/admin/questions/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/admin/questions/[id]",
+    "file": "src/app/api/admin/questions/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/admin/students",
+    "file": "src/app/api/admin/students/route.ts",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/admin/students — list ALL self-registered student accounts (admin only) Self-registered members live in `profiles` (linked to Supabase Auth users). Teacher accounts are excluded so only learners/students are returned."
+  },
+  {
+    "path": "/api/admin/students/[id]/reset-password",
+    "file": "src/app/api/admin/students/[id]/reset-password/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/admin/students/[id]/reset-password — reset a self-registered student's password (admin only) Self-registered students authenticate via Supabase Auth, so we update the auth user directly."
+  },
+  {
+    "path": "/api/admin/teacher-students",
+    "file": "src/app/api/admin/teacher-students/route.ts",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/admin/teacher-students — list ALL students created/imported by teachers (admin only) These accounts live in `teacher_students` and authenticate with a teacher-assigned code + password. Admin sees every teacher's students across the whole system."
+  },
+  {
+    "path": "/api/admin/teacher-students/[id]/reset-password",
+    "file": "src/app/api/admin/teacher-students/[id]/reset-password/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/admin/teacher-students/[id]/reset-password — reset a teacher-created student's password (admin only) These students authenticate with a bcrypt-hashed password stored in teacher_students."
+  },
+  {
+    "path": "/api/admin/topics",
+    "file": "src/app/api/admin/topics/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/admin/topics — List all topics (admin only) POST /api/admin/topics — Create a topic (admin only)"
+  },
+  {
+    "path": "/api/admin/topics/[id]",
+    "file": "src/app/api/admin/topics/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/auth/student/login",
+    "file": "src/app/api/auth/student/login/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/auth/student/login — Self-registered student auth (MongoDB + profiles) Migrated to MongoDB with custom JWTs"
+  },
+  {
+    "path": "/api/auth/teacher/login",
+    "file": "src/app/api/auth/teacher/login/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/auth/teacher/login — Teacher auth: register if not exists, then login Migrated to MongoDB with custom JWTs"
+  },
+  {
+    "path": "/api/grok/explain",
+    "file": "src/app/api/grok/explain/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/grok/generate-question",
+    "file": "src/app/api/grok/generate-question/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/parent/child-stats",
+    "file": "src/app/api/parent/child-stats/route.ts",
+    "methods": [
+      "GET"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/student/certificate",
+    "file": "src/app/api/student/certificate/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/student/certificate — Issue or fetch certificate for a student Creates a Result document in MongoDB so the share/verify page can display real scores"
+  },
+  {
+    "path": "/api/student/chat",
+    "file": "src/app/api/student/chat/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/student/daily-quiz",
+    "file": "src/app/api/student/daily-quiz/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/student/dashboard",
+    "file": "src/app/api/student/dashboard/route.ts",
+    "methods": [
+      "GET",
+      "OPTIONS"
+    ],
+    "description": "GET /api/student/dashboard — student info, assigned path, steps, progress"
+  },
+  {
+    "path": "/api/student/detect-scam",
+    "file": "src/app/api/student/detect-scam/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/student/learning-paths",
+    "file": "src/app/api/student/learning-paths/route.ts",
+    "methods": [
+      "GET"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/student/login",
+    "file": "src/app/api/student/login/route.ts",
+    "methods": [
+      "GET",
+      "OPTIONS",
+      "POST"
+    ],
+    "description": "POST /api/student/login — Student login with code + password GET /api/student/login — Get current student info (unified teacher-created & self-registered)"
+  },
+  {
+    "path": "/api/student/mascot-chat",
+    "file": "src/app/api/student/mascot-chat/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/student/progress",
+    "file": "src/app/api/student/progress/route.ts",
+    "methods": [
+      "DELETE",
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/student/progress — get all progress for current student DELETE /api/student/progress — reset progress for current student POST /api/student/progress — sync XP for current student Migrated to MongoDB"
+  },
+  {
+    "path": "/api/student/questions",
+    "file": "src/app/api/student/questions/route.ts",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/student/questions — Get active questions from MongoDB with filters"
+  },
+  {
+    "path": "/api/student/quiz",
+    "file": "src/app/api/student/quiz/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/student/quiz — Submit a quiz result for a step"
+  },
+  {
+    "path": "/api/student/results",
+    "file": "src/app/api/student/results/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/student/steps/[stepId]",
+    "file": "src/app/api/student/steps/[stepId]/route.ts",
+    "methods": [
+      "GET",
+      "OPTIONS"
+    ],
+    "description": "GET /api/student/steps/[stepId] — get step content (topic or quiz questions)"
+  },
+  {
+    "path": "/api/student/topics",
+    "file": "src/app/api/student/topics/route.ts",
+    "methods": [
+      "GET"
+    ],
+    "description": "GET /api/student/topics — Get active topics from MongoDB"
+  },
+  {
+    "path": "/api/teacher/learning-paths",
+    "file": "src/app/api/teacher/learning-paths/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/teacher/learning-paths — list all learning paths for the authenticated teacher POST /api/teacher/learning-paths — create a new learning path"
+  },
+  {
+    "path": "/api/teacher/learning-paths/[id]",
+    "file": "src/app/api/teacher/learning-paths/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "GET",
+      "PATCH"
+    ],
+    "description": "GET /api/teacher/learning-paths/[id] PATCH /api/teacher/learning-paths/[id] DELETE /api/teacher/learning-paths/[id]"
+  },
+  {
+    "path": "/api/teacher/learning-paths/[id]/assign-students",
+    "file": "src/app/api/teacher/learning-paths/[id]/assign-students/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/teacher/learning-paths/[id]/assign-students"
+  },
+  {
+    "path": "/api/teacher/learning-paths/[id]/steps",
+    "file": "src/app/api/teacher/learning-paths/[id]/steps/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/teacher/learning-paths/[id]/steps — list steps POST /api/teacher/learning-paths/[id]/steps — add a step"
+  },
+  {
+    "path": "/api/teacher/learning-paths/[id]/steps/reorder",
+    "file": "src/app/api/teacher/learning-paths/[id]/steps/reorder/route.ts",
+    "methods": [
+      "PUT"
+    ],
+    "description": "PUT /api/teacher/learning-paths/[id]/steps/reorder"
+  },
+  {
+    "path": "/api/teacher/question-sets",
+    "file": "src/app/api/teacher/question-sets/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/teacher/question-sets — list all question sets for the authenticated teacher POST /api/teacher/question-sets — create a new question set GET /api/teacher/question-sets"
+  },
+  {
+    "path": "/api/teacher/question-sets/[id]",
+    "file": "src/app/api/teacher/question-sets/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "GET",
+      "PATCH"
+    ],
+    "description": "GET /api/teacher/question-sets/[id] PATCH /api/teacher/question-sets/[id] DELETE /api/teacher/question-sets/[id]"
+  },
+  {
+    "path": "/api/teacher/question-sets/[id]/import-questions",
+    "file": "src/app/api/teacher/question-sets/[id]/import-questions/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/teacher/question-sets/[id]/import-questions Batch import questions from Excel file"
+  },
+  {
+    "path": "/api/teacher/question-sets/[id]/questions",
+    "file": "src/app/api/teacher/question-sets/[id]/questions/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/teacher/question-sets/[id]/questions POST /api/teacher/question-sets/[id]/questions"
+  },
+  {
+    "path": "/api/teacher/questions/[id]",
+    "file": "src/app/api/teacher/questions/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "description": "PATCH /api/teacher/questions/[id] DELETE /api/teacher/questions/[id]"
+  },
+  {
+    "path": "/api/teacher/steps/[id]",
+    "file": "src/app/api/teacher/steps/[id]/route.ts",
+    "methods": [
+      "DELETE"
+    ],
+    "description": "DELETE /api/teacher/steps/[id]"
+  },
+  {
+    "path": "/api/teacher/students",
+    "file": "src/app/api/teacher/students/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/teacher/students — list all students for the authenticated teacher POST /api/teacher/students — import students (bulk) GET /api/teacher/students"
+  },
+  {
+    "path": "/api/teacher/students/[id]",
+    "file": "src/app/api/teacher/students/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "GET"
+    ],
+    "description": "DELETE /api/teacher/students/[id] — soft-delete a student GET /api/teacher/students/[id] — get a single student"
+  },
+  {
+    "path": "/api/teacher/students/[id]/assign",
+    "file": "src/app/api/teacher/students/[id]/assign/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/teacher/students/[id]/assign — assign a learning path to a student"
+  },
+  {
+    "path": "/api/teacher/students/[id]/parent-link",
+    "file": "src/app/api/teacher/students/[id]/parent-link/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/teacher/students/[id]/reset-password",
+    "file": "src/app/api/teacher/students/[id]/reset-password/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "POST /api/teacher/students/[id]/reset-password — reset a student password"
+  },
+  {
+    "path": "/api/teacher/topics",
+    "file": "src/app/api/teacher/topics/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/teacher/topics - List all topics (default + custom) GET - List default topics + teacher's custom topics"
+  },
+  {
+    "path": "/api/teacher/topics/[id]",
+    "file": "src/app/api/teacher/topics/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "description": "PATCH /api/teacher/topics/[id] - Update a custom topic DELETE /api/teacher/topics/[id] - Delete a custom topic"
+  },
+  {
+    "path": "/api/teachers",
+    "file": "src/app/api/teachers/route.ts",
+    "methods": [
+      "GET",
+      "POST"
+    ],
+    "description": "GET /api/teachers — list all teachers (admin only)"
+  },
+  {
+    "path": "/api/teachers/[id]",
+    "file": "src/app/api/teachers/[id]/route.ts",
+    "methods": [
+      "DELETE",
+      "PATCH"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/teachers/[id]/reset-password",
+    "file": "src/app/api/teachers/[id]/reset-password/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "No description."
+  },
+  {
+    "path": "/api/tts",
+    "file": "src/app/api/tts/route.ts",
+    "methods": [
+      "POST"
+    ],
+    "description": "No description."
+  }
+]

@@ -36,6 +36,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     option_c: q.option_c,
     correct_option: q.correct_option,
     explanation: q.explanation,
+    image_url: q.image_url,
     is_active: q.is_active,
     created_at: q.created_at,
     updated_at: q.updated_at,
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { question, option_a, option_b, option_c, correct_option, explanation } = body;
+  const { question, option_a, option_b, option_c, correct_option, explanation, image_url } = body;
   if (!question || !option_a || !option_b || !option_c || !correct_option) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
@@ -80,6 +81,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     option_c,
     correct_option,
     explanation: explanation ?? null,
+    image_url: image_url ?? null,
   });
 
   return NextResponse.json({
@@ -91,6 +93,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     option_c: doc.option_c,
     correct_option: doc.correct_option,
     explanation: doc.explanation,
+    image_url: doc.image_url,
     is_active: doc.is_active,
     created_at: doc.created_at,
     updated_at: doc.updated_at,

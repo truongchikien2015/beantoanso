@@ -5,7 +5,6 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { supabase } from "@/lib/supabase";
 import type {
   TeacherQuestionSet,
   TeacherQuestion,
@@ -82,6 +81,9 @@ interface TeacherContentState {
   createTopic: (input: { topic_key: string; label: string }) => Promise<TeacherTopic | null>;
   updateTopic: (id: string, input: { label?: string }) => Promise<void>;
   deleteTopic: (id: string) => Promise<void>;
+
+  // Media
+  uploadMedia: (file: File) => Promise<{ url: string; media_type: string; filename: string; size: number } | null>;
 }
 
 // ============================================================
@@ -90,14 +92,15 @@ interface TeacherContentState {
 
 async function teacherFetch(path: string, init?: RequestInit): Promise<Response> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (supabase) {
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.access_token) {
-      headers["Authorization"] = `Bearer ${data.session.access_token}`;
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("teacher_token");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
     }
   }
   const base = typeof window !== "undefined" ? "" : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
   const res = await fetch(`${base}${path}`, {
+    cache: "no-store",
     ...init,
     headers: { ...headers, ...init?.headers },
   });
@@ -520,6 +523,43 @@ export const useTeacherContentStore = create<TeacherContentState>()(
       setActiveTab: (tab) => set({ activeTab: tab }),
       setError: (error) => set({ error }),
       clearError: () => set({ error: null }),
+
+      // ============================================================
+      // Media Upload
+      // ============================================================
+
+      uploadMedia: async (file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const headers: Record<string, string> = {};
+        if (typeof window !== "undefined") {
+          const token = localStorage.getItem("teacher_token");
+          if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
+        }
+
+        const base = typeof window !== "undefined" ? "" : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000");
+        try {
+          const res = await fetch(`${base}/api/media/upload`, {
+            method: "POST",
+            body: formData,
+            headers, // Do not set Content-Type, fetch will set it with the boundary for FormData
+          });
+
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            set({ error: body.error || "Lỗi upload file" });
+            return null;
+          }
+
+          return await res.json();
+        } catch (e) {
+          set({ error: e instanceof Error ? e.message : "Lỗi kết nối khi upload" });
+          return null;
+        }
+      },
     }),
     {
       name: "teacher-content-v1",

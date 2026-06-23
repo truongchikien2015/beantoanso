@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { setStudentToken } from "@/lib/studentApi";
 
 
@@ -60,12 +61,12 @@ export default function StudentLoginForm() {
   }, [studentCode, password, router]);
 
   return (
-    <div className="Card p-6 mt-4">
+    <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-8 shadow-sm animate-fade-up">
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Student code */}
         <div>
-          <label htmlFor="student_code" className="flex items-center gap-2 text-base font-bold text-slate-700 mb-2">
-            <span className="text-xl">👤</span> Mã học sinh
+          <label htmlFor="student_code" className="flex items-center gap-2 text-sm font-black text-slate-500 mb-2 uppercase tracking-wider">
+            👤 Mã học sinh
           </label>
           <input
             id="student_code"
@@ -73,7 +74,7 @@ export default function StudentLoginForm() {
             value={studentCode}
             onChange={(e) => setStudentCode(e.target.value)}
             placeholder="VD: HS002"
-            className="input-kid text-lg py-4"
+            className="w-full px-5 py-4 border-[3px] border-slate-100 bg-slate-50/50 rounded-2xl font-bold text-base focus:border-teal-400 focus:bg-white transition duration-200 outline-none"
             autoComplete="username"
             autoFocus
           />
@@ -81,8 +82,8 @@ export default function StudentLoginForm() {
 
         {/* Password */}
         <div>
-          <label htmlFor="password" className="flex items-center gap-2 text-base font-bold text-slate-700 mb-2">
-            <span className="text-xl">🔑</span> Mật khẩu
+          <label htmlFor="password" className="flex items-center gap-2 text-sm font-black text-slate-500 mb-2 uppercase tracking-wider">
+            🔑 Mật khẩu
           </label>
           <input
             id="password"
@@ -90,14 +91,14 @@ export default function StudentLoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Nhập mật khẩu..."
-            className="input-kid text-lg py-4"
+            className="w-full px-5 py-4 border-[3px] border-slate-100 bg-slate-50/50 rounded-2xl font-bold text-base focus:border-teal-400 focus:bg-white transition duration-200 outline-none"
             autoComplete="current-password"
           />
         </div>
 
         {/* Error */}
         {error && (
-          <div className={`Badge BadgeError w-full justify-center py-3 text-base font-bold animate-bounce-in ${shakeError ? 'animate-shake' : ''}`}>
+          <div className={`w-full py-3 px-4 bg-rose-50 border-2 border-rose-200 text-rose-600 rounded-2xl text-sm font-bold text-center animate-bounce-in ${shakeError ? "animate-shake" : ""}`}>
             {error}
           </div>
         )}
@@ -106,7 +107,7 @@ export default function StudentLoginForm() {
         <button
           type="submit"
           disabled={loading}
-          className="btn-kid btn-kid-coral w-full justify-center py-4 text-lg"
+          className="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white text-lg font-black rounded-3xl shadow-md hover:shadow-lg active:scale-98 transition duration-200 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
         >
           {loading ? (
             <span className="flex items-center gap-2">
@@ -121,10 +122,10 @@ export default function StudentLoginForm() {
       </form>
 
       {/* Back link */}
-      <div className="mt-4 text-center">
-        <a href="/" className="text-sm font-bold text-sky-600 hover:underline">
+      <div className="mt-5 text-center">
+        <Link href="/" className="text-sm font-black text-teal-600 hover:text-teal-700 transition">
           ← Quay về trang chủ
-        </a>
+        </Link>
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { question: q, option_a, option_b, option_c, correct_option, explanation, is_active } = body;
+  const { question: q, option_a, option_b, option_c, correct_option, explanation, image_url, is_active } = body;
   const updates: Record<string, unknown> = {};
   if (q !== undefined) updates.question = q;
   if (option_a !== undefined) updates.option_a = option_a;
@@ -42,6 +42,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     updates.correct_option = correct_option;
   }
   if (explanation !== undefined) updates.explanation = explanation;
+  if (image_url !== undefined) updates.image_url = image_url;
   if (is_active !== undefined) updates.is_active = is_active;
 
   const data = await TeacherQuestion.findByIdAndUpdate(id, updates, { new: true }).lean();
@@ -56,6 +57,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     option_c: data.option_c,
     correct_option: data.correct_option,
     explanation: data.explanation,
+    image_url: data.image_url,
     is_active: data.is_active,
   });
 }

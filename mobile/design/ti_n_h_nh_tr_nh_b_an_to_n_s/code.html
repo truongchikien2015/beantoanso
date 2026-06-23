@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tiến độ hành trình - Bé An Toàn Số</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#2563eb",
+                        "surface-tint": "#0053db",
+                        "on-primary-fixed": "#00174b",
+                        "surface-container-highest": "#e0e3e5",
+                        "error": "#ba1a1a",
+                        "on-surface": "#191c1e",
+                        "on-error": "#ffffff",
+                        "primary": "#004ac6",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#dbe1ff",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "tertiary-fixed": "#ffdf9f",
+                        "surface-container-low": "#f2f4f6",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-secondary-fixed": "#23005c",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "tertiary": "#6d5000",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-fixed": "#261a00",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-primary-container": "#eeefff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "background": "#f7f9fb",
+                        "on-secondary-container": "#fffbff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#ffeed3",
+                        "on-surface-variant": "#434655",
+                        "surface-dim": "#d8dadc",
+                        "outline-variant": "#c3c6d7",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#8b6700",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-container": "#8455ef",
+                        "inverse-primary": "#b4c5ff",
+                        "secondary-fixed": "#e9ddff",
+                        "secondary": "#6b38d4",
+                        "outline": "#737686",
+                        "success": "#16a34a",
+                        "warning": "#f59e0b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "max-width-content": "1100px",
+                        "lg": "40px",
+                        "xl": "64px",
+                        "margin-desktop": "auto",
+                        "base": "8px",
+                        "xs": "4px",
+                        "md": "24px",
+                        "margin-mobile": "16px",
+                        "gutter": "20px",
+                        "sm": "12px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Be Vietnam Pro"],
+                        "label-bold": ["Be Vietnam Pro"],
+                        "headline-md": ["Be Vietnam Pro"],
+                        "headline-lg": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "800" }],
+                        "label-bold": ["14px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "label-md": ["14px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #F8FAFC; }
+        .chunky-button {
+            border-bottom-width: 6px;
+            transition: all 0.1s ease-in-out;
+        }
+        .chunky-button:active {
+            border-bottom-width: 2px;
+            transform: translateY(4px);
+        }
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            80%, 100% { transform: scale(1.5); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased pb-32 md:pb-10">
+<!-- TopAppBar -->
+<header class="bg-surface docked full-width top-0 sticky z-40 bg-surface dark:bg-on-surface">
+<div class="flex items-center justify-between px-margin-mobile py-base w-full max-w-content mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden border-2 border-primary">
+<img alt="Ảnh đại diện của bé" class="w-full h-full object-cover" data-alt="A cute illustrated avatar of a child character, modern flat design, bright colors, smiling, isolated on a light blue background. The style is playful and appealing to children aged 7-15." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMmJo1xPOlC5QdRm5IlditNBDcVQohaGIV4crwLVAZXatKXS0Iw-Ww9AM-sKAtarhyhbt1e3B2Hgi-PWbS2ZQj3DbCtpdk1A2idOkWDOqADhrBRytdcgBcWU0_OhaE7ieA3qxrdaX-8u9mdYWvdGGaJrDQsIR9VnHd4ROqcFsWCzAynFC2Ls88yCnye_Cl5ezlh_gFrq1rZtK9clmOPXIhT72O8Br9u-7PdOhB1VsSuGmco_bsctJVgh4VkbnL-krp4UnRqh64ghs"/>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed">Hành trình an toàn</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:opacity-80 text-primary dark:text-primary-fixed active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-content mx-auto px-margin-mobile pt-md pb-xl">
+<!-- Progress Header -->
+<div class="flex items-center justify-between bg-white rounded-2xl p-4 shadow-sm border border-surface-variant mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">map</span>
+<span class="font-label-bold text-label-bold text-on-surface">Tiến độ hành trình</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-bold text-label-bold text-on-surface-variant">2/6</span>
+<div class="w-32 h-4 bg-surface-container rounded-full overflow-hidden border border-surface-variant">
+<div class="h-full bg-success rounded-full" style="width: 33%;"></div>
+</div>
+</div>
+</div>
+<!-- The Journey Map (Visual Canvas) -->
+<div class="relative w-full rounded-xl overflow-hidden shadow-lg border-2 border-surface-variant bg-gradient-to-b from-blue-100 to-green-100 h-[400px] mb-8">
+<!-- Background Image Integration as requested -->
+<img alt="Background landscape map" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-multiply" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgyV8pN7FjSKwOIxt0hLUzqPdFeuWTsPZnY1qh8MVLBETbcVZpFwUhAdeQWmhaWud5ZHY0Vb93owx136eVIKw2FTH0UNWLuE8ElwpZ3M9b3kEkQ4XY-xcfOUSXE6XCVvHJneuXYxiB_cQqSDqKjHPG3VUSKfhwKOWVKnKnXc33UJ4sy7Mi_xc-PfnHyQpMj8umI-lGwqRk2Cn4mnVUj8YNvGL35m9vo2TSsPmPdLgPF1hbBPfA2EU08J2txLwfWucpsDSGgNGXaoQ"/>
+<!-- Map Decorative Elements (if no background image provided, this creates the feel) -->
+<div class="absolute inset-0 pointer-events-none opacity-50">
+<svg height="100%" preserveaspectratio="none" viewbox="0 0 1000 400" width="100%">
+<!-- Path Curve -->
+<path d="M 50 300 Q 150 100, 300 250 T 600 150 T 950 200" fill="none" stroke="#FDE047" stroke-linecap="round" stroke-width="24"></path>
+<path d="M 50 300 Q 150 100, 300 250 T 600 150 T 950 200" fill="none" stroke="#FFFFFF" stroke-dasharray="10,10" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+</div>
+<!-- Nodes -->
+<!-- Node 1: Completed -->
+<div class="absolute left-[10%] top-[70%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-success border-4 border-white shadow-md flex items-center justify-center z-10 relative">
+<span class="material-symbols-outlined text-white text-xl">check</span>
+</div>
+<span class="mt-2 font-label-bold text-sm bg-white/80 px-2 py-1 rounded-lg">Chặng 1</span>
+</div>
+<!-- Node 2: Completed -->
+<div class="absolute left-[30%] top-[40%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-success border-4 border-white shadow-md flex items-center justify-center z-10 relative">
+<span class="material-symbols-outlined text-white text-xl">check</span>
+</div>
+<span class="mt-2 font-label-bold text-sm bg-white/80 px-2 py-1 rounded-lg">Chặng 2</span>
+</div>
+<!-- Node 3: Current / Active -->
+<div class="absolute left-[50%] top-[60%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="absolute w-16 h-16 bg-primary rounded-full pulse-ring z-0"></div>
+<div class="w-14 h-14 rounded-full bg-primary border-4 border-white shadow-lg flex items-center justify-center z-10 relative">
+<span class="font-headline-md text-white">3</span>
+</div>
+<span class="mt-2 font-label-bold text-sm bg-primary text-white px-3 py-1 rounded-lg shadow-sm">Hiện tại</span>
+<!-- Mascot Speech Bubble -->
+<div class="absolute -top-16 left-8 bg-white rounded-2xl p-3 shadow-lg border-2 border-surface-variant w-48 z-20 flex items-start gap-2 transform -rotate-2">
+<div class="w-8 h-8 rounded-full bg-surface-container flex-shrink-0 overflow-hidden">
+<span class="material-symbols-outlined text-primary m-1">smart_toy</span>
+</div>
+<p class="font-body-md text-sm text-on-surface leading-tight">Cố lên Sơn ơi, sắp đến trạm tiếp theo rồi!</p>
+<div class="absolute -bottom-2 left-4 w-4 h-4 bg-white border-b-2 border-r-2 border-surface-variant transform rotate-45"></div>
+</div>
+</div>
+<!-- Node 4: Locked -->
+<div class="absolute left-[70%] top-[30%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-surface-variant border-4 border-white shadow-md flex items-center justify-center z-10 relative">
+<span class="material-symbols-outlined text-outline">lock</span>
+</div>
+<span class="mt-2 font-label-bold text-sm bg-white/80 px-2 py-1 rounded-lg text-outline">Chặng 4</span>
+</div>
+<!-- Node 5: Locked -->
+<div class="absolute left-[90%] top-[50%] transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-surface-variant border-4 border-white shadow-md flex items-center justify-center z-10 relative">
+<span class="material-symbols-outlined text-outline">lock</span>
+</div>
+</div>
+</div>
+<!-- Stage List List -->
+<h2 class="font-headline-md text-headline-md text-on-surface mb-4">Các chặng học</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+<!-- Completed Stage -->
+<div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-success flex items-center gap-4 relative overflow-hidden">
+<div class="w-12 h-12 rounded-full bg-success/20 text-success flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-2xl">done</span>
+</div>
+<div>
+<div class="font-label-bold text-on-surface-variant text-xs uppercase tracking-wider">Chặng 1</div>
+<div class="font-body-lg text-on-surface">Người lạ nhắn tin</div>
+</div>
+</div>
+<!-- Completed Stage -->
+<div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-success flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-success/20 text-success flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-2xl">done</span>
+</div>
+<div>
+<div class="font-label-bold text-on-surface-variant text-xs uppercase tracking-wider">Chặng 2</div>
+<div class="font-body-lg text-on-surface">Link lạ và lừa đảo</div>
+</div>
+</div>
+<!-- Current Stage -->
+<div class="bg-primary-container rounded-2xl p-4 shadow-md border-2 border-primary flex items-center gap-4 transform scale-105 z-10 my-2">
+<div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 shadow-inner">
+<span class="font-headline-md">3</span>
+</div>
+<div class="flex-grow">
+<div class="font-label-bold text-primary-fixed-dim text-xs uppercase tracking-wider">Chặng 3 • Đang học</div>
+<div class="font-body-lg text-white font-bold">Mật khẩu và tài khoản</div>
+</div>
+<span class="material-symbols-outlined text-white opacity-80">play_circle</span>
+</div>
+<!-- Locked Stage -->
+<div class="bg-surface rounded-2xl p-4 border border-surface-variant flex items-center gap-4 opacity-70">
+<div class="w-12 h-12 rounded-full bg-surface-container text-outline flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<div>
+<div class="font-label-bold text-outline text-xs uppercase tracking-wider">Chặng 4</div>
+<div class="font-body-lg text-on-surface-variant">Nội dung xấu và tin giả</div>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="mt-8">
+<button class="w-full bg-primary text-white font-headline-md text-headline-md rounded-2xl py-4 flex items-center justify-center gap-2 chunky-button border-on-primary-fixed-variant shadow-lg hover:bg-surface-tint">
+                Vào bài học ngay
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface dark:bg-inverse-surface docked full-width bottom-0 rounded-t-lg border-t-4 border-surface-variant dark:border-outline-variant shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-bold text-[10px]">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 translate-y-[-2px] shadow-[0_4px_0_0_rgba(0,74,198,1)] transition-all duration-100" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-bold text-[10px]">Luyện kỹ năng</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">security</span>
+<span class="font-label-bold text-[10px]">Quét nguy hiểm</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-bold text-[10px]">Hồ sơ</span>
+</a>
+</nav>
+</body></html>

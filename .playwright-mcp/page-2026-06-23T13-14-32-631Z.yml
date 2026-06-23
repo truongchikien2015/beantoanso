@@ -1,0 +1,24 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5] [cursor=pointer]:
+          - generic [ref=e6]: 🛡️
+          - generic [ref=e7]: Bé An Toàn Số
+        - generic [ref=e8]: Cổng Phụ Huynh 👨‍👩‍👧‍👦
+    - main [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: 👨‍👩‍👧‍👦
+        - heading "Đồng hành an toàn số cùng con" [level=1] [ref=e12]
+        - paragraph [ref=e13]: Tra cứu kết quả học tập, phát hiện điểm yếu kỹ năng và nhận các gợi ý hướng dẫn con tự bảo vệ tại nhà.
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: Mã liên kết của con
+          - 'textbox "Ví dụ: HS002 hoặc mã tài khoản của con" [ref=e18]': PH-D1U6OH3QI1
+          - paragraph [ref=e19]: "* Mã liên kết được hiển thị tại màn hình Trang cá nhân hoặc Bản đồ học tập của con."
+        - button "Đang tra cứu dữ liệu..." [disabled] [ref=e20]
+    - contentinfo [ref=e21]:
+      - paragraph [ref=e22]: © 2024 Bé An Toàn Số - Giải pháp bảo vệ trẻ em trực tuyến hàng đầu
+  - button "Open Next.js Dev Tools" [ref=e28] [cursor=pointer]:
+    - img [ref=e29]
+  - alert [ref=e32]

@@ -22,4 +22,6 @@ const TeacherLearningPathStepSchema = new Schema<ITeacherLearningPathStep>(
 TeacherLearningPathStepSchema.index({ path_id: 1 });
 TeacherLearningPathStepSchema.index({ path_id: 1, step_order: 1 }, { unique: true });
 
-export const TeacherLearningPathStep: Model<ITeacherLearningPathStep> = models.TeacherLearningPathStep || model<ITeacherLearningPathStep>("TeacherLearningPathStep", TeacherLearningPathStepSchema);
+export const TeacherLearningPathStep: Model<ITeacherLearningPathStep> =
+  models.TeacherLearningPathStep ||
+  model<ITeacherLearningPathStep>("TeacherLearningPathStep", TeacherLearningPathStepSchema, "teacher_learning_path_steps");

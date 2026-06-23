@@ -19,4 +19,6 @@ const TeacherStudentStatsSchema = new Schema<ITeacherStudentStats>(
   { timestamps: false }
 );
 
-export const TeacherStudentStats: Model<ITeacherStudentStats> = models.TeacherStudentStats || model<ITeacherStudentStats>("TeacherStudentStats", TeacherStudentStatsSchema);
+export const TeacherStudentStats: Model<ITeacherStudentStats> =
+  models.TeacherStudentStats ||
+  model<ITeacherStudentStats>("TeacherStudentStats", TeacherStudentStatsSchema, "teacher_student_stats");

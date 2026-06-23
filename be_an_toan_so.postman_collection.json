@@ -1,0 +1,2782 @@
+{
+  "info": {
+    "_postman_id": "bats-api-coll-1782184640168",
+    "name": "Bé An Toàn Số API Collection",
+    "description": "Bộ sưu tập đầy đủ 52 APIs của hệ thống Bé An Toàn Số phục vụ cho phát triển ứng dụng di động Flutter và Web.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "GET /api/admin/backup-restore",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/backup-restore",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "backup-restore"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/admin/backup-restore",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/backup-restore",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "backup-restore"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/admin/learning-paths",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/learning-paths",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "learning-paths"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/admin/learning-paths",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/learning-paths",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "learning-paths"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/admin/learning-paths/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/learning-paths/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "learning-paths",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/admin/learning-paths/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/learning-paths/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "learning-paths",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/admin/questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "questions"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/admin/questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "questions"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/admin/questions/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "questions",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/admin/questions/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/questions/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "questions",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "list ALL self-registered student accounts (admin only) Self-registered members live in `profiles` (linked to Supabase Auth users). Teacher accounts are excluded so only learners/students are returned.",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "students"
+              ]
+            },
+            "description": "GET /api/admin/students — list ALL self-registered student accounts (admin only) Self-registered members live in `profiles` (linked to Supabase Auth users). Teacher accounts are excluded so only learners/students are returned."
+          },
+          "response": []
+        },
+        {
+          "name": "reset a self-registered student's password (admin only) Self-registered students authenticate via Supabase Auth, so we update the auth user directly.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/students/[id]/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "students",
+                "[id]",
+                "reset-password"
+              ]
+            },
+            "description": "POST /api/admin/students/[id]/reset-password — reset a self-registered student's password (admin only) Self-registered students authenticate via Supabase Auth, so we update the auth user directly."
+          },
+          "response": []
+        },
+        {
+          "name": "list ALL students created/imported by teachers (admin only) These accounts live in `teacher_students` and authenticate with a teacher-assigned code + password. Admin sees every teacher's students across the whole system.",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/teacher-students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "teacher-students"
+              ]
+            },
+            "description": "GET /api/admin/teacher-students — list ALL students created/imported by teachers (admin only) These accounts live in `teacher_students` and authenticate with a teacher-assigned code + password. Admin sees every teacher's students across the whole system."
+          },
+          "response": []
+        },
+        {
+          "name": "reset a teacher-created student's password (admin only) These students authenticate with a bcrypt-hashed password stored in teacher_students.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/teacher-students/[id]/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "teacher-students",
+                "[id]",
+                "reset-password"
+              ]
+            },
+            "description": "POST /api/admin/teacher-students/[id]/reset-password — reset a teacher-created student's password (admin only) These students authenticate with a bcrypt-hashed password stored in teacher_students."
+          },
+          "response": []
+        },
+        {
+          "name": "List all topics (admin only) POST /api/admin/topics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/topics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "topics"
+              ]
+            },
+            "description": "GET /api/admin/topics — List all topics (admin only) POST /api/admin/topics — Create a topic (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/admin/topics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/topics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "topics"
+              ]
+            },
+            "description": "GET /api/admin/topics — List all topics (admin only) POST /api/admin/topics — Create a topic (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/admin/topics/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/topics/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "topics",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/admin/topics/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/topics/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "topics",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Self-registered student auth (MongoDB + profiles) Migrated to MongoDB with custom JWTs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_code\": \"bekim32\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/student/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "student",
+                "login"
+              ]
+            },
+            "description": "POST /api/auth/student/login — Self-registered student auth (MongoDB + profiles) Migrated to MongoDB with custom JWTs"
+          },
+          "response": []
+        },
+        {
+          "name": "Teacher auth: register if not exists, then login Migrated to MongoDB with custom JWTs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teacher@test.com\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/teacher/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "teacher",
+                "login"
+              ]
+            },
+            "description": "POST /api/auth/teacher/login — Teacher auth: register if not exists, then login Migrated to MongoDB with custom JWTs"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Grok",
+      "item": [
+        {
+          "name": "GET /api/grok/explain",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/grok/explain",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "grok",
+                "explain"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/grok/explain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/grok/explain",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "grok",
+                "explain"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/grok/generate-question",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/grok/generate-question",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "grok",
+                "generate-question"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/grok/generate-question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/grok/generate-question",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "grok",
+                "generate-question"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Parent",
+      "item": [
+        {
+          "name": "GET /api/parent/child-stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/parent/child-stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "parent",
+                "child-stats"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Student",
+      "item": [
+        {
+          "name": "Issue or fetch certificate for a student Creates a Result document in MongoDB so the share/verify page can display real scores",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/certificate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "certificate"
+              ]
+            },
+            "description": "POST /api/student/certificate — Issue or fetch certificate for a student Creates a Result document in MongoDB so the share/verify page can display real scores"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/student/chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/chat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "chat"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/student/daily-quiz",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/daily-quiz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "daily-quiz"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/student/daily-quiz",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/daily-quiz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "daily-quiz"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "student info, assigned path, steps, progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "dashboard"
+              ]
+            },
+            "description": "GET /api/student/dashboard — student info, assigned path, steps, progress"
+          },
+          "response": []
+        },
+        {
+          "name": "OPTIONS /api/student/dashboard",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "dashboard"
+              ]
+            },
+            "description": "GET /api/student/dashboard — student info, assigned path, steps, progress"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/student/detect-scam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Anh tặng em 5000 kim cương, hãy bấm vào link garena-free.com và nhập OTP nhé!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/detect-scam",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "detect-scam"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/student/learning-paths",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/learning-paths",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "learning-paths"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/student/login",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "login"
+              ]
+            },
+            "description": "POST /api/student/login — Student login with code + password GET /api/student/login — Get current student info (unified teacher-created & self-registered)"
+          },
+          "response": []
+        },
+        {
+          "name": "OPTIONS /api/student/login",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "login"
+              ]
+            },
+            "description": "POST /api/student/login — Student login with code + password GET /api/student/login — Get current student info (unified teacher-created & self-registered)"
+          },
+          "response": []
+        },
+        {
+          "name": "Student login with code + password GET /api/student/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_code\": \"bekim32\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "login"
+              ]
+            },
+            "description": "POST /api/student/login — Student login with code + password GET /api/student/login — Get current student info (unified teacher-created & self-registered)"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/student/mascot-chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Lỡ bấm vào link lạ thì phải làm sao hả Cú?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/mascot-chat",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "mascot-chat"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/student/progress",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "progress"
+              ]
+            },
+            "description": "GET /api/student/progress — get all progress for current student DELETE /api/student/progress — reset progress for current student POST /api/student/progress — sync XP for current student Migrated to MongoDB"
+          },
+          "response": []
+        },
+        {
+          "name": "get all progress for current student DELETE /api/student/progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "progress"
+              ]
+            },
+            "description": "GET /api/student/progress — get all progress for current student DELETE /api/student/progress — reset progress for current student POST /api/student/progress — sync XP for current student Migrated to MongoDB"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/student/progress",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"xp\": 20,\n  \"source\": \"simulation_chat\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "progress"
+              ]
+            },
+            "description": "GET /api/student/progress — get all progress for current student DELETE /api/student/progress — reset progress for current student POST /api/student/progress — sync XP for current student Migrated to MongoDB"
+          },
+          "response": []
+        },
+        {
+          "name": "Get active questions from MongoDB with filters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "questions"
+              ]
+            },
+            "description": "GET /api/student/questions — Get active questions from MongoDB with filters"
+          },
+          "response": []
+        },
+        {
+          "name": "Submit a quiz result for a step",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"path_id\": \"path_demo_01\",\n  \"step_id\": \"step_01\",\n  \"score\": 100,\n  \"answers\": [\n    {\n      \"question_id\": \"q_s1\",\n      \"selected_option\": \"B\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/quiz",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "quiz"
+              ]
+            },
+            "description": "POST /api/student/quiz — Submit a quiz result for a step"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/student/results",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/results",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "results"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/student/results",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/student/results",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "results"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "get step content (topic or quiz questions)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/steps/[stepId]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "steps",
+                "[stepId]"
+              ]
+            },
+            "description": "GET /api/student/steps/[stepId] — get step content (topic or quiz questions)"
+          },
+          "response": []
+        },
+        {
+          "name": "OPTIONS /api/student/steps/[stepId]",
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/steps/[stepId]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "steps",
+                "[stepId]"
+              ]
+            },
+            "description": "GET /api/student/steps/[stepId] — get step content (topic or quiz questions)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get active topics from MongoDB",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/student/topics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "student",
+                "topics"
+              ]
+            },
+            "description": "GET /api/student/topics — Get active topics from MongoDB"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Teacher",
+      "item": [
+        {
+          "name": "list all learning paths for the authenticated teacher POST /api/teacher/learning-paths",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths"
+              ]
+            },
+            "description": "GET /api/teacher/learning-paths — list all learning paths for the authenticated teacher POST /api/teacher/learning-paths — create a new learning path"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/learning-paths",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Hành trình an toàn số mới\",\n  \"description\": \"Các bài học nâng cao về ứng xử và phòng vệ trên không gian mạng.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths"
+              ]
+            },
+            "description": "GET /api/teacher/learning-paths — list all learning paths for the authenticated teacher POST /api/teacher/learning-paths — create a new learning path"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/teacher/learning-paths/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths",
+                "[id]"
+              ]
+            },
+            "description": "GET /api/teacher/learning-paths/[id] PATCH /api/teacher/learning-paths/[id] DELETE /api/teacher/learning-paths/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/teacher/learning-paths/[id]",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths",
+                "[id]"
+              ]
+            },
+            "description": "GET /api/teacher/learning-paths/[id] PATCH /api/teacher/learning-paths/[id] DELETE /api/teacher/learning-paths/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/teacher/learning-paths/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths",
+                "[id]"
+              ]
+            },
+            "description": "GET /api/teacher/learning-paths/[id] PATCH /api/teacher/learning-paths/[id] DELETE /api/teacher/learning-paths/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/learning-paths/[id]/assign-students",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths/[id]/assign-students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths",
+                "[id]",
+                "assign-students"
+              ]
+            },
+            "description": "POST /api/teacher/learning-paths/[id]/assign-students"
+          },
+          "response": []
+        },
+        {
+          "name": "list steps POST /api/teacher/learning-paths/[id]/steps",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths/[id]/steps",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths",
+                "[id]",
+                "steps"
+              ]
+            },
+            "description": "GET /api/teacher/learning-paths/[id]/steps — list steps POST /api/teacher/learning-paths/[id]/steps — add a step"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/learning-paths/[id]/steps",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths/[id]/steps",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths",
+                "[id]",
+                "steps"
+              ]
+            },
+            "description": "GET /api/teacher/learning-paths/[id]/steps — list steps POST /api/teacher/learning-paths/[id]/steps — add a step"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/teacher/learning-paths/[id]/steps/reorder",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/learning-paths/[id]/steps/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "learning-paths",
+                "[id]",
+                "steps",
+                "reorder"
+              ]
+            },
+            "description": "PUT /api/teacher/learning-paths/[id]/steps/reorder"
+          },
+          "response": []
+        },
+        {
+          "name": "list all question sets for the authenticated teacher POST /api/teacher/question-sets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets"
+              ]
+            },
+            "description": "GET /api/teacher/question-sets — list all question sets for the authenticated teacher POST /api/teacher/question-sets — create a new question set GET /api/teacher/question-sets"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/question-sets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bộ câu hỏi Stranger an toàn\",\n  \"topic_id\": \"stranger\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets"
+              ]
+            },
+            "description": "GET /api/teacher/question-sets — list all question sets for the authenticated teacher POST /api/teacher/question-sets — create a new question set GET /api/teacher/question-sets"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/teacher/question-sets/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets",
+                "[id]"
+              ]
+            },
+            "description": "GET /api/teacher/question-sets/[id] PATCH /api/teacher/question-sets/[id] DELETE /api/teacher/question-sets/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/teacher/question-sets/[id]",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets",
+                "[id]"
+              ]
+            },
+            "description": "GET /api/teacher/question-sets/[id] PATCH /api/teacher/question-sets/[id] DELETE /api/teacher/question-sets/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/teacher/question-sets/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets",
+                "[id]"
+              ]
+            },
+            "description": "GET /api/teacher/question-sets/[id] PATCH /api/teacher/question-sets/[id] DELETE /api/teacher/question-sets/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/question-sets/[id]/import-questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets/[id]/import-questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets",
+                "[id]",
+                "import-questions"
+              ]
+            },
+            "description": "POST /api/teacher/question-sets/[id]/import-questions Batch import questions from Excel file"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/teacher/question-sets/[id]/questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets/[id]/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets",
+                "[id]",
+                "questions"
+              ]
+            },
+            "description": "GET /api/teacher/question-sets/[id]/questions POST /api/teacher/question-sets/[id]/questions"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/question-sets/[id]/questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/question-sets/[id]/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "question-sets",
+                "[id]",
+                "questions"
+              ]
+            },
+            "description": "GET /api/teacher/question-sets/[id]/questions POST /api/teacher/question-sets/[id]/questions"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/teacher/questions/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/questions/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "questions",
+                "[id]"
+              ]
+            },
+            "description": "PATCH /api/teacher/questions/[id] DELETE /api/teacher/questions/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/teacher/questions/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/questions/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "questions",
+                "[id]"
+              ]
+            },
+            "description": "PATCH /api/teacher/questions/[id] DELETE /api/teacher/questions/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/teacher/steps/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/steps/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "steps",
+                "[id]"
+              ]
+            },
+            "description": "DELETE /api/teacher/steps/[id]"
+          },
+          "response": []
+        },
+        {
+          "name": "list all students for the authenticated teacher POST /api/teacher/students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "students"
+              ]
+            },
+            "description": "GET /api/teacher/students — list all students for the authenticated teacher POST /api/teacher/students — import students (bulk) GET /api/teacher/students"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/students",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nickname\": \"Bạn nhỏ 5A\",\n  \"age\": 10,\n  \"class_name\": \"Lớp 5A\",\n  \"password\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/students",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "students"
+              ]
+            },
+            "description": "GET /api/teacher/students — list all students for the authenticated teacher POST /api/teacher/students — import students (bulk) GET /api/teacher/students"
+          },
+          "response": []
+        },
+        {
+          "name": "soft-delete a student GET /api/teacher/students/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/students/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "students",
+                "[id]"
+              ]
+            },
+            "description": "DELETE /api/teacher/students/[id] — soft-delete a student GET /api/teacher/students/[id] — get a single student"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/teacher/students/[id]",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/students/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "students",
+                "[id]"
+              ]
+            },
+            "description": "DELETE /api/teacher/students/[id] — soft-delete a student GET /api/teacher/students/[id] — get a single student"
+          },
+          "response": []
+        },
+        {
+          "name": "assign a learning path to a student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/students/[id]/assign",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "students",
+                "[id]",
+                "assign"
+              ]
+            },
+            "description": "POST /api/teacher/students/[id]/assign — assign a learning path to a student"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/students/[id]/parent-link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/students/[id]/parent-link",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "students",
+                "[id]",
+                "parent-link"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "reset a student password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/students/[id]/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "students",
+                "[id]",
+                "reset-password"
+              ]
+            },
+            "description": "POST /api/teacher/students/[id]/reset-password — reset a student password"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/teacher/topics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/topics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "topics"
+              ]
+            },
+            "description": "GET /api/teacher/topics - List all topics (default + custom) GET - List default topics + teacher's custom topics"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teacher/topics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/topics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "topics"
+              ]
+            },
+            "description": "GET /api/teacher/topics - List all topics (default + custom) GET - List default topics + teacher's custom topics"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/teacher/topics/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/topics/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "topics",
+                "[id]"
+              ]
+            },
+            "description": "PATCH /api/teacher/topics/[id] - Update a custom topic DELETE /api/teacher/topics/[id] - Delete a custom topic"
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/teacher/topics/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teacher/topics/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teacher",
+                "topics",
+                "[id]"
+              ]
+            },
+            "description": "PATCH /api/teacher/topics/[id] - Update a custom topic DELETE /api/teacher/topics/[id] - Delete a custom topic"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Teachers",
+      "item": [
+        {
+          "name": "list all teachers (admin only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teachers"
+              ]
+            },
+            "description": "GET /api/teachers — list all teachers (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teachers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teachers"
+              ]
+            },
+            "description": "GET /api/teachers — list all teachers (admin only)"
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/teachers/[id]",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {},
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teachers",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/teachers/[id]",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/[id]",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teachers",
+                "[id]"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/teachers/[id]/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{teacherToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/[id]/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "teachers",
+                "[id]",
+                "reset-password"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tts",
+      "item": [
+        {
+          "name": "POST /api/tts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tts"
+              ]
+            },
+            "description": "No description."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "studentToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teacherToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

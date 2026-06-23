@@ -56,3 +56,11 @@ export type { IDailyQuizAnswer } from "./DailyQuizAnswer";
 export { TeacherStudentDailyAttempt } from "./TeacherStudentDailyAttempt";
 export type { ITeacherStudentDailyAttempt } from "./TeacherStudentDailyAttempt";
 
+export { Feedback } from "./Feedback";
+export type { IFeedback } from "./Feedback";
+
+export { NewsCategory } from "./NewsCategory";
+export type { INewsCategory } from "./NewsCategory";
+
+export { NewsArticle } from "./NewsArticle";
+export type { INewsArticle } from "./NewsArticle";

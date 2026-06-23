@@ -8,6 +8,7 @@ export interface ITeacherQuestion {
   option_c: string;
   correct_option: "A" | "B" | "C";
   explanation: string | null;
+  image_url: string | null;
   is_active: boolean;
   created_at: Date;
   updated_at: Date;
@@ -22,6 +23,7 @@ const TeacherQuestionSchema = new Schema<ITeacherQuestion>(
     option_c: { type: String, required: true, maxlength: 500 },
     correct_option: { type: String, required: true, enum: ["A", "B", "C"] },
     explanation: { type: String, maxlength: 500, default: null },
+    image_url: { type: String, default: null },
     is_active: { type: Boolean, default: true },
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
@@ -29,4 +31,5 @@ const TeacherQuestionSchema = new Schema<ITeacherQuestion>(
 
 TeacherQuestionSchema.index({ set_id: 1 });
 
-export const TeacherQuestion: Model<ITeacherQuestion> = models.TeacherQuestion || model<ITeacherQuestion>("TeacherQuestion", TeacherQuestionSchema);
+export const TeacherQuestion: Model<ITeacherQuestion> =
+  models.TeacherQuestion || model<ITeacherQuestion>("TeacherQuestion", TeacherQuestionSchema, "teacher_questions");

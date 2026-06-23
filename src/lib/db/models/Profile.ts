@@ -2,6 +2,8 @@ import { Model,  Schema, model, models, Document } from "mongoose";
 
 export interface IProfile {
   _id: string; // maps to Supabase auth user id
+  email?: string | null;
+  password_hash?: string | null;
   full_name: string | null;
   gender: "male" | "female" | "other" | null;
   birth_year: number | null;
@@ -16,6 +18,8 @@ export interface IProfile {
 const ProfileSchema = new Schema<IProfile>(
   {
     _id: { type: String, required: true },
+    email: { type: String, sparse: true, default: null },
+    password_hash: { type: String, default: null },
     full_name: { type: String, default: null },
     gender: { type: String, enum: ["male", "female", "other", null], default: null },
     birth_year: { type: Number, default: null },
@@ -26,5 +30,7 @@ const ProfileSchema = new Schema<IProfile>(
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
+
+ProfileSchema.index({ email: 1 }, { unique: true, sparse: true });
 
 export const Profile: Model<IProfile> = models.Profile || model<IProfile>("Profile", ProfileSchema);

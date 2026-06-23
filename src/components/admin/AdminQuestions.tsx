@@ -9,7 +9,6 @@ import {
 } from "../../lib/store";
 import { QuizTopic } from "../../data/quizQuestions";
 import { QuestionForm } from "./QuestionForm";
-import { supabase } from "../../lib/supabase";
 import {
   getAiQuestionGenerationAvailability,
   generateGrokQuestion,
@@ -95,7 +94,7 @@ export function AdminQuestions({
 }) {
   const [items, setItems] = useState<AdminQuestion[]>(() => Questions.list());
   const [loading, setLoading] = useState(false);
-  const [usingSupabase, setUsingSupabase] = useState(false);
+  const [usingDb, setUsingDb] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [dbTopics, setDbTopics] = useState<Array<{ slug: string; label: string }>>([]);
   const [search, setSearch] = useState("");
@@ -121,29 +120,29 @@ export function AdminQuestions({
   const PAGE_SIZE = 20;
 
   const loadQuestions = async () => {
-    if (!supabase) {
-      setUsingSupabase(false);
-      setItems(Questions.list());
-      return;
-    }
-
     setLoading(true);
     setLoadError("");
-    const { data, error } = await supabase
-      .from("questions")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    setLoading(false);
-    if (error) {
-      setUsingSupabase(false);
-      setLoadError(`Không tải được Supabase: ${error.message}`);
+    try {
+      const adminPassword = Admin.getPassword();
+      const res = await fetch("/api/admin/questions", {
+        headers: { "x-admin-password": adminPassword },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok && body.data) {
+        setItems(body.data.map(fromDbQuestion));
+        setUsingDb(true);
+      } else {
+        setUsingDb(false);
+        setLoadError(`Không tải được câu hỏi: ${body.error ?? "Lỗi máy chủ"}`);
+        setItems(Questions.list());
+      }
+    } catch (err: any) {
+      setUsingDb(false);
+      setLoadError(`Không tải được câu hỏi: ${err.message}`);
       setItems(Questions.list());
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setUsingSupabase(true);
-    setItems(((data || []) as DbQuestion[]).map(fromDbQuestion));
   };
 
   const refresh = () => {
@@ -154,21 +153,29 @@ export function AdminQuestions({
     void loadQuestions();
     
     async function loadTopics() {
-      if (supabase) {
-        const { data } = await supabase
-          .from("topics")
-          .select("slug, label")
-          .order("topic_order", { ascending: true });
-        if (data) {
-          setDbTopics(data);
-          return;
+      try {
+        const adminPassword = Admin.getPassword();
+        const res = await fetch("/api/admin/topics", {
+          headers: { "x-admin-password": adminPassword },
+        });
+        const body = await res.json().catch(() => ({}));
+        if (res.ok && body.data) {
+          setDbTopics(body.data.map((t: any) => ({ slug: t.slug, label: t.label })));
+        } else {
+          const local = Topics.list();
+          if (local && local.length > 0) {
+            setDbTopics(local.map(t => ({ slug: t.slug, label: t.label })));
+          } else {
+            setDbTopics(TOPIC_VALUES.map(t => ({ slug: t, label: topicLabels[t] })));
+          }
         }
-      }
-      const local = Topics.list();
-      if (local && local.length > 0) {
-        setDbTopics(local.map(t => ({ slug: t.slug, label: t.label })));
-      } else {
-        setDbTopics(TOPIC_VALUES.map(t => ({ slug: t, label: topicLabels[t] })));
+      } catch {
+        const local = Topics.list();
+        if (local && local.length > 0) {
+          setDbTopics(local.map(t => ({ slug: t.slug, label: t.label })));
+        } else {
+          setDbTopics(TOPIC_VALUES.map(t => ({ slug: t, label: topicLabels[t] })));
+        }
       }
     }
     void loadTopics();
@@ -263,52 +270,66 @@ export function AdminQuestions({
   };
 
   const handleSaveQuestion = async (data: QuestionDraft) => {
-    if (!supabase) {
-      if (editing) Questions.update(editing.id, data);
-      else Questions.create(data);
+    const adminPassword = Admin.getPassword();
+    const payload = toDbQuestion(data);
+
+    try {
+      let res;
+      if (editing) {
+        res = await fetch(`/api/admin/questions/${editing.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": adminPassword,
+          },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        res = await fetch("/api/admin/questions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-password": adminPassword,
+          },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setLoadError(`Không lưu được câu hỏi: ${body.error ?? "Lỗi máy chủ"}`);
+        return;
+      }
+
       setCreating(false);
       setEditing(null);
       setGeneratedDraft(null);
       refresh();
-      return;
+    } catch (err: any) {
+      setLoadError(`Không lưu được câu hỏi: ${err.message}`);
     }
-
-    const payload = toDbQuestion(data);
-    const { error } = editing
-      ? await supabase.from("questions").update(payload).eq("id", editing.id)
-      : await supabase.from("questions").insert(payload);
-
-    if (error) {
-      setLoadError(`Không lưu được câu hỏi: ${error.message}`);
-      return;
-    }
-
-    setCreating(false);
-    setEditing(null);
-    setGeneratedDraft(null);
-    refresh();
   };
 
   const handleToggleQuestion = async (question: AdminQuestion) => {
-    if (!supabase) {
-      Questions.toggle(question.id, !question.is_active);
+    const adminPassword = Admin.getPassword();
+    try {
+      const res = await fetch(`/api/admin/questions/${question.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": adminPassword,
+        },
+        body: JSON.stringify({ is_active: !question.is_active }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setLoadError(`Không cập nhật trạng thái: ${body.error ?? "Lỗi máy chủ"}`);
+        return;
+      }
       refresh();
-      return;
+    } catch (err: any) {
+      setLoadError(`Không cập nhật trạng thái: ${err.message}`);
     }
-
-    const { error } = await supabase
-      .from("questions")
-      .update({
-        is_active: !question.is_active,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", question.id);
-
-    if (error) {
-      setLoadError(`Không cập nhật trạng thái: ${error.message}`);
-      return;
-    }
-    refresh();
   };
 
   const selectedProviderAvailable = aiProviders.some(
@@ -367,7 +388,7 @@ export function AdminQuestions({
               <div className="flex-1">
                 <p className="text-slate-800 font-semibold">✨ AI tạo câu hỏi</p>
                 <p className="text-sm text-slate-500">
-                  AI sẽ tạo nháp, admin cần xem lại rồi mới lưu vào Supabase.
+                AI sẽ tạo nháp, admin cần xem lại rồi mới lưu vào cơ sở dữ liệu.
                 </p>
               </div>
               {availableProviderCount > 1 && (
@@ -429,7 +450,7 @@ export function AdminQuestions({
               </select>
               <button
                 onClick={handleGenerateQuestion}
-                disabled={generating || !usingSupabase || !selectedProviderAvailable}
+                disabled={generating || !usingDb || !selectedProviderAvailable}
                 className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50"
               >
                 {generating ? "Đang tạo..." : "AI tạo câu hỏi"}
@@ -442,9 +463,9 @@ export function AdminQuestions({
               rows={2}
               className="mt-3 w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:border-indigo-400"
             />
-            {!usingSupabase && (
+            {!usingDb && (
               <p className="mt-2 text-sm text-amber-700">
-                Cần kết nối Supabase để lưu câu hỏi AI cho luồng nhiệm vụ.
+                Cần kết nối Database để lưu câu hỏi AI cho luồng nhiệm vụ.
               </p>
             )}
             {generatorError && (
@@ -652,22 +673,25 @@ export function AdminQuestions({
           title="Xóa câu hỏi?"
           message={`"${confirmDelete.question}" sẽ bị xóa vĩnh viễn.`}
           onCancel={() => setConfirmDelete(null)}
-          onConfirm={() => {
-            if (!supabase) {
-              Questions.remove(confirmDelete.id);
+          onConfirm={async () => {
+            const adminPassword = Admin.getPassword();
+            try {
+              const res = await fetch(`/api/admin/questions/${confirmDelete.id}`, {
+                method: "DELETE",
+                headers: {
+                  "x-admin-password": adminPassword,
+                },
+              });
+              if (!res.ok) {
+                const body = await res.json().catch(() => ({}));
+                setLoadError(`Không xóa được câu hỏi: ${body.error ?? "Lỗi máy chủ"}`);
+              }
               setConfirmDelete(null);
               refresh();
-              return;
+            } catch (err: any) {
+              setLoadError(`Không xóa được câu hỏi: ${err.message}`);
+              setConfirmDelete(null);
             }
-            supabase
-              .from("questions")
-              .delete()
-              .eq("id", confirmDelete.id)
-              .then(({ error }) => {
-                if (error) setLoadError(`Không xóa được câu hỏi: ${error.message}`);
-                setConfirmDelete(null);
-                refresh();
-              });
           }}
         />
       )}

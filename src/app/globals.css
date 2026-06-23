@@ -59,7 +59,7 @@ html, body {
 }
 
 html, body {
-  font-family: var(--font-nunito), 'Nunito', sans-serif !important;
+  font-family: var(--font-nunito, 'Nunito'), sans-serif !important;
 }
 
 /* ── Playful Button Base ── */
@@ -67,7 +67,7 @@ html, body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-nunito), sans-serif;
+  font-family: var(--font-nunito, 'Nunito'), sans-serif;
   font-weight: 800;
   font-size: 1rem;
   border-radius: var(--radius-kid);
@@ -429,10 +429,9 @@ html, body {
 /* ── Input for kids ── */
 .input-kid {
   width: 100%;
-  padding: 0.85rem 1.25rem;
   border-radius: var(--radius-kid);
   border: 2.5px solid #bae6fd;
-  font-family: var(--font-nunito), sans-serif;
+  font-family: var(--font-nunito, 'Nunito'), sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
   color: #0f172a;
@@ -470,7 +469,7 @@ html, body {
   border-radius: 999px;
   font-weight: 800;
   font-size: 0.8rem;
-  font-family: var(--font-nunito), sans-serif;
+  font-family: var(--font-nunito, 'Nunito'), sans-serif;
 }
 
 /* ========================================
@@ -787,4 +786,85 @@ thead {
   .card-kid:hover {
     transform: none;
   }
+}
+
+.padding-left-4 {
+  padding-left: 1rem;
+}
+
+/* ── Quill Editor Overrides ── */
+.ql-container {
+  font-family: inherit !important;
+  font-size: 15px !important;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.ql-toolbar {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background-color: #f8fafc;
+  border-color: #e2e8f0 !important;
+}
+.ql-container.ql-snow {
+  border-color: #e2e8f0 !important;
+  min-height: 400px;
+}
+.ql-editor {
+  min-height: 400px;
+}
+
+/* ── Article prose content fixes ── */
+/* Ensure rich-text content from Quill never overflows the card */
+.overflow-wrap-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Every descendant element must stay within its container */
+.prose > * {
+  max-width: 100%;
+}
+
+/* Fix: Quill generates <p> tags with no margin by default.
+   prose plugin handles margin but we add extra spacing for readability */
+.prose p {
+  margin-bottom: 1.25em;
+}
+
+/* Make block-level html from Quill properly spaced */
+.prose strong {
+  font-weight: 700;
+}
+
+.prose ul, .prose ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose li {
+  margin-bottom: 0.4rem;
+  line-height: 1.75;
+}
+
+/* Inline images from Quill should not overflow */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 1rem auto;
+  display: block;
+}
+
+/* Tables from Quill editor */
+.prose table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+  border-collapse: collapse;
+}
+
+.prose th, .prose td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  text-align: left;
 }

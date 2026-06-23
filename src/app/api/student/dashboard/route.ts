@@ -8,12 +8,17 @@ import { TeacherStudentProgress } from "@/lib/db/models/TeacherStudentProgress";
 import { Profile } from "@/lib/db/models/Profile";
 import { getAnyStudentId } from "@/lib/auth-helpers";
 import { ensureStudentStats } from "@/lib/server/studentRewards";
+import { corsOptions, jsonWithCors, withCors } from "@/lib/cors";
+
+export async function OPTIONS(req: NextRequest) {
+  return corsOptions(req);
+}
 
 export async function GET(req: NextRequest) {
   await connectDB();
 
   const session = getAnyStudentId(req);
-  if (session instanceof NextResponse) return session;
+  if (session instanceof NextResponse) return withCors(req, session);
 
   const { studentId, accountType } = session;
   const stats = await ensureStudentStats(studentId);
@@ -21,29 +26,68 @@ export async function GET(req: NextRequest) {
   // Self-registered students live in `profiles`, not in teacher_students.
   if (accountType === "self") {
     const profile = await Profile.findOne({ _id: studentId } as any).lean();
+    
+    // Fetch public learning paths and map the first one
+    const { LearningPath } = await import("@/lib/db/models/LearningPath");
+    const publicPaths = await LearningPath.find({ is_active: true }).sort({ createdAt: 1 }).lean();
+    
+    let assigned_path: any = null;
+    if (publicPaths.length > 0) {
+      const firstPath = publicPaths[0];
+      const mappedSteps = (firstPath.topic_ids || []).map((topicId, index) => ({
+        id: topicId, // Use topicId directly as step_id for self-learning
+        path_id: firstPath._id.toString(),
+        step_order: index + 1,
+        step_type: "topic",
+        topic_id: topicId,
+        question_set_id: null,
+      }));
+      
+      assigned_path = {
+        id: firstPath._id.toString(),
+        title: firstPath.title,
+        description: firstPath.description,
+        steps: mappedSteps,
+        step_count: mappedSteps.length,
+      };
+    }
 
-    return NextResponse.json({
+    // Get progress for self-registered student
+    const progress = await TeacherStudentProgress.find({
+      student_id: studentId,
+    }).lean();
+
+    const mappedProgress = progress.map((p) => ({
+      id: p._id.toString(),
+      student_id: p.student_id.toString(),
+      path_id: p.path_id.toString(),
+      step_id: p.step_id.toString(),
+      score: p.score,
+      completed_at: p.completed_at,
+    }));
+
+    return jsonWithCors(req, {
       student: {
         id: studentId,
         nickname: profile?.full_name ?? "Bé học sinh",
         email: null,
-        class_name: null,
+        class_name: "Tự do",
         student_code: "",
-        assigned_path_id: null,
+        assigned_path_id: assigned_path?.id ?? null,
       },
-      assigned_path: null,
-      progress: [],
+      assigned_path,
+      progress: mappedProgress,
       stats,
     });
   }
 
   // Get student info
   const student = await TeacherStudent.findOne({ _id: studentId, is_active: true })
-    .select("nickname email class_name student_code assigned_path_id")
+    .select("nickname email class_name student_code assigned_path_id parent_access_code")
     .lean();
 
   if (!student) {
-    return NextResponse.json({ error: "Không tìm thấy học sinh" }, { status: 404 });
+    return jsonWithCors(req, { error: "Không tìm thấy học sinh" }, { status: 404 });
   }
 
   const studentData = {
@@ -53,11 +97,12 @@ export async function GET(req: NextRequest) {
     class_name: student.class_name,
     student_code: student.student_code,
     assigned_path_id: student.assigned_path_id?.toString() ?? null,
+    parent_access_code: student.parent_access_code || null,
   };
 
   // No assigned path → return empty
   if (!student.assigned_path_id) {
-    return NextResponse.json({
+    return jsonWithCors(req, {
       student: studentData,
       assigned_path: null,
       progress: [],
@@ -74,7 +119,7 @@ export async function GET(req: NextRequest) {
     .lean();
 
   if (!path) {
-    return NextResponse.json({
+    return jsonWithCors(req, {
       student: studentData,
       assigned_path: null,
       progress: [],
@@ -114,7 +159,7 @@ export async function GET(req: NextRequest) {
     completed_at: p.completed_at,
   }));
 
-  return NextResponse.json({
+  return jsonWithCors(req, {
     student: studentData,
     assigned_path: {
       id: path._id.toString(),

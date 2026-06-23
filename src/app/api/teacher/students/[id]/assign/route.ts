@@ -77,6 +77,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     email: updated.email,
     class_name: updated.class_name,
     student_code: updated.student_code,
+    parent_access_code: updated.parent_access_code ?? null,
     assigned_path_id: updated.assigned_path_id?.toString() ?? null,
     assigned_at: updated.assigned_at,
     is_active: updated.is_active,

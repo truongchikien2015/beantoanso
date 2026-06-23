@@ -5,8 +5,11 @@ import { TeacherLearningPathStep } from "@/lib/db/models/TeacherLearningPathStep
 import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
 import { TeacherQuestion } from "@/lib/db/models/TeacherQuestion";
 import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
+import { Question } from "@/lib/db/models/Question";
+import { Topic } from "@/lib/db/models/Topic";
 import { getStudentId } from "@/lib/auth-helpers";
 import type { StudentStepContent } from "@/types/teacher-content";
+import { corsOptions, jsonWithCors, withCors } from "@/lib/cors";
 import mongoose from "mongoose";
 
 function toObjectId(id: string): mongoose.Types.ObjectId {
@@ -18,6 +21,42 @@ function toObjectId(id: string): mongoose.Types.ObjectId {
   return new mongoose.Types.ObjectId(hash.substring(0, 24));
 }
 
+async function resolvePublicTopic(stepId: string) {
+  if (mongoose.Types.ObjectId.isValid(stepId)) {
+    return Topic.findById(stepId).lean();
+  }
+
+  return Topic.findOne({ slug: stepId, is_active: true }).lean();
+}
+
+async function getPublicTopicQuestions(topicSlug: string) {
+  const questions = await Question.find({
+    topic_slug: topicSlug,
+    is_active: true,
+  })
+    .sort({ created_at: 1 })
+    .lean();
+
+  return questions.map((q) => ({
+    id: q._id.toString(),
+    set_id: "public-question-bank",
+    question: q.question,
+    option_a: q.option_a,
+    option_b: q.option_b,
+    option_c: q.option_c,
+    correct_option: q.correct_option,
+    explanation: q.explanation,
+    image_url: q.image_url,
+    is_active: q.is_active,
+    created_at: q.created_at.toISOString(),
+    updated_at: q.updated_at.toISOString(),
+  }));
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return corsOptions(req);
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ stepId: string }> }
@@ -25,10 +64,29 @@ export async function GET(
   await connectDB();
 
   const session = getStudentId(req);
-  if (session instanceof NextResponse) return session;
+  if (session instanceof NextResponse) return withCors(req, session);
 
   const { studentId } = session;
   const { stepId } = await params;
+
+  const publicTopic = await resolvePublicTopic(stepId);
+  if (publicTopic) {
+    const questions = await getPublicTopicQuestions(publicTopic.slug);
+    const result: StudentStepContent = {
+      step_id: stepId,
+      path_id: "public_path",
+      step_type: "topic",
+      topic_id: publicTopic._id.toString(),
+      question_set_id: null,
+      step_order: 1,
+      topic: publicTopic.slug as any,
+      topic_label: publicTopic.label,
+      questions,
+      question_count: questions.length,
+    };
+
+    return jsonWithCors(req, result);
+  }
 
   const stepObjectId = toObjectId(stepId);
   const studentObjectId = toObjectId(studentId);
@@ -37,7 +95,7 @@ export async function GET(
   const step = await TeacherLearningPathStep.findOne({ _id: stepObjectId }).lean();
 
   if (!step) {
-    return NextResponse.json({ error: "Không tìm thấy bước học" }, { status: 404 });
+    return jsonWithCors(req, { error: "Không tìm thấy bước học" }, { status: 404 });
   }
 
   // Verify student is assigned to this path
@@ -46,7 +104,7 @@ export async function GET(
     .lean();
 
   if (!student || student.assigned_path_id?.toString() !== step.path_id.toString()) {
-    return NextResponse.json({ error: "Bạn không có quyền truy cập bước học này" }, { status: 403 });
+    return jsonWithCors(req, { error: "Bạn không có quyền truy cập bước học này" }, { status: 403 });
   }
 
   const result: StudentStepContent = {
@@ -88,6 +146,7 @@ export async function GET(
         option_c: q.option_c,
         correct_option: q.correct_option as "A" | "B" | "C",
         explanation: q.explanation,
+        image_url: q.image_url,
         is_active: q.is_active,
         created_at: q.created_at.toISOString(),
         updated_at: q.updated_at.toISOString(),
@@ -111,6 +170,7 @@ export async function GET(
       option_c: q.option_c,
       correct_option: q.correct_option as "A" | "B" | "C",
       explanation: q.explanation,
+      image_url: q.image_url,
       is_active: q.is_active,
       created_at: q.created_at.toISOString(),
       updated_at: q.updated_at.toISOString(),
@@ -118,7 +178,7 @@ export async function GET(
     result.question_count = questions.length;
   }
 
-  return NextResponse.json(result);
+  return jsonWithCors(req, result);
 }
 
 function getTopicLabel(topic: string): string {

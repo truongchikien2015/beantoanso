@@ -33,7 +33,7 @@ export type FinalResult = {
 const KEYS = {
   questions: "bats:questions:v1",
   results: "bats:final_results:v1",
-  admin: "be_an_toan_so_admin",
+  admin: "bats:admin",
   player: "be-an-toan-so:v2",
   topics: "bats:topics:v1",
   paths: "bats:paths:v1",
@@ -212,21 +212,29 @@ export const Player = {
 export const Admin = {
   isLoggedIn(): boolean {
     try {
-      const v = localStorage.getItem(KEYS.admin);
-      return v !== null && v !== "";
+      const v = localStorage.getItem("bats:admin") || localStorage.getItem("be_an_toan_so_admin");
+      return v === ADMIN_PASSWORD;
     } catch {
       return false;
     }
   },
   login(pw: string): boolean {
     if (pw === ADMIN_PASSWORD) {
-      localStorage.setItem(KEYS.admin, pw);
+      localStorage.setItem("bats:admin", pw);
       return true;
     }
     return false;
   },
   logout() {
-    localStorage.removeItem(KEYS.admin);
+    localStorage.removeItem("bats:admin");
+    localStorage.removeItem("be_an_toan_so_admin");
+  },
+  getPassword(): string {
+    try {
+      return localStorage.getItem("bats:admin") || localStorage.getItem("be_an_toan_so_admin") || "";
+    } catch {
+      return "";
+    }
   },
 };
 
