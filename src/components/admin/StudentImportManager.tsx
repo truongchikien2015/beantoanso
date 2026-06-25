@@ -23,7 +23,7 @@ export function StudentImportManager() {
   const [importError, setImportError] = useState<{ errors: Array<{ row: number; message: string }> } | null>(null);
   const [importedCredentials, setImportedCredentials] = useState<ImportedCredential[] | null>(null);
   const [assignTarget, setAssignTarget] = useState<string | null>(null);
-  const [assignPathId, setAssignPathId] = useState("");
+  const [assignPathIds, setAssignPathIds] = useState<string[]>([]);
   const [resetTarget, setResetTarget] = useState<{ id: string; nickname: string } | null>(null);
   const [resetForm, setResetForm] = useState({ newPassword: "", confirmPassword: "" });
   const [resetLoading, setResetLoading] = useState(false);
@@ -83,11 +83,11 @@ export function StudentImportManager() {
       if (classFilter && s.class_name !== classFilter) return false;
 
       // Status filter
-      if (statusFilter === "assigned" && !s.assigned_path_id) return false;
-      if (statusFilter === "unassigned" && s.assigned_path_id) return false;
+      if (statusFilter === "assigned" && (!s.assigned_path_ids || s.assigned_path_ids.length === 0)) return false;
+      if (statusFilter === "unassigned" && s.assigned_path_ids && s.assigned_path_ids.length > 0) return false;
 
       // Path filter
-      if (pathFilter && s.assigned_path_id !== pathFilter) return false;
+      if (pathFilter && !(s.assigned_path_ids || []).includes(pathFilter)) return false;
 
       return true;
     });
@@ -204,10 +204,9 @@ export function StudentImportManager() {
   };
 
   const handleAssign = async (studentId: string) => {
-    if (!assignPathId) return;
-    await assignPathToStudent(studentId, assignPathId);
+    await assignPathToStudent(studentId, assignPathIds);
     setAssignTarget(null);
-    setAssignPathId("");
+    setAssignPathIds([]);
   };
 
   const openResetPassword = (student: { id: string; nickname: string }) => {
@@ -319,24 +318,29 @@ export function StudentImportManager() {
   };
 
   const handleBulkAssign = async () => {
-    if (!assignPathId || selectedStudents.size === 0) return;
+    if (assignPathIds.length === 0 || selectedStudents.size === 0) return;
     setBulkAssignLoading(true);
     setBulkAssignSuccess("");
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
-      const res = await fetch(`/api/teacher/learning-paths/${assignPathId}/assign-students`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ studentIds: Array.from(selectedStudents) }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Lỗi khi gán lộ trình");
-      setBulkAssignSuccess(`Đã gán lộ trình cho ${data.assignedCount} học sinh!`);
+      let assignedCount = 0;
+      for (const pathId of assignPathIds) {
+        const res = await fetch(`/api/teacher/learning-paths/${pathId}/assign-students`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({ studentIds: Array.from(selectedStudents) }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Lỗi khi gán lộ trình");
+        assignedCount = data.assignedCount;
+      }
+      setBulkAssignSuccess(`Đã gán ${assignPathIds.length} lộ trình cho ${assignedCount} học sinh!`);
       setSelectedStudents(new Set());
       setShowBulkAssign(false);
+      setAssignPathIds([]);
       await fetchStudents();
       setTimeout(() => setBulkAssignSuccess(""), 3000);
     } catch (err: unknown) {
@@ -609,7 +613,7 @@ export function StudentImportManager() {
             </div>
             <div className="divide-y divide-sky-50">
               {filteredStudents.map(student => {
-                const path = learningPaths.find(p => p.id === student.assigned_path_id);
+                const assignedPaths = learningPaths.filter(p => (student.assigned_path_ids || []).includes(p.id));
                 return (
                   <div key={student.id} className={`grid gap-3 px-4 py-3 transition hover:bg-sky-50/50 md:grid-cols-[44px_1.1fr_0.5fr_0.6fr_1fr_1.1fr_132px] md:items-center ${selectedStudents.has(student.id) ? "bg-indigo-50/70" : ""}`}>
                     <div className="flex items-center justify-between md:block">
@@ -621,8 +625,8 @@ export function StudentImportManager() {
                         aria-label={`Chọn ${student.nickname}`}
                       />
                       <div className="flex gap-1 md:hidden">
-                        {!student.assigned_path_id && learningPaths.length > 0 && (
-                          <button onClick={() => { setAssignTarget(student.id); setAssignPathId(""); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
+                        {learningPaths.length > 0 && (
+                          <button onClick={() => { setAssignTarget(student.id); setAssignPathIds(student.assigned_path_ids || []); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
                             <Plus size={14} />
                           </button>
                         )}
@@ -644,10 +648,14 @@ export function StudentImportManager() {
                     <span className="text-sm text-slate-600">{student.class_name || "Chưa có lớp"}</span>
                     <span className="w-fit rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600">{student.student_code}</span>
                     <div className="min-w-0">
-                      {path ? (
-                        <span className="inline-flex max-w-full items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700">
-                          <span className="truncate">{path.title}</span>
-                        </span>
+                      {assignedPaths.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {assignedPaths.map(path => (
+                            <span key={path.id} className="inline-flex max-w-full items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700">
+                              <span className="truncate">{path.title}</span>
+                            </span>
+                          ))}
+                        </div>
                       ) : (
                         <span className="text-xs text-slate-400">Chưa gán lộ trình</span>
                       )}
@@ -685,8 +693,8 @@ export function StudentImportManager() {
                       )}
                     </div>
                     <div className="hidden justify-end gap-1 md:flex">
-                      {!student.assigned_path_id && learningPaths.length > 0 && (
-                        <button onClick={() => { setAssignTarget(student.id); setAssignPathId(""); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
+                      {learningPaths.length > 0 && (
+                        <button onClick={() => { setAssignTarget(student.id); setAssignPathIds(student.assigned_path_ids || []); }} className="Btn Btn--secondary Btn--sm" title="Gán lộ trình">
                           <Plus size={14} />
                         </button>
                       )}
@@ -703,13 +711,34 @@ export function StudentImportManager() {
 
                     {assignTarget === student.id && (
                       <div className="rounded-xl border border-sky-100 bg-sky-50/60 p-3 md:col-span-7">
-                        <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto]">
-                          <select className="Input w-full text-sm" value={assignPathId} onChange={e => setAssignPathId(e.target.value)}>
-                            <option value="">-- Chọn lộ trình --</option>
-                            {learningPaths.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                          </select>
-                          <button onClick={() => handleAssign(student.id)} disabled={!assignPathId} className="Btn Btn--primary Btn--sm text-xs">Gán</button>
-                          <button onClick={() => { setAssignTarget(null); setAssignPathId(""); }} className="Btn Btn--secondary Btn--sm text-xs">Hủy</button>
+                        <div className="flex flex-col gap-2.5">
+                          <label className="text-xs font-bold text-sky-900">Chọn lộ trình học tập cho bé:</label>
+                          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto border border-sky-100 bg-white p-2 rounded-xl">
+                            {learningPaths.map(p => {
+                              const isChecked = assignPathIds.includes(p.id);
+                              return (
+                                <label key={p.id} className="flex items-center gap-2 text-xs font-bold text-sky-950 cursor-pointer py-1 px-2.5 rounded bg-sky-50 hover:bg-sky-100/80 transition-all border border-sky-100">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setAssignPathIds([...assignPathIds, p.id]);
+                                      } else {
+                                        setAssignPathIds(assignPathIds.filter(id => id !== p.id));
+                                      }
+                                    }}
+                                    className="w-4 h-4 rounded border-sky-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
+                                  />
+                                  <span>{p.title}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                          <div className="flex gap-2 justify-end mt-1">
+                            <button onClick={() => handleAssign(student.id)} className="Btn Btn--primary Btn--sm text-xs">Gán</button>
+                            <button onClick={() => { setAssignTarget(null); setAssignPathIds([]); }} className="Btn Btn--secondary Btn--sm text-xs">Hủy</button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -740,14 +769,16 @@ export function StudentImportManager() {
                       </span>
                       <span className="text-xs text-green-600 flex items-center gap-0.5"><UserCheck size={10} /> Hoạt động</span>
                     </div>
-                    {student.assigned_path_id && (
-                      <div className="mt-1">
+                    {student.assigned_path_ids && student.assigned_path_ids.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
                         {(() => {
-                          const path = learningPaths.find(p => p.id === student.assigned_path_id);
-                          return path
-                            ? <span className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
-                                Lộ trình: {path.title}
-                              </span>
+                          const paths = learningPaths.filter(p => student.assigned_path_ids.includes(p.id));
+                          return paths.length > 0
+                            ? paths.map(path => (
+                                <span key={path.id} className="text-xs px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                                  Lộ trình: {path.title}
+                                </span>
+                              ))
                             : <span className="text-xs text-gray-400">Đã gán lộ trình</span>;
                         })()}
                       </div>
@@ -786,8 +817,8 @@ export function StudentImportManager() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    {!student.assigned_path_id && learningPaths.length > 0 && (
-                      <button onClick={() => { setAssignTarget(student.id); setAssignPathId(""); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
+                    {learningPaths.length > 0 && (
+                      <button onClick={() => { setAssignTarget(student.id); setAssignPathIds(student.assigned_path_ids || []); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
                         <Plus size={14} />
                       </button>
                     )}
@@ -804,14 +835,33 @@ export function StudentImportManager() {
                 </div>
 
                 {assignTarget === student.id && (
-                  <div className="pt-2 border-t border-gray-200 space-y-2">
-                    <select className="Input w-full text-sm" value={assignPathId} onChange={e => setAssignPathId(e.target.value)}>
-                      <option value="">-- Chọn lộ trình --</option>
-                      {learningPaths.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                    </select>
-                    <div className="flex gap-1">
-                      <button onClick={() => handleAssign(student.id)} disabled={!assignPathId} className="Btn Btn--primary Btn--sm text-xs">Gán</button>
-                      <button onClick={() => { setAssignTarget(null); setAssignPathId(""); }} className="Btn Btn--secondary Btn--sm text-xs">Hủy</button>
+                  <div className="pt-2 border-t border-gray-200 space-y-2.5">
+                    <label className="text-xs font-bold text-sky-900">Chọn lộ trình học tập:</label>
+                    <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto border border-sky-100 bg-white p-2 rounded-xl">
+                      {learningPaths.map(p => {
+                        const isChecked = assignPathIds.includes(p.id);
+                        return (
+                          <label key={p.id} className="flex items-center gap-2 text-xs font-bold text-sky-950 cursor-pointer py-1 px-2 rounded hover:bg-sky-50 transition-all">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setAssignPathIds([...assignPathIds, p.id]);
+                                } else {
+                                  setAssignPathIds(assignPathIds.filter(id => id !== p.id));
+                                }
+                              }}
+                              className="w-4 h-4 rounded border-sky-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
+                            />
+                            <span>{p.title}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <div className="flex gap-1.5 justify-end">
+                      <button onClick={() => handleAssign(student.id)} className="Btn Btn--primary Btn--sm text-xs">Gán</button>
+                      <button onClick={() => { setAssignTarget(null); setAssignPathIds([]); }} className="Btn Btn--secondary Btn--sm text-xs">Hủy</button>
                     </div>
                   </div>
                 )}
@@ -924,18 +974,30 @@ export function StudentImportManager() {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">Lộ trình học tập</label>
-              <select
-                className="Input w-full"
-                value={assignPathId}
-                onChange={e => setAssignPathId(e.target.value)}
-              >
-                <option value="">-- Chọn lộ trình --</option>
-                {learningPaths.map(p => (
-                  <option key={p.id} value={p.id}>{p.title}</option>
-                ))}
-              </select>
+            <div className="space-y-2.5">
+              <label className="text-sm font-semibold text-gray-700">Lộ trình học tập</label>
+              <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto border border-sky-100 bg-white p-2.5 rounded-xl">
+                {learningPaths.map(p => {
+                  const isChecked = assignPathIds.includes(p.id);
+                  return (
+                    <label key={p.id} className="flex items-center gap-2 text-xs font-bold text-sky-950 cursor-pointer py-1 px-2 rounded hover:bg-sky-50 transition-all">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setAssignPathIds([...assignPathIds, p.id]);
+                          } else {
+                            setAssignPathIds(assignPathIds.filter(id => id !== p.id));
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-sky-300 text-sky-600 focus:ring-sky-500 cursor-pointer"
+                      />
+                      <span>{p.title}</span>
+                    </label>
+                  );
+                })}
+              </div>
             </div>
 
             {bulkAssignSuccess && (
@@ -954,7 +1016,7 @@ export function StudentImportManager() {
               </button>
               <button
                 onClick={handleBulkAssign}
-                disabled={!assignPathId || selectedStudents.size === 0 || bulkAssignLoading}
+                disabled={assignPathIds.length === 0 || selectedStudents.size === 0 || bulkAssignLoading}
                 className="Btn Btn--primary Btn--sm flex items-center gap-1"
               >
                 {bulkAssignLoading ? (

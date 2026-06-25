@@ -41,71 +41,99 @@ export default function TeacherDashboard({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100 flex">
-      {/* Sidebar */}
-      <aside className="w-56 bg-slate-800 flex flex-col min-h-screen flex-shrink-0">
-        <div className="px-4 py-4 border-b border-slate-700">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xl">👩‍🏫</span>
-            <span className="text-white font-bold text-lg">Giáo Viên</span>
+    <div className="min-h-screen bg-[#f8fafc] flex font-sans text-slate-800">
+      {/* Sidebar - Light Mode */}
+      <aside className="w-64 bg-[#f0f4f8] flex flex-col min-h-screen flex-shrink-0 border-r border-slate-200">
+        <div className="pt-8 pb-6 px-4 flex flex-col items-center border-b border-slate-200/60 mb-4">
+          <div className="w-[72px] h-[72px] rounded-full bg-slate-200 overflow-hidden mb-3 border-4 border-white shadow-sm">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher" alt="Avatar" className="w-full h-full object-cover" />
           </div>
-          <p className="text-slate-400 text-xs">Theo dõi kết quả học tập</p>
+          <h2 className="text-lg font-black text-[#0060ac]">Bé An Toàn Số</h2>
+          <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-0.5">Admin Portal</p>
         </div>
 
-        <nav className="flex-1 py-2">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => setTab(item.key)}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition ${
-                tab === item.key
-                  ? "bg-indigo-600 text-white"
-                  : "text-slate-300 hover:bg-slate-700 hover:text-white"
-              }`}
-            >
-              <span className="text-base">{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+          {NAV_ITEMS.map((item) => {
+            const isActive = tab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setTab(item.key)}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-all ${
+                  isActive
+                    ? "bg-[#0060ac] text-white shadow-md shadow-blue-900/20"
+                    : "text-slate-500 hover:bg-white hover:text-[#0060ac] hover:shadow-sm"
+                }`}
+              >
+                <span className={`text-lg ${isActive ? "opacity-100" : "opacity-70 grayscale"}`}>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
-        <div className="p-3 border-t border-slate-700">
+        <div className="p-4 border-t border-slate-200/60 mt-auto space-y-1">
+          <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 hover:bg-white hover:text-[#0060ac] text-sm font-bold transition-all">
+            <span className="text-lg opacity-70 grayscale">⚙️</span>
+            <span>Cài đặt</span>
+          </button>
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:bg-rose-600 hover:text-white text-sm"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 text-sm font-bold transition-all"
           >
-            <span>🚪</span>
+            <span className="text-lg opacity-70 grayscale">🚪</span>
             <span>Đăng xuất</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto min-h-screen">
-        {tab === "overview" && <OverviewTab stats={stats} />}
-        {tab === "students" && <StudentsTab allRows={allRows} onPrint={() => setIsPrinting(true)} />}
-        {tab === "chart" && <ChartTab />}
-        {tab === "question-sets" && (
-          <ManagerShell>
-            <QuestionSetManager />
-          </ManagerShell>
-        )}
-        {tab === "learning-paths" && (
-          <ManagerShell>
-            <LearningPathManager />
-          </ManagerShell>
-        )}
-        {tab === "scenarios" && (
-          <ManagerShell>
-            <TeacherScenarioManager />
-          </ManagerShell>
-        )}
-        {tab === "students-manage" && (
-          <ManagerShell>
-            <StudentImportManager />
-          </ManagerShell>
-        )}
-      </main>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 max-h-screen">
+        {/* Top Header */}
+        <header className="h-[72px] bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
+          <span className="text-slate-600 font-bold text-sm">Chào các thầy cô!</span>
+          <div className="flex items-center gap-4">
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#0060ac] hover:bg-[#005090] text-white rounded-lg text-xs font-bold transition shadow-sm">
+              <span>⚡</span>
+              <span>Dữ liệu trực tiếp</span>
+            </button>
+            <button className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition relative">
+              <span className="text-xl">🔔</span>
+              <span className="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+            </button>
+            <button className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition overflow-hidden shadow-sm">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher" alt="Avatar" className="w-full h-full object-cover" />
+            </button>
+          </div>
+        </header>
+
+        {/* Content View */}
+        <main className="flex-1 overflow-auto p-8">
+          {tab === "overview" && <OverviewTab stats={stats} />}
+          {tab === "students" && <StudentsTab allRows={allRows} onPrint={() => setIsPrinting(true)} />}
+          {tab === "chart" && <ChartTab />}
+          {tab === "question-sets" && (
+            <ManagerShell>
+              <QuestionSetManager />
+            </ManagerShell>
+          )}
+          {tab === "learning-paths" && (
+            <ManagerShell>
+              <LearningPathManager />
+            </ManagerShell>
+          )}
+          {tab === "scenarios" && (
+            <ManagerShell>
+              <TeacherScenarioManager />
+            </ManagerShell>
+          )}
+          {tab === "students-manage" && (
+            <ManagerShell>
+              <StudentImportManager />
+            </ManagerShell>
+          )}
+        </main>
+      </div>
 
       {isPrinting && (
         <div className="fixed inset-0 bg-white z-[9999] overflow-y-auto printable-report">
@@ -222,47 +250,163 @@ function OverviewTab({ stats }: { stats: any }) {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">📊 Tổng quan</h1>
-        <button
-          onClick={() => {
-            if (confirm("Nạp dữ liệu mẫu 20 học sinh Lớp 5A để thuyết trình demo?")) {
-              seedDemoData();
-            }
-          }}
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm transition shadow-sm cursor-pointer"
-        >
-          ⚡ Nạp Dữ Liệu Demo Lớp 5A
-        </button>
+    <div className="space-y-8 max-w-[1200px] mx-auto">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-black text-slate-800 tracking-tight">Báo cáo Lớp 5A</h1>
+        <p className="text-slate-500 font-medium text-sm mt-1.5">
+          Theo dõi tiến trình học tập của lớp trong tuần này.
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Tổng lượt chơi"
-          value={stats.totalAttempts}
-          color="indigo"
-        />
-        <StatCard
-          label="Điểm TB"
-          value={stats.averageScore}
-          color="amber"
-        />
-        <StatCard
-          label="Điểm cao nhất"
-          value={stats.topScore}
-          color="emerald"
-        />
-        <StatCard
-          label="Học sinh xuất sắc"
-          value={
-            stats.topStudent
-              ? `${stats.topStudent.nickname} (${stats.topStudent.score})`
-              : "—"
-          }
-          color="rose"
-          small
-        />
+      {/* 3 Top Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* Metric 1 */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-12 h-12 bg-indigo-50 rounded-[16px] flex items-center justify-center text-indigo-500 text-xl">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            </div>
+            <span className="bg-sky-50 text-sky-600 font-bold text-[11px] px-2.5 py-1 rounded-md">📈 +12%</span>
+          </div>
+          <div>
+            <span className="text-4xl font-black text-slate-800 block mb-1">{stats.totalAttempts}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tổng lượt học</span>
+          </div>
+        </div>
+
+        {/* Metric 2 */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-12 h-12 bg-blue-50 rounded-[16px] flex items-center justify-center text-blue-500 text-xl">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+          </div>
+          <div>
+            <span className="text-4xl font-black text-slate-800 block mb-1">{stats.studentsParticipated || 0}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Số bé tham gia</span>
+          </div>
+        </div>
+
+        {/* Metric 3 */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-12 h-12 bg-blue-50 rounded-[16px] flex items-center justify-center text-blue-500 text-xl">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <span className="bg-sky-50 text-sky-600 font-bold text-[11px] px-2.5 py-1 rounded-md">📈 +5pt</span>
+          </div>
+          <div>
+            <span className="text-4xl font-black text-slate-800 block mb-1">{stats.averageScore}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Điểm trung bình</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Middle Section: Chart & Topics & Top Student */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        {/* Chart Card */}
+        <div className="lg:col-span-8 bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col min-h-[360px]">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="text-lg font-bold text-slate-800">Lưu lượng & Tương tác</h3>
+              <p className="text-xs font-medium text-slate-500">Hoạt động trong tuần</p>
+            </div>
+            <button className="text-slate-400 hover:text-slate-600">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            </button>
+          </div>
+          <div className="flex-1 relative flex items-end">
+            {/* Extremely simple mockup of the area chart as per the image */}
+            <svg className="w-full h-full absolute inset-0" preserveAspectRatio="none" viewBox="0 0 100 100">
+               <defs>
+                 <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                   <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.2"/>
+                   <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0"/>
+                 </linearGradient>
+               </defs>
+               <path d="M0,100 L0,50 Q20,50 40,50 T60,90 T80,100 L100,100 Z" fill="url(#chartGradient)" />
+               <path d="M0,50 Q20,50 40,50 T60,90 T80,100 L100,100" fill="none" stroke="#0ea5e9" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+            </svg>
+            
+            {/* X-axis labels */}
+            <div className="absolute bottom-0 left-0 w-full flex justify-between text-[10px] font-bold text-slate-400 px-2 translate-y-6">
+              <span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span>
+            </div>
+          </div>
+          <div className="h-6"></div> {/* Spacer for x-axis */}
+        </div>
+
+        {/* Right Column: Topics & Top Student */}
+        <div className="lg:col-span-4 flex flex-col gap-6">
+          
+          {/* Topics Card */}
+          <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex-1 flex flex-col justify-between">
+            <h3 className="text-base font-bold text-slate-800 mb-6">Chủ đề cần lưu ý</h3>
+            
+            <div className="space-y-5">
+              {/* Progress 1 */}
+              <div>
+                <div className="flex justify-between text-[11px] font-bold mb-1.5">
+                  <span className="text-slate-600">Người lạ nhắn tin</span>
+                  <span className="text-[#0060ac]">85%</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-1.5">
+                  <div className="bg-[#0060ac] h-1.5 rounded-full" style={{ width: '85%' }}></div>
+                </div>
+              </div>
+              
+              {/* Progress 2 */}
+              <div>
+                <div className="flex justify-between text-[11px] font-bold mb-1.5">
+                  <span className="text-slate-600">Link lạ và lừa đảo</span>
+                  <span className="text-[#0074c9]">62%</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-1.5">
+                  <div className="bg-[#0074c9] h-1.5 rounded-full" style={{ width: '62%' }}></div>
+                </div>
+              </div>
+
+              {/* Progress 3 */}
+              <div>
+                <div className="flex justify-between text-[11px] font-bold mb-1.5">
+                  <span className="text-slate-600">Bảo mật thông tin</span>
+                  <span className="text-slate-500">45%</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-1.5">
+                  <div className="bg-slate-400 h-1.5 rounded-full" style={{ width: '45%' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Top Student Card */}
+          <div className="bg-[#0074c9] rounded-[24px] p-6 sm:p-7 shadow-md relative overflow-hidden flex flex-col justify-between h-[140px]">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-sky-400 rounded-full blur-3xl -mr-10 -mt-10 opacity-30"></div>
+            <div className="relative z-10 flex items-center gap-2 text-sky-100 text-[10px] font-bold uppercase tracking-widest mb-4">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8m-4-4v4m0-11V3m-4 4h8l-4 4-4-4Z"/></svg>
+              Bé xuất sắc nhất
+            </div>
+            
+            <div className="relative z-10 flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 bg-slate-200 shrink-0">
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${stats.topStudent?.nickname || 'Student'}`} alt="Student" className="w-full h-full object-cover" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="text-white font-bold text-lg leading-tight truncate">
+                  {stats.topStudent ? stats.topStudent.nickname : "Chưa có"}
+                </h4>
+                {stats.topStudent && (
+                  <p className="text-sky-200 text-xs font-medium flex items-center gap-1 mt-0.5">
+                    ☆ {stats.topStudent.score} điểm thưởng
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   );
@@ -496,7 +640,7 @@ function ChartTab() {
     stranger: "from-orange-400 to-red-500",
     phishing: "from-red-400 to-pink-500",
     password: "from-blue-400 to-indigo-500",
-    privacy: "from-purple-400 to-violet-500",
+    privacy: "from-sky-400 to-blue-500",
     behavior: "from-green-400 to-emerald-500",
     screentime: "from-cyan-400 to-teal-500",
     badcontent: "from-yellow-400 to-amber-500",
@@ -518,7 +662,7 @@ function ChartTab() {
               </span>
               <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
                 <div
-                  className={`h-full bg-gradient-to-r ${TOPIC_COLORS[s.topicId] ?? "from-indigo-400 to-purple-500"} rounded-full transition-all`}
+                  className={`h-full bg-gradient-to-r ${TOPIC_COLORS[s.topicId] ?? "from-indigo-400 to-blue-500"} rounded-full transition-all`}
                   style={{ width: `${Math.max((s.totalAnswers / maxAnswers) * 100, s.totalAnswers > 0 ? 4 : 0)}%` }}
                 />
               </div>
@@ -671,7 +815,7 @@ function StudentDetailModal({
                               ? "bg-blue-50 text-blue-700"
                               : a.selectedOption === "B"
                               ? "bg-green-50 text-green-700"
-                              : "bg-purple-50 text-purple-700"
+                              : "bg-blue-50 text-blue-700"
                           }`}
                         >
                           {a.selectedOption}
@@ -704,34 +848,7 @@ function StudentDetailModal({
   );
 }
 
-// === Stat Card ===
-function StatCard({
-  label,
-  value,
-  color,
-  small,
-}: {
-  label: string;
-  value: string | number;
-  color: "indigo" | "emerald" | "amber" | "rose";
-  small?: boolean;
-}) {
-  const colors: Record<string, string> = {
-    indigo: "from-indigo-500 to-purple-600",
-    emerald: "from-emerald-500 to-teal-600",
-    amber: "from-amber-400 to-orange-500",
-    rose: "from-rose-500 to-pink-600",
-  };
-
-  return (
-    <div className={`rounded-2xl p-4 text-white bg-gradient-to-br ${colors[color]}`}>
-      <p className="opacity-80 text-sm mb-1">{label}</p>
-      <p className={small ? "text-sm font-medium leading-tight" : "text-2xl font-bold"}>
-        {value}
-      </p>
-    </div>
-  );
-}
+// Removed StatCard function as it is no longer used
 
 // === Printable Report ===
 function PrintableReport({

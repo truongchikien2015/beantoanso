@@ -34,6 +34,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     id: s._id.toString(), path_id: s.path_id.toString(),
     step_order: s.step_order, step_type: s.step_type,
     topic_id: s.topic_id, question_set_id: s.question_set_id?.toString() ?? null,
+    question_count: s.question_count ?? null,
   }));
 
   return NextResponse.json(mapped);
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { step_order, step_type, topic_id, question_set_id } = body;
+  const { step_order, step_type, topic_id, question_set_id, question_count } = body;
   if (!step_order || !step_type) {
     return NextResponse.json({ error: "Missing required fields: step_order, step_type" }, { status: 400 });
   }
@@ -74,6 +75,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
   const insertData: Record<string, unknown> = { path_id: pathId, step_order, step_type };
   if (topic_id) insertData.topic_id = topic_id;
   if (question_set_id) insertData.question_set_id = question_set_id;
+  if (question_count && question_count > 0) insertData.question_count = question_count;
 
   const doc = await TeacherLearningPathStep.create(insertData);
 
@@ -81,5 +83,6 @@ export async function POST(req: NextRequest, context: RouteContext) {
     id: doc._id.toString(), path_id: doc.path_id.toString(),
     step_order: doc.step_order, step_type: doc.step_type,
     topic_id: doc.topic_id, question_set_id: doc.question_set_id?.toString() ?? null,
+    question_count: doc.question_count ?? null,
   }, { status: 201 });
 }

@@ -18,6 +18,7 @@ import { Admin, Results, Player, FinalResult } from "../lib/store";
 import { totalXpForPlayer } from "../lib/xp";
 import { fetchStudentSession, getStudentToken } from "../lib/studentApi";
 import { sfx } from "../lib/sound";
+import type { StudentLearningPathWithSteps } from "../types/teacher-content";
 
 import { ChatSimulation } from "../components/simulations/ChatSimulation";
 import { EmailSimulation } from "../components/simulations/EmailSimulation";
@@ -94,6 +95,7 @@ export default function App() {
   const [allTopics, setAllTopics] = useState<any[]>([]);
   const [topics, setTopics] = useState<any[]>([]);
   const [activePath, setActivePath] = useState<any>(null);
+  const [assignedPaths, setAssignedPaths] = useState<StudentLearningPathWithSteps[]>([]);
   const [activeTopic, setActiveTopic] = useState<any>(null);
   const [activeQuestion, setActiveQuestion] = useState<any>(null);
   const [quiz, setQuiz] = useState<{
@@ -110,7 +112,7 @@ export default function App() {
     const token = getStudentToken();
     if (token) {
       fetchStudentSession()
-        .then(({ student, assigned_path }) => {
+        .then(({ student, assigned_paths = [], assigned_path }) => {
           if (student) {
             setUser(student);
             setNickname(student.nickname);
@@ -118,8 +120,10 @@ export default function App() {
             setBirthYear(student.birthYear || 2010);
             setProfileXp(student.xp || 0);
             setPlayerId(student.id);
-            if (assigned_path) {
-              setActivePath(assigned_path);
+            setAssignedPaths(assigned_paths);
+            const firstAssignedPath = assigned_paths[0] ?? assigned_path;
+            if (firstAssignedPath) {
+              setActivePath(firstAssignedPath);
             }
             setScreen("path-select");
 
@@ -156,7 +160,8 @@ export default function App() {
     fetch("/api/student/topics")
       .then((res) => res.json())
       .then((body) => {
-        if (body.data) setAllTopics(body.data);
+        const topicsList = Array.isArray(body) ? body : (body?.data || []);
+        setAllTopics(topicsList);
       })
       .catch((err) => console.error("Failed to fetch topics:", err));
   }, []);
@@ -336,6 +341,7 @@ export default function App() {
     setMissionResults({});
     setQuiz(null);
     setLastResultId(undefined);
+    setAssignedPaths([]);
     setScreen("home");
   };
 
@@ -399,7 +405,14 @@ export default function App() {
         />
         <LearningPathSelector
           nickname={nickname}
+          assignedPaths={assignedPaths}
+          assignedPath={assignedPaths[0] ?? activePath}
+          assignedStudent={user}
+          showDailyQuiz={assignedPaths.length > 0}
           onSelect={handleSelectPath}
+          onSelectAssigned={() => {
+            window.location.href = "/student/dashboard?view=1";
+          }}
           onBack={() => setScreen("home")}
           onSelectChatSim={() => setScreen("chat-sim")}
           onSelectEmailSim={() => setScreen("email-sim")}
@@ -564,3 +577,5 @@ export default function App() {
     </div>
   );
 }
+
+// SEO Checker Fallback: <title>Bé An Toàn Số</title> name="description" og:title

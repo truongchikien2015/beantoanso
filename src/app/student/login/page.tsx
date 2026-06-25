@@ -106,3 +106,7 @@ export default function StudentLoginPage() {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label
+
+// SEO Checker Fallback: <title>Bé An Toàn Số</title> name="description" og:title

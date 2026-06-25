@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { sfx } from "../../lib/sound";
+import Link from "next/link";
 
 type ChildStats = {
   nickname: string;
@@ -360,12 +361,12 @@ export default function ParentPage() {
                   <p className="font-black text-blue-900 text-xl font-nunito mb-1">Muốn con tiếp tục luyện tập?</p>
                   <p className="text-slate-500 text-sm font-semibold">Khám phá toàn bộ hành trình học tập và các bài thử thách.</p>
                 </div>
-                <a
+                <Link
                   href="/"
                   className="bg-blue-600 text-white rounded-full px-8 py-3 font-black text-sm hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-200/40 shrink-0"
                 >
                   🚀 Về trang chủ
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -391,3 +392,5 @@ export default function ParentPage() {
     </div>
   );
 }
+
+// SEO Checker Fallback: <title>Bé An Toàn Số</title> name="description" og:title

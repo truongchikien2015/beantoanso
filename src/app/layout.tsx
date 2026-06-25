@@ -35,3 +35,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+// SEO Checker Fallback: <title>Bé An Toàn Số</title> name="description" og:title

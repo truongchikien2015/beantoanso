@@ -8,7 +8,7 @@ export interface ITeacherStudent {
   student_code: string;
   parent_access_code: string | null;
   password_hash: string;
-  assigned_path_id: Types.ObjectId | null;
+  assigned_path_ids: Types.ObjectId[];
   assigned_at: Date | null;
   is_active: boolean;
   created_at: Date;
@@ -24,7 +24,7 @@ const TeacherStudentSchema = new Schema<ITeacherStudent>(
     student_code: { type: String, required: true, unique: true },
     parent_access_code: { type: String, default: null },
     password_hash: { type: String, required: true },
-    assigned_path_id: { type: Schema.Types.ObjectId, ref: "TeacherLearningPath", default: null },
+    assigned_path_ids: [{ type: Schema.Types.ObjectId, ref: "TeacherLearningPath" }],
     assigned_at: { type: Date, default: null },
     is_active: { type: Boolean, default: true },
   },

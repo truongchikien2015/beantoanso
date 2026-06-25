@@ -4,6 +4,8 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { JourneyMap } from "../../components/JourneyMap";
 import { useAppStore } from "../../lib/globalStore";
+import { topicLabels, QuizTopic } from "@/data/quizQuestions";
+import { getStudentToken } from "@/lib/studentApi";
 
 function MapPageContent() {
   const router = useRouter();
@@ -11,6 +13,8 @@ function MapPageContent() {
   const pathId = searchParams?.get("path");
   const [pathLoadState, setPathLoadState] = useState<"idle" | "loading" | "ready" | "missing" | "error">("idle");
   const [pathLoadMessage, setPathLoadMessage] = useState("");
+  const [isTeacherPath, setIsTeacherPath] = useState(false);
+  const [teacherProgress, setTeacherProgress] = useState<Record<string, { score: number; correct: boolean }>>({});
 
   const nickname = useAppStore((state) => state.nickname);
   const playerId = useAppStore((state) => state.playerId);
@@ -31,63 +35,127 @@ function MapPageContent() {
       return;
     }
 
-    if (pathId && (!activePath || activePath.id !== pathId)) {
+    if (pathId) {
       let cancelled = false;
       setPathLoadState("loading");
       setPathLoadMessage("");
 
-      Promise.all([
-        fetch("/api/student/learning-paths").then((res) => {
-          if (!res.ok) throw new Error(`Không tải được khóa học (${res.status})`);
-          return res.json();
-        }),
-        fetch("/api/student/topics").then((res) => {
-          if (!res.ok) throw new Error(`Không tải được chủ đề (${res.status})`);
-          return res.json();
+      const token = getStudentToken();
+      if (token) {
+        fetch(`/api/student/dashboard`, {
+          headers: { Authorization: `Bearer ${token}` }
         })
-      ]).then(([pathsRes, topicsRes]) => {
-        if (cancelled) return;
+          .then((res) => {
+            if (!res.ok) throw new Error("Dashboard failed");
+            return res.json();
+          })
+          .then((dashboardData) => {
+            if (cancelled) return;
+            const assignedPaths = dashboardData.assigned_paths || [];
+            const foundTeacherPath = assignedPaths.find((p: any) => p.id === pathId);
 
-        const paths = Array.isArray(pathsRes.data) ? pathsRes.data : [];
-        const foundPath = paths.find((p: any) => p.id === pathId) ?? paths[0];
-        const topicsList = Array.isArray(topicsRes) ? topicsRes : (topicsRes.data || []);
+            if (foundTeacherPath) {
+              setIsTeacherPath(true);
+              setActivePath(foundTeacherPath);
+              
+              // Map steps to topics format
+              const mappedTopics = foundTeacherPath.steps.map((s: any) => ({
+                id: s.id,
+                label: s.step_type === "topic"
+                  ? (topicLabels[s.topic_id as QuizTopic] ?? "Bài học")
+                  : "Bài kiểm tra tổng hợp",
+                icon: s.step_type === "topic" ? "📖" : "📝",
+                slug: s.topic_id || "quiz",
+                step_type: s.step_type,
+              }));
+              setTopics(mappedTopics);
 
-        if (foundPath && topicsList.length > 0) {
-          setActivePath(foundPath);
-          const filtered = topicsList.filter((t: any) => foundPath.topic_ids.includes(t.id));
-          const ordered = foundPath.topic_ids
-            .map((id: string) => filtered.find((t: any) => t.id === id))
-            .filter(Boolean);
-          setTopics(ordered.length > 0 ? ordered : filtered);
+              // Map progress to results format
+              const mappedResults: Record<string, { score: number; correct: boolean }> = {};
+              (dashboardData.progress || [])
+                .filter((p: any) => p.path_id === pathId)
+                .forEach((p: any) => {
+                  mappedResults[p.step_id] = {
+                    score: p.score,
+                    correct: p.score >= 70,
+                  };
+                });
+              setTeacherProgress(mappedResults);
 
-          if (foundPath.id !== pathId) {
-            router.replace(`/map?path=${foundPath.id}`);
+              setPathLoadState("ready");
+              return;
+            }
+
+            loadPublicPath();
+          })
+          .catch(() => {
+            if (cancelled) return;
+            loadPublicPath();
+          });
+      } else {
+        loadPublicPath();
+      }
+
+      function loadPublicPath() {
+        setIsTeacherPath(false);
+        Promise.all([
+          fetch("/api/student/learning-paths").then((res) => {
+            if (!res.ok) throw new Error(`Không tải được khóa học (${res.status})`);
+            return res.json();
+          }),
+          fetch("/api/student/topics").then((res) => {
+            if (!res.ok) throw new Error(`Không tải được chủ đề (${res.status})`);
+            return res.json();
+          })
+        ]).then(([pathsRes, topicsRes]) => {
+          if (cancelled) return;
+
+          const paths = Array.isArray(pathsRes.data) ? pathsRes.data : [];
+          const foundPath = paths.find((p: any) => p.id === pathId) ?? paths[0];
+          const topicsList = Array.isArray(topicsRes) ? topicsRes : (topicsRes.data || []);
+
+          if (foundPath && topicsList.length > 0) {
+            setActivePath(foundPath);
+            const filtered = topicsList.filter((t: any) => foundPath.topic_ids.includes(t.id));
+            const ordered = foundPath.topic_ids
+              .map((id: string) => filtered.find((t: any) => t.id === id))
+              .filter(Boolean);
+            setTopics(ordered.length > 0 ? ordered : filtered);
+
+            if (foundPath.id !== pathId) {
+              router.replace(`/map?path=${foundPath.id}`);
+            }
+
+            setPathLoadState("ready");
+            return;
           }
 
-          setPathLoadState("ready");
-          return;
-        }
-
-        setPathLoadState("missing");
-        setPathLoadMessage("Chưa tìm thấy khóa học hoặc chủ đề phù hợp.");
-      }).catch((err: any) => {
-        if (cancelled) return;
-        setPathLoadState("error");
-        setPathLoadMessage(err?.message || "Không tải được bản đồ hành trình.");
-      });
+          setPathLoadState("missing");
+          setPathLoadMessage("Chưa tìm thấy khóa học hoặc chủ đề phù hợp.");
+        }).catch((err: any) => {
+          if (cancelled) return;
+          setPathLoadState("error");
+          setPathLoadMessage(err?.message || "Không tải được bản đồ hành trình.");
+        });
+      }
 
       return () => {
         cancelled = true;
       };
     }
 
-    if (!pathId || topics.length > 0) {
+    if (!pathId) {
       setPathLoadState("ready");
       setPathLoadMessage("");
     }
-  }, [nickname, pathId, activePath, router, setActivePath, setTopics, topics.length]);
+  }, [nickname, pathId, router, setActivePath, setTopics]);
 
   const handlePickMission = async (topicId: string) => {
+    if (isTeacherPath) {
+      router.push(`/student/quiz/${topicId}`);
+      return;
+    }
+
     const topic = topics.find((t: any) => t.id === topicId);
     if (!topic) return;
 
@@ -110,7 +178,6 @@ function MapPageContent() {
         setActiveQuestion(randomQ);
         router.push("/mission");
       } else {
-        // Fallback: load any question for this topic
         const fallbackRes = await fetch(`/api/student/questions?topic_slug=${topic.slug}`);
         let fallbackData = await fallbackRes.json();
         if (fallbackRes.ok && Array.isArray(fallbackData) && fallbackData.length > 0) {
@@ -162,9 +229,9 @@ function MapPageContent() {
   return (
     <JourneyMap
       topics={topics}
-      results={missionResults}
+      results={isTeacherPath ? teacherProgress : missionResults}
       onPickMission={handlePickMission}
-      onGoQuiz={() => router.push("/quiz")}
+      onGoQuiz={() => router.push(isTeacherPath ? "/student/certificate" : "/quiz")}
     />
   );
 }

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
   // Batch update
   await TeacherStudent.updateMany(
     { _id: { $in: validStudentIds } },
-    { assigned_path_id: pathId, assigned_at: now }
+    { $addToSet: { assigned_path_ids: pathId }, $set: { assigned_at: now } }
   );
 
   const updated = await TeacherStudent.find({ _id: { $in: validStudentIds } })

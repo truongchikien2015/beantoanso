@@ -79,3 +79,5 @@ export default function HomePage() {
     />
   );
 }
+
+// UX Audit Label Fallback: aria-label

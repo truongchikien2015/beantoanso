@@ -46,14 +46,15 @@ export function Certificate({ nickname, totalScore, onBack, resultId }: Props) {
         </button>
       </div>
 
-      <div
-        id="certificate"
-        className="relative bg-white aspect-[1.55/1] w-full overflow-hidden shadow-2xl print:shadow-none print:aspect-auto"
-        style={{
-          boxShadow:
-            "0 20px 50px -10px rgba(15, 76, 92, 0.25), 0 0 0 1px rgba(15, 76, 92, 0.06)",
-        }}
-      >
+      <div className="w-full overflow-x-auto pb-4 scrollbar-none select-none print:overflow-visible">
+        <div
+          id="certificate"
+          className="relative bg-white aspect-[1.55/1] w-full min-w-[768px] print:min-w-0 print:w-full overflow-hidden shadow-2xl print:shadow-none print:aspect-auto"
+          style={{
+            boxShadow:
+              "0 20px 50px -10px rgba(15, 76, 92, 0.25), 0 0 0 1px rgba(15, 76, 92, 0.06)",
+          }}
+        >
         {/* Corner decorations */}
         <CornerShapes />
 
@@ -147,6 +148,7 @@ export function Certificate({ nickname, totalScore, onBack, resultId }: Props) {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <style>{`

@@ -32,15 +32,15 @@ export async function GET(req: NextRequest) {
 
   const result = students.map((s) => {
     const teacher = teacherByUid.get(s.created_by);
-    const pathTitle = s.assigned_path_id ? pathById.get(s.assigned_path_id.toString()) : null;
+    const pathTitles = (s.assigned_path_ids || []).map(id => pathById.get(id.toString())).filter(Boolean).join(", ");
     return {
       id: s._id.toString(),
       nickname: s.nickname,
       email: s.email,
       className: s.class_name,
       studentCode: s.student_code,
-      assignedPathId: s.assigned_path_id?.toString() ?? null,
-      assignedPathTitle: pathTitle ?? null,
+      assignedPathIds: (s.assigned_path_ids || []).map(id => id.toString()),
+      assignedPathTitle: pathTitles || null,
       assignedAt: s.assigned_at,
       isActive: s.is_active,
       createdAt: s.created_at,

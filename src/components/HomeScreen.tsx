@@ -192,7 +192,7 @@ export function HomeScreen({
 
               {/* Feature 3 */}
               <div className="flex gap-4 items-start">
-                <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-purple-200">
+                <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-amber-200">
                   🦉
                 </div>
                 <div className="text-left">
@@ -257,7 +257,7 @@ export function HomeScreen({
             {/* Card 3: Behavior */}
             <div className="bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 flex flex-col justify-between transition-transform hover:-translate-y-1">
               <div>
-                <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl text-purple-600 mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-2xl text-rose-600 mb-6">
                   👥
                 </div>
                 <h3 className="font-black text-slate-800 text-lg mb-3 font-nunito">Ứng xử văn minh</h3>
@@ -328,35 +328,6 @@ export function HomeScreen({
         </span>
       </section>
 
-      {/* ── 7. Footer (Mockup Details) ── */}
-      <footer className="w-full bg-[#f8fafc] py-8 border-t border-slate-100 mt-auto">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <h4 className="font-extrabold text-blue-900 text-base mb-1 font-nunito">Bé An Toàn Số</h4>
-            <p className="text-xs text-slate-400 font-extrabold">
-              © 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt trên không gian mạng.
-            </p>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="flex gap-x-5 text-xs text-slate-400 font-extrabold">
-              <a href="#" className="hover:text-slate-600 transition-colors">Điều khoản</a>
-              <a href="#" className="hover:text-slate-600 transition-colors">Bảo mật</a>
-              <a href="#" className="hover:text-slate-600 transition-colors">Liên hệ</a>
-              <a href="#" className="hover:text-slate-600 transition-colors">Trợ giúp</a>
-            </div>
-            
-            {/* Share and contact buttons */}
-            <div className="flex gap-3">
-              <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition shadow-sm border border-slate-200/50">
-                📎
-              </button>
-              <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 transition shadow-sm border border-slate-200/50">
-                ✉️
-              </button>
-            </div>
-          </div>
-        </div>
-      </footer>
 
       {/* Auth Modal overlay */}
       <AuthModal
@@ -369,49 +340,6 @@ export function HomeScreen({
       {/* ── 8. News Feed (Articles & Categories) ── */}
       <NewsFeed />
 
-      {/* ── 9. Về chúng tôi (About Us Static Section) ── */}
-      <section id="about" className="py-20 px-6 max-w-6xl mx-auto w-full border-t border-slate-100 scroll-mt-20">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-center">
-          {/* Left Column: Chân dung tác giả */}
-          <div className="md:col-span-5 flex flex-col items-center relative">
-            <div className="relative p-2 bg-white card-kid rounded-[36px] max-w-xs w-full shadow-lg border border-slate-200/50">
-              <img
-                src="/images/graduation_author.png"
-                alt="Chân dung tác giả Trương Chí Kiên"
-                className="w-full rounded-[30px] object-cover shadow-inner"
-              />
-            </div>
-            {/* Author tag */}
-            <div className="absolute -bottom-4 right-4 bg-white card-kid py-2.5 px-4.5 rounded-2xl flex items-center gap-2 border border-slate-200 shadow-md">
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-lg shadow-sm text-white font-bold">
-                🎓
-              </div>
-              <div className="leading-tight text-left">
-                <p className="text-[10px] text-slate-400 font-black leading-none">Tác giả</p>
-                <p className="text-xs text-blue-900 font-black leading-tight mt-0.5">Trương Chí Kiên</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Narrative Content */}
-          <div className="md:col-span-7 flex flex-col items-start text-left">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-rose-50 border border-rose-100 text-rose-500 rounded-full text-xs font-black mb-4">
-              ❤️ Tâm sự từ người sáng lập
-            </span>
-            <h2 className="text-2xl md:text-3xl font-black text-blue-900 tracking-tight leading-tight mb-6 font-nunito">
-              Xây dựng không gian mạng <span className="text-blue-600 font-black">an toàn cho trẻ em</span>
-            </h2>
-            <div className="space-y-4 text-slate-700 text-base font-semibold leading-relaxed">
-              <p>
-                Xin chào! Mình là Trương Chí Kiên. Nhận thấy trẻ em ngày nay tiếp xúc với Internet từ rất sớm nhưng lại thiếu các kỹ năng tự bảo vệ, mình đã tạo ra &quot;Bé An Toàn Số&quot; với mong muốn đóng góp một phần nhỏ bé cho cộng đồng.
-              </p>
-              <p>
-                Trang web được thiết kế như một trò chơi tương tác, nơi các em có thể hóa thân thành những &quot;Hiệp sĩ không gian mạng&quot;, trải qua các thử thách để học cách nhận biết lừa đảo, bảo vệ thông tin cá nhân và ứng xử văn minh trên môi trường số.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Guest Play Quick Start Modal overlay */}
       {showQuickStart && (

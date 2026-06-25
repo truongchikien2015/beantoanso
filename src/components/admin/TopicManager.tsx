@@ -19,10 +19,10 @@ const COLORS = [
   { label: "Rose", value: "rose" },
   { label: "Amber", value: "amber" },
   { label: "Sky", value: "sky" },
-  { label: "Violet", value: "violet" },
+  { label: "Pink", value: "pink" },
   { label: "Teal", value: "teal" },
   { label: "Orange", value: "orange" },
-  { label: "Fuchsia", value: "fuchsia" },
+  { label: "Blue", value: "blue" },
   { label: "Cyan", value: "cyan" },
 ];
 
@@ -37,10 +37,10 @@ const COLOR_BG: Record<string, string> = {
   rose: "bg-rose-100 text-rose-700",
   amber: "bg-amber-100 text-amber-700",
   sky: "bg-sky-100 text-sky-700",
-  violet: "bg-violet-100 text-violet-700",
+  pink: "bg-pink-100 text-pink-700",
   teal: "bg-teal-100 text-teal-700",
   orange: "bg-orange-100 text-orange-700",
-  fuchsia: "bg-fuchsia-100 text-fuchsia-700",
+  blue: "bg-blue-100 text-blue-700",
   cyan: "bg-cyan-100 text-cyan-700",
 };
 
@@ -177,10 +177,10 @@ export function TopicManager({ onLogout, onHome }: Props) {
                           t.color === "rose" ? "bg-rose-500" :
                           t.color === "amber" ? "bg-amber-500" :
                           t.color === "sky" ? "bg-sky-500" :
-                          t.color === "violet" ? "bg-violet-500" :
+                          t.color === "pink" ? "bg-pink-500" :
                           t.color === "teal" ? "bg-teal-500" :
                           t.color === "orange" ? "bg-orange-500" :
-                          t.color === "fuchsia" ? "bg-fuchsia-500" :
+                          t.color === "blue" ? "bg-blue-500" :
                           "bg-cyan-500"
                         }`} />
                       </td>
@@ -438,10 +438,10 @@ function TopicForm({
                   c.value === "rose" ? "bg-rose-500" :
                   c.value === "amber" ? "bg-amber-500" :
                   c.value === "sky" ? "bg-sky-500" :
-                  c.value === "violet" ? "bg-violet-500" :
+                  c.value === "pink" ? "bg-pink-500" :
                   c.value === "teal" ? "bg-teal-500" :
                   c.value === "orange" ? "bg-orange-500" :
-                  c.value === "fuchsia" ? "bg-fuchsia-500" :
+                  c.value === "blue" ? "bg-blue-500" :
                   "bg-cyan-500"
                 }`} />
                 <span className="text-xs text-slate-600">{c.label}</span>

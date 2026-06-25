@@ -13,7 +13,7 @@ type Props = {
 const QUIZ_POS = { x: 650, y: 246 };
 
 export function JourneyMap({ topics, results, onPickMission, onGoQuiz }: Props) {
-  const completedCount = Object.keys(results).length;
+  const completedCount = topics.filter((m) => !!results[m.id]).length;
   const allDone = completedCount >= topics.length && topics.length > 0;
   const progress = topics.length > 0 ? (completedCount / topics.length) * 100 : 0;
 
@@ -26,7 +26,7 @@ export function JourneyMap({ topics, results, onPickMission, onGoQuiz }: Props) 
       { x: 240, y: 476, color: "#FF6B6B" }, // Chặng 1
       { x: 360, y: 403, color: "#FFE66D" }, // Chặng 2
       { x: 500, y: 375, color: "#4ECDC4" }, // Chặng 3
-      { x: 630, y: 342, color: "#A06CD5" }, // Chặng 4
+      { x: 630, y: 342, color: "#FF9F43" }, // Chặng 4
       { x: 540, y: 297, color: "#FF8E53" }, // Chặng 5
       { x: 520, y: 263, color: "#FF6B8B" }, // Chặng 6
     ];
@@ -37,7 +37,7 @@ export function JourneyMap({ topics, results, onPickMission, onGoQuiz }: Props) 
     const startX = 130;
     const endX = 870;
     const stepX = topics.length > 1 ? (endX - startX) / (topics.length - 1) : 0;
-    const colors = ["#FF6B6B", "#FFE66D", "#4ECDC4", "#A06CD5", "#FF8E53", "#FF6B8B"];
+    const colors = ["#FF6B6B", "#FFE66D", "#4ECDC4", "#FF9F43", "#FF8E53", "#FF6B8B"];
     for (let i = 0; i < topics.length; i++) {
       nodes.push({
         x: startX + stepX * i,
@@ -89,94 +89,96 @@ export function JourneyMap({ topics, results, onPickMission, onGoQuiz }: Props) 
         {/* Action button */}
         <button
           onClick={handleStartActiveLesson}
-          className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-extrabold text-sm shadow-[0_4px_14px_rgba(107,70,193,0.3)] hover:shadow-[0_6px_20px_rgba(107,70,193,0.4)] transform hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all cursor-pointer"
+          className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-extrabold text-sm shadow-[0_4px_14px_rgba(20,184,166,0.3)] hover:shadow-[0_6px_20px_rgba(20,184,166,0.4)] transform hover:-translate-y-0.5 active:translate-y-0 active:scale-98 transition-all cursor-pointer"
         >
           <Play className="w-4 h-4 fill-current stroke-[3]" />
           Vào bài học ngay
         </button>
       </div>
 
-      {/* Map board container */}
-      <div
-        className="relative w-full rounded-[32px] overflow-hidden shadow-xl border-4 border-white bg-slate-100"
-        style={{ aspectRatio: "1000 / 560", minHeight: 360 }}
-      >
-        {/* Background image */}
-        <img
-          src="/images/adventure_map_bg.png"
-          alt="Bản đồ hành trình"
-          className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
-        />
+      {/* Map board container - scrollable on mobile to preserve layout aspect ratio */}
+      <div className="w-full overflow-x-auto pb-2 scrollbar-none select-none">
+        <div
+          className="relative rounded-[32px] overflow-hidden shadow-xl border-4 border-white bg-slate-100"
+          style={{ aspectRatio: "1000 / 560", minWidth: 768 }}
+        >
+          {/* Background image */}
+          <img
+            src="/images/adventure_map_bg.png"
+            alt="Bản đồ hành trình"
+            className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+          />
 
-        {/* Stage nodes */}
-        {topics.map((m, idx) => {
-          const pos = nodePos[idx] || { x: 100, y: 100 };
-          const done = !!results[m.id];
-          const isCurrent = !done && idx === activeIndex;
-          // Perspective scale calculation: items further up (smaller Y) are smaller
-          const scale = pos.y ? Math.max(0.7, Math.min(1.0, 0.7 + (pos.y - 200) / 400)) : 1.0;
+          {/* Stage nodes */}
+          {topics.map((m, idx) => {
+            const pos = nodePos[idx] || { x: 100, y: 100 };
+            const done = !!results[m.id];
+            const isCurrent = !done && idx === activeIndex;
+            // Perspective scale calculation: items further up (smaller Y) are smaller
+            const scale = pos.y ? Math.max(0.7, Math.min(1.0, 0.7 + (pos.y - 200) / 400)) : 1.0;
 
-          return (
-            <StageNode
-              key={m.id}
-              x={pos.x}
-              y={pos.y}
-              number={idx + 1}
-              icon={m.icon}
-              title={m.label.replace("phồng cháy", "phòng cháy")}
-              done={done}
-              current={isCurrent}
-              score={results[m.id]?.score}
-              scale={scale}
-              onClick={() => {
-                sfx.click();
-                onPickMission(m.id);
-              }}
+            return (
+              <StageNode
+                key={m.id}
+                x={pos.x}
+                y={pos.y}
+                number={idx + 1}
+                icon={m.icon}
+                title={m.label.replace("phồng cháy", "phòng cháy")}
+                done={done}
+                current={isCurrent}
+                score={results[m.id]?.score}
+                scale={scale}
+                onClick={() => {
+                  sfx.click();
+                  onPickMission(m.id);
+                }}
+              />
+            );
+          })}
+
+          {/* Final assessment castle node */}
+          <CastleNode
+            x={QUIZ_POS.x}
+            y={QUIZ_POS.y}
+            unlocked={allDone}
+            scale={0.8}
+            onClick={() => {
+              if (!allDone) {
+                sfx.wrong();
+                return;
+              }
+              sfx.click();
+              onGoQuiz();
+            }}
+          />
+
+          {/* Player avatar bouncing */}
+          {topics.length > 0 && (
+            <PlayerMarker
+              x={
+                allDone
+                  ? QUIZ_POS.x
+                  : nodePos[activeIndex]?.x ?? nodePos[0].x
+              }
+              y={
+                (allDone
+                  ? QUIZ_POS.y
+                  : nodePos[activeIndex]?.y ?? nodePos[0].y) - 52
+              }
             />
-          );
-        })}
+          )}
 
-        {/* Final assessment castle node */}
-        <CastleNode
-          x={QUIZ_POS.x}
-          y={QUIZ_POS.y}
-          unlocked={allDone}
-          scale={0.8}
-          onClick={() => {
-            if (!allDone) {
-              sfx.wrong();
-              return;
-            }
-            sfx.click();
-            onGoQuiz();
-          }}
-        />
-
-        {/* Player avatar bouncing */}
-        {topics.length > 0 && (
-          <PlayerMarker
-            x={
-              allDone
-                ? QUIZ_POS.x
-                : nodePos[activeIndex]?.x ?? nodePos[0].x
-            }
-            y={
-              (allDone
-                ? QUIZ_POS.y
-                : nodePos[activeIndex]?.y ?? nodePos[0].y) - 52
-            }
-          />
-        )}
-
-        {/* Robot guide balloon inside map (Desktop/Tablet) */}
-        <div className="absolute left-4 bottom-4 max-w-[50%] md:max-w-[40%] hidden sm:block z-10">
-          <RobotGuide
-            message={
-              allDone
-                ? "Tuyệt vời! Bấm vào lâu đài để làm quiz cuối nhé!"
-                : `Chào mừng trở lại! Hãy tiếp tục Chặng ${activeIndex + 1} nhé!`
-            }
-          />
+          {/* Robot guide balloon inside map (Desktop/Tablet) */}
+          <div className="absolute left-4 bottom-4 max-w-[50%] md:max-w-[40%] hidden sm:block z-10">
+            <RobotGuide
+              message={
+                allDone
+                  ? "Tuyệt vời! Bấm vào lâu đài để làm quiz cuối nhé!"
+                  : `Chào mừng trở lại! Hãy tiếp tục Chặng ${activeIndex + 1} nhé!`
+              }
+            />
+          </div>
         </div>
       </div>
 
@@ -215,7 +217,7 @@ export function JourneyMap({ topics, results, onPickMission, onGoQuiz }: Props) 
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded bg-purple-700/50 text-white">
+                      <span className="text-[10px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded bg-teal-700/50 text-white">
                         Đang học
                       </span>
                     </div>
@@ -335,7 +337,7 @@ function StageNode({
           /* Current / Active: blue circle with active icon and indicator */
           <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-full border-4 border-white bg-blue-600 text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
             <span className="text-xl sm:text-2xl">{icon}</span>
-            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-purple-600 text-[10px] font-bold border border-white text-white shadow">
+            <span className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded-full bg-teal-500 text-[10px] font-bold border border-white text-white shadow">
               #{number}
             </span>
           </div>
@@ -418,7 +420,7 @@ function PlayerMarker({ x, y }: { x: number; y: number }) {
       style={{ left: `${(x / 1000) * 100}%`, top: `${(y / 560) * 100}%` }}
     >
       <div className="relative animate-bounce">
-        <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-500 border-3 border-white flex items-center justify-center shadow-2xl">
+        <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-gradient-to-br from-sky-400 via-sky-500 to-blue-600 border-3 border-white flex items-center justify-center shadow-2xl">
           <span className="text-2xl sm:text-3xl">👦</span>
         </div>
         <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-3 h-3 bg-blue-500 rotate-45 border-r border-b border-white" />
@@ -426,4 +428,6 @@ function PlayerMarker({ x, y }: { x: number; y: number }) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label
 

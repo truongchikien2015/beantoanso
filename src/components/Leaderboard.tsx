@@ -128,7 +128,7 @@ export function Leaderboard({
               )}
               <button
                 onClick={onReplay}
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow"
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow"
               >
                 🔄 Chơi lại để cải thiện điểm
               </button>

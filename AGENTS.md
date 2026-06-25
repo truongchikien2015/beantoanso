@@ -1,27 +1,35 @@
+AGENTS.md
+
 <!-- SPECKIT START -->
-For additional context about technologies, project structure, shell commands, and other important information, see:
 
-- `SPEC.md` — Full project specification (pages, components, data models, API, tech stack, database schema)
-- `.specify/memory/constitution.md` — Project constitution (7 core principles)
-- `specs/` — Feature-specific specs and plans
+Project Context
 
-Active features in progress:
-- `specs/028-student-ux-elementary/` — Child-friendly student UI redesign (playful colors, larger buttons, animations)
+Read these files before implementing a feature when relevant:
 
-Quick reference:
-- Tech stack: Next.js 16 + TypeScript 6 (strict) + Zustand + localStorage + Supabase
-- UI: Tailwind CSS v4 + MUI v7 + Radix UI
-- Vietnamese-first: all user-facing text must be in Vietnamese
-- All components: business logic in `src/lib/`, UI in `src/components/`
-- localStorage keys: `bats:` prefix convention
-- AI: Grok/OpenRouter via `/api/grok/` routes
-- Admin auth: `be_an_toan_so_admin`, `NEXT_PUBLIC_ADMIN_PASSWORD`
+- SPEC.md — Project specification: pages, components, data models, API, tech stack, database schema.
+- .specify/memory/constitution.md — Seven core project principles.
+- specs/ — Feature specifications, plans, and acceptance criteria.
+
+Active Feature
+
+- specs/028-student-ux-elementary/ — Child-friendly student UI redesign with playful colors, larger controls, and animations.
+
+Technical Rules
+
+- Stack: Next.js 16, TypeScript 6 strict mode, Zustand, localStorage, Supabase.
+- UI: Tailwind CSS v4, MUI v7, Radix UI.
+- Vietnamese-first: all user-facing text must be Vietnamese.
+- Keep business logic in src/lib/.
+- Keep UI components in src/components/.
+- All localStorage keys must use the bats: prefix.
+- AI integrations use Grok/OpenRouter through /api/grok/ routes.
+- Admin authentication uses be_an_toan_so_admin and NEXT_PUBLIC_ADMIN_PASSWORD.
+
 <!-- SPECKIT END -->
-
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **beantoanso** (3887 symbols, 7974 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **beantoanso** (4084 symbols, 8367 relationships, 291 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -30,8 +38,9 @@ This project is indexed by GitNexus as **beantoanso** (3887 symbols, 7974 relati
 - **MUST run impact analysis before editing any symbol.** Before modifying a function, class, or method, run `impact({target: "symbolName", direction: "upstream"})` and report the blast radius (direct callers, affected processes, risk level) to the user.
 - **MUST run `detect_changes()` before committing** to verify your changes only affect expected symbols and execution flows. For regression review, compare against the default branch: `detect_changes({scope: "compare", base_ref: "main"})`.
 - **MUST warn the user** if impact analysis returns HIGH or CRITICAL risk before proceeding with edits.
-- When exploring unfamiliar code, use `query({query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
+- When exploring unfamiliar code, use `query({search_query: "concept"})` to find execution flows instead of grepping. It returns process-grouped results ranked by relevance.
 - When you need full context on a specific symbol — callers, callees, which execution flows it participates in — use `context({name: "symbolName"})`.
+- For security review, `explain({target: "fileOrSymbol"})` lists taint findings (source→sink flows; needs `analyze --pdg`).
 
 ## Never Do
 

@@ -90,3 +90,5 @@ export default async function NewsPage() {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

@@ -22,7 +22,7 @@ const topicStyles: Record<string, { icon: string; bg: string; text: string }> = 
   phishing: { icon: "🎣", bg: "from-red-200 to-orange-200", text: "text-red-700" },
   password: { icon: "🔑", bg: "from-orange-200 to-pink-200", text: "text-indigo-600" },
   privacy: { icon: "🛡️", bg: "from-green-200 to-emerald-200", text: "text-green-700" },
-  behavior: { icon: "🤝", bg: "from-purple-200 to-indigo-200", text: "text-purple-700" },
+  behavior: { icon: "🤝", bg: "from-amber-200 to-orange-200", text: "text-orange-700" },
   screentime: { icon: "⏱️", bg: "from-teal-200 to-emerald-200", text: "text-teal-700" },
   badcontent: { icon: "⚠️", bg: "from-rose-200 to-red-200", text: "text-rose-700" },
 };
@@ -853,7 +853,7 @@ function Stat({
   accent?: "indigo" | "emerald" | "slate";
 }) {
   const map = {
-    indigo: "from-indigo-500 to-purple-500",
+    indigo: "from-indigo-500 to-blue-500",
     emerald: "from-emerald-500 to-teal-500",
     slate: "from-slate-400 to-slate-500",
   };

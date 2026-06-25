@@ -135,7 +135,7 @@ export function MissionScreen({ topic, question, onFinish, onBack }: Props) {
     <div className="max-w-3xl mx-auto px-4 py-6">
       <button
         onClick={onBack}
-        className="mb-4 text-indigo-600 hover:underline"
+        className="mb-4 text-teal-600 hover:underline"
       >
         ← Quay lại bản đồ
       </button>
@@ -146,7 +146,7 @@ export function MissionScreen({ topic, question, onFinish, onBack }: Props) {
             <div className="inline-flex w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-200 to-pink-200 items-center justify-center text-5xl shadow-inner">
               {topic.icon}
             </div>
-            <h2 className="mt-3 text-indigo-700">{topic.label}</h2>
+            <h2 className="mt-3 text-teal-700">{topic.label}</h2>
           </div>
           <div className="flex items-start gap-2 bg-amber-50 rounded-2xl p-4 border border-amber-200 text-slate-700">
             <p className="flex-1">📖 {question.question}</p>
@@ -154,7 +154,7 @@ export function MissionScreen({ topic, question, onFinish, onBack }: Props) {
               <button
                 onClick={readQuestion}
                 title="Nghe đọc câu hỏi"
-                className="shrink-0 w-9 h-9 rounded-full border border-indigo-200 hover:bg-indigo-50 text-indigo-700"
+                className="shrink-0 w-9 h-9 rounded-full border border-teal-200 hover:bg-teal-50 text-teal-700"
               >
                 🔊
               </button>
@@ -227,7 +227,7 @@ export function MissionScreen({ topic, question, onFinish, onBack }: Props) {
                 disabled={picked !== null}
                 className={`w-full text-left p-4 rounded-2xl border-2 transition ${cls}`}
               >
-                <span className="inline-block w-7 h-7 rounded-full bg-indigo-500 text-white text-center mr-3">
+                <span className="inline-block w-7 h-7 rounded-full bg-teal-500 text-white text-center mr-3">
                   {opt.key}
                 </span>
                 {opt.text}
@@ -281,7 +281,7 @@ export function MissionScreen({ topic, question, onFinish, onBack }: Props) {
                 sfx.click();
                 onFinish(pickedOpt.isCorrect ? 10 : 0, pickedOpt.isCorrect);
               }}
-              className="w-full py-4 mt-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg hover:scale-[1.02] active:scale-95 transition"
+              className="w-full py-4 mt-4 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg hover:scale-[1.02] active:scale-95 transition"
             >
               Tiếp tục hành trình →
             </button>

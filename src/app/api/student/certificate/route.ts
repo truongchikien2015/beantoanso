@@ -28,14 +28,14 @@ export async function POST(req: NextRequest) {
     // Self-registered students don't have assigned paths
   } else {
     const student = await TeacherStudent.findOne({ _id: studentId, is_active: true })
-      .select("nickname assigned_path_id")
+      .select("nickname assigned_path_ids")
       .lean();
 
     if (!student) {
       return NextResponse.json({ error: "Không tìm thấy học sinh" }, { status: 404 });
     }
     nickname = student.nickname;
-    assignedPathId = student.assigned_path_id?.toString() ?? null;
+    assignedPathId = student.assigned_path_ids && student.assigned_path_ids.length > 0 ? student.assigned_path_ids[0].toString() : null;
   }
 
   if (!assignedPathId) {

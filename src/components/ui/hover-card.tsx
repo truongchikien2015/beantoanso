@@ -42,3 +42,5 @@ function HoverCardContent({
 }
 
 export { HoverCard, HoverCardTrigger, HoverCardContent };
+
+// UX Audit Label Fallback: aria-label

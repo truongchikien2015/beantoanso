@@ -7,6 +7,7 @@ import type { StudentStepContent, TeacherQuestion } from "@/types/teacher-conten
 import { topicLabels } from "@/data/quizQuestions";
 import { StudentChatbot } from "@/components/student/StudentChatbot";
 import { getMediaType, getYouTubeEmbedUrl } from "@/lib/mediaUtils";
+import { lessons } from "@/data/lessons";
 
 
 
@@ -50,14 +51,56 @@ function Confetti() {
 }
 
 function TopicContent({ step }: { step: StudentStepContent }) {
-  const label = step.topic_label ?? step.topic ? topicLabels[step.topic as keyof typeof topicLabels] : "Bài học";
+  const lesson = lessons.find((l) => l.topic === step.topic || l.topic === step.topic_id);
+  const label = step.topic_label ?? (step.topic ? topicLabels[step.topic as keyof typeof topicLabels] : "Bài học");
+  
+  if (!lesson) {
+    return (
+      <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-8 text-center shadow-sm">
+        <div className="text-6xl mb-4 animate-bounce-in">📖</div>
+        <h2 className="text-2xl font-black text-slate-800 mb-2">{label}</h2>
+        <p className="text-slate-500 text-base">Nội dung bài học sẽ được cập nhật sau.</p>
+        <div className="mt-6 p-5 bg-teal-50 border-2 border-teal-100 rounded-2xl text-base text-slate-700 font-bold">
+          📚 Bài học này giúp bạn hiểu về chủ đề <span className="font-black text-rose-500">&ldquo;{label}&rdquo;</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-8 text-center shadow-sm">
-      <div className="text-6xl mb-4 animate-bounce-in">📖</div>
-      <h2 className="text-2xl font-black text-slate-800 mb-2">{label}</h2>
-      <p className="text-slate-500 text-base">Nội dung bài học sẽ được cập nhật sau.</p>
-      <div className="mt-6 p-5 bg-teal-50 border-2 border-teal-100 rounded-2xl text-base text-slate-700 font-bold">
-        📚 Bài học này giúp bạn hiểu về chủ đề <span className="font-black text-rose-500">&ldquo;{label}&rdquo;</span>
+    <div className="bg-white rounded-[32px] border-[3px] border-slate-200/80 p-6 sm:p-8 shadow-sm animate-fade-up relative overflow-hidden text-left">
+      {/* Header info */}
+      <div className="text-center mb-6">
+        <div className="text-7xl mb-4 animate-float inline-block drop-shadow-sm">{lesson.emoji}</div>
+        <h2 className="text-2xl font-black text-slate-800 font-nunito">{lesson.title}</h2>
+        <div className="mt-1.5 h-[3px] w-16 bg-teal-400 rounded-full mx-auto" />
+      </div>
+
+      {/* Intro text */}
+      <div className="bg-amber-50/50 border-2 border-amber-100/70 rounded-2xl p-5 text-slate-700 font-bold leading-relaxed text-base shadow-inner mb-6">
+        {lesson.intro}
+      </div>
+
+      {/* Tips Section */}
+      <h3 className="text-slate-800 font-black text-lg mb-3 flex items-center gap-1.5 font-nunito">
+        <span>💡</span> Bí kíp của Robot
+      </h3>
+      <ul className="space-y-3 mb-6">
+        {lesson.tips.map((t, i) => (
+          <li
+            key={i}
+            className="flex gap-3 bg-teal-50/30 border-2 border-teal-100/50 rounded-2xl px-4 py-3 items-center font-bold text-sm text-slate-700"
+          >
+            <span className="text-emerald-500 shrink-0 text-base font-bold">✓</span>
+            <span>{t}</span>
+          </li>
+        ))}
+      </ul>
+
+      {/* Rule highlight */}
+      <div className="p-5 rounded-2xl bg-rose-50 border-2 border-rose-100 text-rose-700 font-black flex items-start gap-3 text-base shadow-sm">
+        <span className="text-2xl shrink-0">🛡️</span>
+        <p className="leading-relaxed">{lesson.rule}</p>
       </div>
     </div>
   );
@@ -350,9 +393,9 @@ export default function QuizPage() {
             >
               ← Thoát
             </button>
-            <h1 className="font-black text-slate-800 text-lg flex items-center gap-2">
+            <h2 className="font-black text-slate-800 text-lg flex items-center gap-2">
               ✨ Kết quả bài học ✨
-            </h1>
+            </h2>
             <div className="w-12" />
           </div>
           {/* Score card - Celebration Style */}
@@ -532,7 +575,7 @@ export default function QuizPage() {
             >
               ← Quay lại
             </button>
-            <h1 className="font-black text-slate-800 text-lg">{step.topic_label ?? "Bài học"}</h1>
+            <h2 className="font-black text-slate-800 text-lg">{step.topic_label ?? "Bài học"}</h2>
             <div className="w-12" />
           </div>
           <TopicContent step={step} />
@@ -564,9 +607,9 @@ export default function QuizPage() {
           >
             ← Thoát
           </button>
-          <h1 className="font-black text-slate-800 text-lg flex items-center gap-2">
+          <h2 className="font-black text-slate-800 text-lg flex items-center gap-2">
             📝 Bài kiểm tra
-          </h1>
+          </h2>
           <span className="bg-teal-50 border border-teal-100 text-teal-600 px-3.5 py-1 rounded-full text-xs font-black shrink-0">
             Câu {answeredCount}/{totalQ}
           </span>

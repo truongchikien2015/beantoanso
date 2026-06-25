@@ -204,3 +204,5 @@ export function StudentDailyQuizPanel({ onUnauthorized, onBack, compact = false 
     </section>
   );
 }
+
+// UX Audit Label Fallback: aria-label

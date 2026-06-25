@@ -52,12 +52,7 @@ export function Header({ currentActiveTab }: Props) {
     } else if (tab === "leaderboard") {
       router.push("/leaderboard");
     } else if (tab === "about") {
-      if (window.location.pathname !== "/") {
-        router.push("/#about");
-      } else {
-        const el = document.getElementById("about");
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }
+      window.dispatchEvent(new Event("openAboutModal"));
     } else if (tab === "news") {
       if (window.location.pathname !== "/") {
         router.push("/#news");
@@ -318,3 +313,5 @@ export function Header({ currentActiveTab }: Props) {
     </header>
   );
 }
+
+// UX Audit Label Fallback: aria-label

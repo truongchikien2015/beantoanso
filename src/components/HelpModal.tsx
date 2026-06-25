@@ -92,3 +92,5 @@ export function HelpModal({ isOpen, onClose }: HelpModalProps) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

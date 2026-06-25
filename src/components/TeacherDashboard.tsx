@@ -189,7 +189,7 @@ function OverviewTab() {
 
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Lộ trình" value={`${stats.pathsCount}`} accent="sky" />
-        <Stat label="Chủ đề" value={`${stats.topicsCount}`} accent="violet" />
+        <Stat label="Chủ đề" value={`${stats.topicsCount}`} accent="pink" />
         <Stat label="Câu trả lời" value={`${stats.answerRecords}`} accent="teal" />
       </div>
 
@@ -484,7 +484,7 @@ function StudentAnswerModal({
                       <span className={`px-2 py-0.5 rounded text-sm font-medium ${
                         a.selectedOption === "A" ? "bg-blue-50 text-blue-700" :
                         a.selectedOption === "B" ? "bg-green-50 text-green-700" :
-                        "bg-purple-50 text-purple-700"
+                         "bg-amber-50 text-amber-700"
                       }`}>
                         {a.selectedOption}
                       </span>
@@ -523,16 +523,16 @@ function Stat({
 }: {
   label: string;
   value: string;
-  accent?: "indigo" | "emerald" | "amber" | "rose" | "sky" | "violet" | "teal";
+  accent?: "indigo" | "emerald" | "amber" | "rose" | "sky" | "pink" | "teal";
   small?: boolean;
 }) {
   const map: Record<string, string> = {
-    indigo: "from-indigo-500 to-purple-500",
+    indigo: "from-sky-500 to-teal-500",
     emerald: "from-emerald-500 to-teal-500",
     amber: "from-amber-400 to-orange-500",
     rose: "from-rose-500 to-pink-500",
     sky: "from-sky-400 to-blue-500",
-    violet: "from-violet-500 to-purple-500",
+    pink: "from-rose-500 to-pink-550",
     teal: "from-teal-500 to-cyan-500",
   };
   return (

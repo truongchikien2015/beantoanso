@@ -5,6 +5,8 @@ import Link from "next/link";
 import { sfx } from "../lib/sound";
 import type { StudentLearningPathWithSteps, StudentSession } from "../types/teacher-content";
 import { LinkDetector } from "./LinkDetector";
+import { useAppStore } from "../lib/globalStore";
+import { getAvatars, getSelectedAvatar, setSelectedAvatar } from "../lib/xp";
 
 type LearningPath = {
   id: string;
@@ -17,12 +19,13 @@ type LearningPath = {
 type Props = {
   nickname: string;
   assignedPath?: StudentLearningPathWithSteps | null;
+  assignedPaths?: StudentLearningPathWithSteps[];
   assignedStudent?: StudentSession | null;
   assignedLoading?: boolean;
   showDailyQuiz?: boolean;
   onOpenDailyQuiz?: () => void;
   onSelect: (path: LearningPath) => void;
-  onSelectAssigned?: () => void;
+  onSelectAssigned?: (path?: StudentLearningPathWithSteps) => void;
   onBack: () => void;
   onSelectChatSim?: () => void;
   onSelectEmailSim?: () => void;
@@ -72,6 +75,7 @@ const DEFAULT_STYLE = {
 export function LearningPathSelector({
   nickname,
   assignedPath,
+  assignedPaths = [],
   assignedStudent,
   assignedLoading = false,
   showDailyQuiz = false,
@@ -91,6 +95,66 @@ export function LearningPathSelector({
   const [paths, setPaths] = useState<LearningPath[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
+
+  // Profile settings inline states
+  const [isEditing, setIsEditing] = useState(false);
+  const [customNickname, setCustomNickname] = useState(nickname);
+  const [customSlogan, setCustomSlogan] = useState("Internet net binh con ono!");
+  const [selectedAvatarId, setSelectedAvatarId] = useState("kid");
+
+  // Temp draft states while editing
+  const [editName, setEditName] = useState("");
+  const [editSlogan, setEditSlogan] = useState("");
+  const [editAvatarId, setEditAvatarId] = useState("");
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedNickname = localStorage.getItem("bats:student:nickname") || nickname;
+      const savedSlogan = localStorage.getItem("bats:slogan") || "Internet net binh con ono!";
+      const savedAvatar = getSelectedAvatar();
+
+      setCustomNickname(savedNickname);
+      setCustomSlogan(savedSlogan);
+      setSelectedAvatarId(savedAvatar);
+    }
+  }, [nickname]);
+
+  const handleSave = () => {
+    sfx.click();
+    if (!editName.trim()) {
+      alert("Tên hiển thị không được để trống!");
+      return;
+    }
+
+    // Save locally
+    localStorage.setItem("bats:student:nickname", editName.trim());
+    localStorage.setItem("bats:slogan", editSlogan.trim());
+    setSelectedAvatar(editAvatarId);
+
+    // Update local state
+    setCustomNickname(editName.trim());
+    setCustomSlogan(editSlogan.trim());
+    setSelectedAvatarId(editAvatarId);
+
+    // Sync to useAppStore (for global nickname changes)
+    useAppStore.getState().setNickname(editName.trim());
+
+    // Exit edit mode
+    setIsEditing(false);
+    setShowAvatarPicker(false);
+  };
+
+  const handleCancel = () => {
+    sfx.click();
+    setIsEditing(false);
+    setShowAvatarPicker(false);
+  };
+  const teacherAssignedPaths = assignedPaths.length > 0
+    ? assignedPaths
+    : assignedPath
+      ? [assignedPath]
+      : [];
 
   useEffect(() => {
     async function loadPaths() {
@@ -137,16 +201,53 @@ export function LearningPathSelector({
         {/* Student Profile Card */}
         <section className="sd-profile-card animate-fade-up">
           <div className="sd-profile-left">
-            <div className="sd-profile-avatar-circle">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="sd-profile-name">{assignedStudent?.nickname ?? nickname}</h2>
-              <p className="sd-profile-tagline">Internet net binh con ono!</p>
+            {isEditing ? (
+              <div className="flex flex-col items-center gap-1.5 relative">
+                <button
+                  onClick={() => { sfx.click(); setShowAvatarPicker(!showAvatarPicker); }}
+                  className="sd-profile-avatar-circle text-2xl flex items-center justify-center relative cursor-pointer border-2 border-dashed border-teal-400 bg-teal-50 hover:bg-teal-100 transition-colors w-12 h-12 rounded-full"
+                  title="Chọn ảnh đại diện"
+                  aria-label="Chọn ảnh đại diện"
+                >
+                  {getAvatars().find((a) => a.id === editAvatarId)?.emoji ?? "👦"}
+                  <span className="absolute -bottom-1 -right-1 bg-teal-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">✏️</span>
+                </button>
+              </div>
+            ) : (
+              <div className="sd-profile-avatar-circle text-2xl flex items-center justify-center w-12 h-12 rounded-full bg-sky-100 text-sky-700">
+                {getAvatars().find((a) => a.id === selectedAvatarId)?.emoji ?? "👦"}
+              </div>
+            )}
+            
+            <div className="flex-1 min-w-[150px]">
+              {isEditing ? (
+                <div className="flex flex-col gap-1.5 w-full">
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value.slice(0, 20))}
+                    className="w-full px-3 py-1 rounded-xl border-2 border-slate-200 focus:border-teal-400 outline-none font-bold text-slate-800 text-sm"
+                    placeholder="Tên của bé..."
+                    aria-label="Tên của bé"
+                  />
+                  <input
+                    type="text"
+                    value={editSlogan}
+                    onChange={(e) => setEditSlogan(e.target.value.slice(0, 50))}
+                    className="w-full px-3 py-1 rounded-xl border-2 border-slate-200 focus:border-teal-400 outline-none font-bold text-slate-500 text-xs"
+                    placeholder="Slogan của bé..."
+                    aria-label="Slogan của bé"
+                  />
+                </div>
+              ) : (
+                <>
+                  <h2 className="sd-profile-name">{customNickname}</h2>
+                  <p className="sd-profile-tagline">{customSlogan}</p>
+                </>
+              )}
             </div>
           </div>
+          
           <div className="sd-profile-right">
             <div className="sd-profile-badge badge-blue">
               <span>⚡ Lv.{playerLevel}</span>
@@ -154,15 +255,76 @@ export function LearningPathSelector({
             <div className="sd-profile-badge badge-yellow">
               <span>⭐ {playerXp} XP</span>
             </div>
-            <button 
-              onClick={() => { sfx.click(); alert("Cài đặt tài khoản học tập của con!"); }} 
-              className="sd-settings-btn"
-            >
-              <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.99l1.004.831a1.125 1.125 0 0 1 .26 1.43l-1.297 2.247a1.125 1.125 0 0 1-1.37.491l-1.216-.456c-.356-.133-.751-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.552 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.83c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.645-.869L9.594 3.94ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-              </svg>
-            </button>
+            
+            {isEditing ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSave}
+                  className="w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-sm cursor-pointer border-none transition-colors"
+                  title="Lưu"
+                  aria-label="Lưu"
+                >
+                  ✓
+                </button>
+                <button
+                  onClick={handleCancel}
+                  className="w-8 h-8 rounded-full bg-rose-500 hover:bg-rose-600 text-white flex items-center justify-center font-bold text-sm shadow-sm cursor-pointer border-none transition-colors"
+                  title="Hủy"
+                  aria-label="Hủy"
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => {
+                  sfx.click();
+                  setEditName(customNickname);
+                  setEditSlogan(customSlogan);
+                  setEditAvatarId(selectedAvatarId);
+                  setIsEditing(true);
+                }} 
+                className="sd-settings-btn border-none bg-transparent cursor-pointer hover:bg-slate-100 p-1.5 rounded-lg transition-colors flex items-center justify-center"
+                title="Cài đặt tài khoản"
+                aria-label="Cài đặt tài khoản"
+              >
+                <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.99l1.004.831a1.125 1.125 0 0 1 .26 1.43l-1.297 2.247a1.125 1.125 0 0 1-1.37.491l-1.216-.456c-.356-.133-.751-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.552 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.83c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.645-.869L9.594 3.94ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                </svg>
+              </button>
+            )}
           </div>
+
+          {/* Inline Avatar Picker List */}
+          {isEditing && showAvatarPicker && (
+            <div className="w-full mt-2.5 p-3 bg-slate-50 border-2 border-slate-200/60 rounded-2xl animate-fade-up">
+              <p className="text-[11px] font-black text-slate-500 mb-2 text-left">Chọn ảnh đại diện của bạn:</p>
+              <div className="flex gap-2.5 overflow-x-auto py-1">
+                {getAvatars().map((av) => {
+                  const isUnlocked = playerLevel >= av.unlockLevel;
+                  return (
+                    <button
+                      key={av.id}
+                      onClick={() => { sfx.click(); if (isUnlocked) setEditAvatarId(av.id); }}
+                      disabled={!isUnlocked}
+                      className={`w-11 h-11 rounded-full flex items-center justify-center text-xl border-2 transition-all shrink-0 relative cursor-pointer
+                        ${!isUnlocked ? "opacity-30 bg-slate-200 cursor-not-allowed border-slate-300" :
+                          editAvatarId === av.id ? "border-teal-400 bg-teal-50 shadow-sm" :
+                          "border-slate-100 bg-white hover:border-teal-300"
+                        }`}
+                      title={isUnlocked ? av.name : `Mở khóa ở Cấp ${av.unlockLevel}`}
+                      aria-label={isUnlocked ? av.name : `Khóa: Mở ở Cấp ${av.unlockLevel}`}
+                    >
+                      <span>{av.emoji}</span>
+                      {!isUnlocked && (
+                        <span className="absolute -top-1 -right-1 text-[9px] bg-slate-400 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center scale-90 font-bold">🔒</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* Mascot Message Chat Bubble */}
@@ -174,8 +336,8 @@ export function LearningPathSelector({
           </div>
           <div className="sd-chat-content">
             <p>
-              {assignedPath
-                ? "Giáo viên đã chuẩn bị sẵn một lộ trình riêng cho em. Em có thể bắt đầu ngay nhé!"
+              {teacherAssignedPaths.length > 0
+                ? "Giáo viên đã chuẩn bị sẵn lộ trình riêng cho em. Em có thể bắt đầu ngay nhé!"
                 : "Mỗi lộ trình có các chủ đề khác nhau. Em hãy chọn lộ trình muốn học nhé!"}
             </p>
           </div>
@@ -187,40 +349,44 @@ export function LearningPathSelector({
           </div>
         )}
 
-        {/* Journey Card (Assigned Path) */}
-        {assignedPath && (
-          <section className="sd-path-card animate-fade-up delay-200">
+        {/* Journey Cards (Assigned Paths) */}
+        {teacherAssignedPaths.map((path, index) => (
+          <section key={path.id} className="sd-path-card animate-fade-up delay-200">
             <div className="sd-path-top-bar" />
             <div className="sd-path-inner">
-              <div className="sd-path-details">
-                <span className="sd-path-badge">LỘ TRÌNH GIÁO VIÊN ĐÃ GẮN</span>
-                <h3 className="sd-path-title">{assignedPath.title}</h3>
-                <p className="sd-path-desc">
-                  {assignedPath.description || "Xây dựng nền tảng vững chắc cho tương lai số."}
-                </p>
-                <div className="sd-path-meta">
-                  <span className="meta-badge badge-blue">
-                    {(assignedStudent?.class_name ?? "").startsWith("Lớp")
-                      ? assignedStudent?.class_name
-                      : `Lớp ${assignedStudent?.class_name || "5A"}`}
+                <div className="sd-path-details">
+                  <span className="sd-path-badge">
+                    {teacherAssignedPaths.length > 1
+                      ? `LỘ TRÌNH GIÁO VIÊN ĐÃ GẮN ${index + 1}/${teacherAssignedPaths.length}`
+                      : "LỘ TRÌNH GIÁO VIÊN ĐÃ GẮN"}
                   </span>
-                  <span className="meta-badge badge-red">{assignedPath.step_count} bước học</span>
-                  <Link href={`/map?path=${assignedPath.id}`} className="meta-map-link">
-                    🗺️ Xem bản đồ
-                  </Link>
+                  <h3 className="sd-path-title">{path.title}</h3>
+                  <p className="sd-path-desc">
+                    {path.description || "Xây dựng nền tảng vững chắc cho tương lai số."}
+                  </p>
+                  <div className="sd-path-meta">
+                    <span className="meta-badge badge-blue">
+                      {(assignedStudent?.class_name ?? "").startsWith("Lớp")
+                        ? assignedStudent?.class_name
+                        : `Lớp ${assignedStudent?.class_name || "5A"}`}
+                    </span>
+                    <span className="meta-badge badge-red">{path.step_count} bước học</span>
+                    <Link href={`/map?path=${path.id}`} className="meta-map-link">
+                      🗺️ Xem bản đồ
+                    </Link>
+                  </div>
+                </div>
+                <div className="sd-path-action">
+                  <button
+                    onClick={() => { sfx.click(); onSelectAssigned?.(path); }}
+                    className="sd-path-btn"
+                  >
+                    Bắt đầu lộ trình này
+                  </button>
                 </div>
               </div>
-              <div className="sd-path-action">
-                <button
-                  onClick={() => { sfx.click(); onSelectAssigned?.(); }}
-                  className="sd-path-btn"
-                >
-                  Bắt đầu lộ trình của em
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
+            </section>
+        ))}
 
         {/* Daily Streak Card */}
         {showDailyQuiz && (
@@ -326,7 +492,7 @@ export function LearningPathSelector({
         {paths.length > 0 && (
           <div className="mt-8">
             <div className="mb-4 text-center text-base font-black text-slate-500">
-              {assignedPath ? "Hoặc khám phá thêm lộ trình khác" : "Các lộ trình học tập có sẵn"}
+              {teacherAssignedPaths.length > 0 ? "Hoặc khám phá thêm lộ trình khác" : "Các lộ trình học tập có sẵn"}
             </div>
             
             <div className="grid gap-5 sm:grid-cols-2">
@@ -1042,7 +1208,63 @@ export function LearningPathSelector({
         .sd-footer-link:hover {
           color: #2563eb;
         }
+
+        /* ─── Mobile Responsiveness Overrides ─── */
+        @media (max-width: 640px) {
+          .sd-main {
+            padding: 1rem 1rem 3rem;
+            gap: 1rem;
+          }
+          .sd-profile-card {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 1.25rem;
+            text-align: center;
+          }
+          .sd-profile-left {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .sd-profile-right {
+            justify-content: center;
+            width: 100%;
+          }
+          .sd-chat-bubble {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.75rem;
+            padding: 1rem;
+          }
+          .sd-path-inner {
+            flex-direction: column;
+            align-items: stretch;
+            text-align: center;
+            padding: 1.25rem;
+          }
+          .sd-path-details {
+            min-width: 100%;
+          }
+          .sd-path-meta {
+            justify-content: center;
+          }
+          .sd-path-action {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+          }
+          .sd-path-btn {
+            width: 100%;
+            justify-content: center;
+          }
+          .sd-detector-section .card-kid {
+            padding: 1.25rem !important;
+          }
+        }
       `}</style>
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

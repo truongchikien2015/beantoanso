@@ -134,7 +134,7 @@ export function ClassifyGame({ onBack }: { onBack: () => void }) {
         <div className="mt-6 text-center">
           <button
             onClick={reset}
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow font-bold hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow font-bold hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
             🔄 Chơi lại
           </button>

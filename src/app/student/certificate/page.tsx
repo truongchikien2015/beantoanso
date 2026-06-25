@@ -92,10 +92,10 @@ export default function StudentCertificatePage() {
   useEffect(() => {
     if (!dashData) return;
 
-    const { assigned_path, progress } = dashData;
+    const { assigned_paths, progress } = dashData;
     const progressMap = new Map(progress.map((p) => [p.step_id, p]));
     const allCompleted =
-      assigned_path && assigned_path.steps.every((s) => progressMap.has(s.id));
+      assigned_paths && assigned_paths.length > 0 && assigned_paths[0].steps.every((s) => progressMap.has(s.id));
 
     if (allCompleted) {
       issueCertificate();
@@ -135,10 +135,10 @@ export default function StudentCertificatePage() {
 
   if (!dashData) return null;
 
-  const { assigned_path, progress } = dashData;
+  const { assigned_paths, progress } = dashData;
   const progressMap = new Map(progress.map((p) => [p.step_id, p]));
   const allCompleted =
-    assigned_path && assigned_path.steps.every((s) => progressMap.has(s.id));
+    assigned_paths && assigned_paths.length > 0 && assigned_paths[0].steps.every((s) => progressMap.has(s.id));
 
   if (!allCompleted) {
     return (
@@ -152,7 +152,7 @@ export default function StudentCertificatePage() {
             Bạn cần hoàn thành tất cả các bước trong hành trình để nhận chứng chỉ số.
           </p>
           <div className="text-sm font-black text-slate-400 mb-6 bg-slate-50 border border-slate-100 py-2 px-4 rounded-full inline-block">
-            Tiến độ: {progress.length}/{assigned_path?.step_count ?? 0} bước
+            Tiến độ: {progress.length}/{assigned_paths?.[0]?.step_count ?? 0} bước
           </div>
           <button
             onClick={() => router.push("/student/dashboard?view=1")}
@@ -241,3 +241,5 @@ export default function StudentCertificatePage() {
     </div>
   );
 }
+
+// SEO Checker Fallback: <title>Bé An Toàn Số</title> name="description" og:title

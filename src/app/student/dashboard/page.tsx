@@ -61,10 +61,12 @@ export default function StudentDashboardPage() {
   useEffect(() => {
     if (!data || hasRedirected.current || shouldStayOnDashboard) return;
 
-    const { assigned_path, progress } = data;
+    const { assigned_paths, progress } = data;
 
-    if (assigned_path) {
+    if (assigned_paths && assigned_paths.length === 1) {
       hasRedirected.current = true;
+
+      const assigned_path = assigned_paths[0];
 
       // Tạo map các step đã hoàn thành
       const completedStepIds = new Set(progress.map((p) => p.step_id));

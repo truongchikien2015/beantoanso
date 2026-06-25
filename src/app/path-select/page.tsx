@@ -86,7 +86,7 @@ export default function PathSelectPage() {
     return null;
   }
 
-  const showStudentFeatures = !!studentData?.assigned_path || isSelfStudent;
+  const showStudentFeatures = !!(studentData?.assigned_paths && studentData.assigned_paths.length > 0) || isSelfStudent;
 
   const rewardXp = studentData?.stats?.total_xp ?? 0;
   const headerTotalScore = rewardXp || totalScore;
@@ -102,13 +102,14 @@ export default function PathSelectPage() {
     <>
       <LearningPathSelector
         nickname={studentData?.student.nickname ?? nickname}
-        assignedPath={studentData?.assigned_path ?? null}
+        assignedPath={(studentData?.assigned_paths && studentData.assigned_paths.length > 0) ? studentData.assigned_paths[0] : null}
+        assignedPaths={studentData?.assigned_paths ?? []}
         assignedStudent={studentData?.student ?? null}
         assignedLoading={studentLoading}
         showDailyQuiz={showStudentFeatures}
         onOpenDailyQuiz={() => router.push("/student/daily")}
         onSelect={handleSelectPath}
-        onSelectAssigned={() => router.push("/student/dashboard")}
+        onSelectAssigned={(path) => router.push(`/student/dashboard?view=1&path=${path?.id ?? ""}`)}
         onBack={() => router.push("/")}
         onSelectChatSim={() => router.push("/chat-sim")}
         onSelectEmailSim={() => router.push("/email-sim")}

@@ -289,3 +289,5 @@ export function ChatSimulation({ onBack, onComplete }: Props) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

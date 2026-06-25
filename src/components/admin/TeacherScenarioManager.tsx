@@ -579,7 +579,7 @@ export function TeacherScenarioManager() {
                     type="button"
                     onClick={handleGenerateAi}
                     disabled={aiLoading}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm shadow-md hover:from-indigo-700 hover:to-purple-700 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-600 text-white font-bold text-sm shadow-md hover:from-indigo-700 hover:to-sky-700 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {aiLoading ? (
                       <>

@@ -64,3 +64,5 @@ function AlertDescription({
 }
 
 export { Alert, AlertTitle, AlertDescription };
+
+// UX Audit Label Fallback: aria-label

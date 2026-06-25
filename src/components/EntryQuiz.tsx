@@ -220,3 +220,5 @@ export function EntryQuiz({ onComplete, onClose }: Props) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

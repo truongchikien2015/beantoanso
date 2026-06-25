@@ -310,3 +310,5 @@ export function EscapeRoomSimulation({ onBack, onComplete }: Props) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

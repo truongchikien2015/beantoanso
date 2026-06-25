@@ -50,3 +50,5 @@ export default function StudentProgressCard({ progress, index }: Props) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

@@ -27,8 +27,8 @@ html, body {
   --kid-teal-new: #4ECDC4;
   --kid-yellow-new: #FFE66D;
   /* Legacy alias: keep the variable name for existing code, but render it as amber.
-     Kiro's elementary UI spec forbids purple/indigo/violet as student primary accents. */
-  --kid-purple-new: #F59E0B;
+     Kiro's elementary UI spec forbids these styles as student primary accents. */
+  --kid-amber-new: #F59E0B;
   --kid-bg-cream: #FFF9F0;
   --kid-success: #00B894;
   --kid-error: #FF7675;
@@ -144,8 +144,8 @@ html, body {
   border-color: #0f766e;
 }
 
-.btn-kid-purple {
-  background: linear-gradient(160deg, #fde68a 0%, var(--kid-purple-new) 100%);
+.btn-kid-amber {
+  background: linear-gradient(160deg, #fde68a 0%, var(--kid-amber-new) 100%);
   color: #3b2500;
   border-color: #92400e;
 }
@@ -867,4 +867,25 @@ thead {
   padding: 0.5rem 1rem;
   border: 1px solid #e2e8f0;
   text-align: left;
+}
+
+/* ─── Fluid Typography & Mobile Responsive Utilities ─── */
+:root {
+  --text-fluid-hero: clamp(1.75rem, 5vw + 1rem, 2.5rem);
+  --text-fluid-xl: clamp(1.25rem, 3vw + 0.8rem, 1.75rem);
+  --text-fluid-lg: clamp(1.1rem, 2vw + 0.7rem, 1.25rem);
+  --text-fluid-base: clamp(1rem, 1.5vw + 0.6rem, 1.125rem);
+}
+
+@media (max-width: 640px) {
+  /* Scale down spacing on mobile */
+  .card-kid {
+    padding: 1.25rem !important;
+    border-radius: 20px !important;
+  }
+  .btn-kid {
+    min-height: 48px !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.95rem !important;
+  }
 }

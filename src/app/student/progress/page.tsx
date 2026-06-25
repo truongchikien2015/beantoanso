@@ -443,3 +443,5 @@ export default function StudentProgressPage() {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

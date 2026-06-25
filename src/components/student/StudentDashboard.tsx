@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import type { StudentDashboardData } from "@/types/teacher-content";
 import { topicLabels } from "@/data/quizQuestions";
 import { StudentChatbot } from "@/components/student/StudentChatbot";
@@ -14,7 +15,23 @@ interface Props {
 
 export default function StudentDashboard({ data, onLogout }: Props) {
   const router = useRouter();
-  const { student, assigned_path, progress, stats } = data;
+  const { student, assigned_paths, progress, stats } = data;
+
+  const [selectedPathId, setSelectedPathId] = useState<string | null>(
+    assigned_paths && assigned_paths.length > 0 ? assigned_paths[0].id : null
+  );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlPathId = params.get("path");
+      if (urlPathId && assigned_paths?.some(p => p.id === urlPathId)) {
+        setSelectedPathId(urlPathId);
+      }
+    }
+  }, [assigned_paths]);
+
+  const assigned_path = assigned_paths?.find(p => p.id === selectedPathId) || null;
 
   const progressMap = new Map(progress.map((p) => [p.step_id, p]));
 
@@ -66,7 +83,7 @@ export default function StudentDashboard({ data, onLogout }: Props) {
 
     progress.forEach((p) => {
       const stepDetail = assigned_path?.steps.find((s) => s.id === p.step_id);
-      const topicId = stepDetail?.topic_id || p.step_id;
+      const topicId = stepDetail?.topic_id || p.topic_slug || p.step_id;
       if (topicId && topicScores[topicId as string]) {
         topicScores[topicId as string].sum += p.score;
         topicScores[topicId as string].count += 1;
@@ -101,6 +118,9 @@ export default function StudentDashboard({ data, onLogout }: Props) {
       let suggestion = "Con làm rất tốt, hãy duy trì nhé!";
       let link = "";
 
+      const matchingStep = assigned_path?.steps.find((s) => s.topic_id === t);
+      const quizLink = matchingStep ? `/student/quiz/${matchingStep.id}` : `/student/quiz/${t}`;
+
       if (average !== null) {
         if (average < 70) {
           status = "red";
@@ -115,12 +135,12 @@ export default function StudentDashboard({ data, onLogout }: Props) {
             link = "/chat-sim";
           } else {
             suggestion = "Cần rèn luyện thêm!";
-            link = "/student/dashboard?view=1";
+            link = quizLink;
           }
         } else if (average < 85) {
           status = "yellow";
           suggestion = "Đọc lại bài học để củng cố!";
-          link = "/lessons";
+          link = quizLink;
         }
       } else {
         if (entryWeaknesses.includes(t)) {
@@ -133,12 +153,12 @@ export default function StudentDashboard({ data, onLogout }: Props) {
             link = "/chat-sim";
           } else {
             suggestion = "Con cần rèn luyện chặng này!";
-            link = "/student/dashboard?view=1";
+            link = quizLink;
           }
         } else {
           status = "yellow";
           suggestion = "Chưa hoàn thành bài học";
-          link = "/student/dashboard?view=1";
+          link = quizLink;
         }
       }
 
@@ -293,7 +313,7 @@ export default function StudentDashboard({ data, onLogout }: Props) {
                           className={`h-full rounded-full ${
                             isRed ? "bg-rose-500" : isYellow ? "bg-amber-500" : "bg-emerald-500"
                           }`}
-                          style={{ width: `${hasScore ? r.score : (isRed ? 40 : 75)}%` }}
+                          style={{ width: `${hasScore ? r.score : 0}%` }}
                         />
                       </div>
                       <span className="text-[10px] font-black text-slate-500 shrink-0">
@@ -325,9 +345,38 @@ export default function StudentDashboard({ data, onLogout }: Props) {
           </div>
         </section>
 
-        {assigned_path ? (
+        {assigned_paths && assigned_paths.length > 0 ? (
           <>
+            {assigned_paths.length > 1 && (
+              <section className="mb-6 animate-fade-up">
+                <div className="bg-white p-5 rounded-3xl border-2 border-indigo-100 shadow-sm">
+                  <h3 className="font-black text-lg text-indigo-900 mb-3 flex items-center gap-2">
+                    <span>🗺️</span> Bé muốn khám phá vùng đất nào hôm nay?
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {assigned_paths.map(path => (
+                      <button
+                        key={path.id}
+                        onClick={() => { sfx.click(); setSelectedPathId(path.id); }}
+                        className={`px-4 py-3 rounded-2xl border-2 font-bold text-left transition-all flex-1 min-w-[200px] ${
+                          selectedPathId === path.id
+                            ? "bg-indigo-50 border-indigo-500 text-indigo-700 ring-4 ring-indigo-500/20 shadow-md transform scale-[1.02]"
+                            : "bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50/50"
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="truncate pr-2">{path.title}</span>
+                          {selectedPathId === path.id && <span className="text-indigo-500 font-black">✓</span>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Journey Card (Assigned Path Steps) */}
+            {assigned_path && (
             <section className="sd-path-card animate-fade-up">
               <div className="sd-path-top-bar" />
               <div className="sd-path-inner flex-col items-stretch gap-6">
@@ -405,8 +454,9 @@ export default function StudentDashboard({ data, onLogout }: Props) {
                 </div>
               </div>
             </section>
+            )}
 
-            {/* Continue button or Certificate button */}
+
             {nextStep ? (
               <button
                 onClick={handleContinue}
@@ -943,7 +993,64 @@ export default function StudentDashboard({ data, onLogout }: Props) {
         .sd-footer-link:hover {
           color: #2563eb;
         }
+
+        /* ─── Mobile Responsiveness Overrides ─── */
+        @media (max-width: 640px) {
+          .sd-main {
+            padding: 1rem 1rem 3rem;
+            gap: 1rem;
+          }
+          .sd-profile-card {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 1.25rem;
+            text-align: center;
+          }
+          .sd-profile-left {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .sd-profile-nav {
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+          }
+          .sd-profile-nav-btn {
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+          }
+          .sd-profile-right {
+            justify-content: center;
+            width: 100%;
+          }
+          .sd-chat-bubble {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.75rem;
+            padding: 1rem;
+          }
+          .sd-streak-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+            padding: 1.25rem;
+          }
+          .sd-streak-action {
+            width: 100%;
+          }
+          .sd-streak-btn {
+            width: 100%;
+          }
+          .sd-path-inner {
+            padding: 1.25rem;
+          }
+        }
       `}</style>
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

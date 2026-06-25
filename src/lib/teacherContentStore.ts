@@ -66,7 +66,7 @@ interface TeacherContentState {
   // Students
   fetchStudents: () => Promise<void>;
   importStudents: (students: ImportStudentInput[]) => Promise<TeacherStudent[]>;
-  assignPathToStudent: (studentId: string, pathId: string) => Promise<void>;
+  assignPathToStudent: (studentId: string, pathIds: string[]) => Promise<void>;
   resetStudentPassword: (studentId: string, newPassword: string) => Promise<string | null>;
   deleteStudent: (id: string) => Promise<void>;
   fetchStudentProgress: (studentId: string) => Promise<TeacherStudentProgress[]>;
@@ -342,18 +342,33 @@ export const useTeacherContentStore = create<TeacherContentState>()(
           return null;
         }
         const created: TeacherLearningPathStep = await res.json();
-        set((s) => ({ pathSteps: [...s.pathSteps, created] }));
+        set((s) => ({
+          pathSteps: [...s.pathSteps, created],
+          learningPaths: s.learningPaths.map((lp) =>
+            lp.id === pathId ? { ...lp, step_count: (lp.step_count ?? 0) + 1 } : lp
+          ),
+        }));
         return created;
       },
 
       removePathStep: async (stepId) => {
+        const stepToRemove = get().pathSteps.find((st) => st.id === stepId);
         const res = await teacherFetch(`/api/teacher/steps/${stepId}`, { method: "DELETE" });
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
           set({ error: body.error || "Lỗi xóa bước" });
           return;
         }
-        set((s) => ({ pathSteps: s.pathSteps.filter((st) => st.id !== stepId) }));
+        set((s) => ({
+          pathSteps: s.pathSteps.filter((st) => st.id !== stepId),
+          learningPaths: stepToRemove
+            ? s.learningPaths.map((lp) =>
+                lp.id === stepToRemove.path_id
+                  ? { ...lp, step_count: Math.max(0, (lp.step_count ?? 0) - 1) }
+                  : lp
+              )
+            : s.learningPaths,
+        }));
       },
 
       reorderPathSteps: async (pathId, steps) => {
@@ -408,10 +423,10 @@ export const useTeacherContentStore = create<TeacherContentState>()(
     return imported;
   },
 
-  assignPathToStudent: async (studentId, pathId) => {
+  assignPathToStudent: async (studentId, pathIds) => {
     const res = await teacherFetch(`/api/teacher/students/${studentId}/assign`, {
       method: "POST",
-      body: JSON.stringify({ path_id: pathId }),
+      body: JSON.stringify({ path_ids: pathIds }),
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));

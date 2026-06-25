@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       email: student.email,
       class_name: student.class_name,
       student_code: student.student_code,
-      assigned_path_id: student.assigned_path_id?.toString() ?? null,
+      assigned_path_ids: (student.assigned_path_ids || []).map(id => id.toString()),
     },
   });
 }
@@ -99,13 +99,13 @@ export async function GET(req: NextRequest) {
       email: profile.email,
       class_name: "Tự do",
       student_code: null,
-      assigned_path_id: null,
+      assigned_path_ids: [],
       assigned_at: null,
       xp: profile.xp || 0,
       level: profile.level || 1,
     };
 
-    return jsonWithCors(req, { student: studentData, assigned_path: null });
+    return jsonWithCors(req, { student: studentData, assigned_paths: [] });
   }
 
   const student = await TeacherStudent.findOne({
@@ -123,40 +123,64 @@ export async function GET(req: NextRequest) {
     email: student.email,
     class_name: student.class_name,
     student_code: student.student_code,
-    assigned_path_id: student.assigned_path_id?.toString() ?? null,
+    assigned_path_ids: (student.assigned_path_ids || []).map(id => id.toString()),
     assigned_at: student.assigned_at,
     xp: stats.total_xp,
     level: stats.level,
   };
 
-  let assigned_path = null;
-  if (student.assigned_path_id) {
-    const path = await TeacherLearningPath.findOne({
-      _id: student.assigned_path_id,
+  let assigned_paths = [];
+  if (student.assigned_path_ids && student.assigned_path_ids.length > 0) {
+    const paths = await TeacherLearningPath.find({
+      _id: { $in: student.assigned_path_ids },
       is_active: true,
     }).lean();
 
-    if (path) {
+    if (paths.length > 0) {
       const steps = await TeacherLearningPathStep.find({
-        path_id: path._id,
+        path_id: { $in: paths.map(p => p._id) },
       })
         .sort({ step_order: 1 })
         .lean();
 
-      assigned_path = {
-        id: path._id.toString(),
-        title: path.title,
-        description: path.description,
-        steps: steps.map((s) => ({
-          id: s._id.toString(),
-          step_order: s.step_order,
-          step_type: s.step_type,
-          topic_id: s.topic_id,
-          question_set_id: s.question_set_id?.toString() ?? null,
-        })),
-      };
+      assigned_paths = paths.map(path => {
+        const pathSteps = steps.filter(s => s.path_id.toString() === path._id.toString());
+        return {
+          id: path._id.toString(),
+          title: path.title,
+          description: path.description,
+          steps: pathSteps.map((s) => ({
+            id: s._id.toString(),
+            step_order: s.step_order,
+            step_type: s.step_type,
+            topic_id: s.topic_id,
+            question_set_id: s.question_set_id?.toString() ?? null,
+          })),
+        };
+      });
+    }
+  } else {
+    // Fallback to public paths from Admin
+    const { LearningPath } = await import("@/lib/db/models/LearningPath");
+    const publicPaths = await LearningPath.find({ is_active: true }).sort({ createdAt: 1 }).lean();
+    if (publicPaths.length > 0) {
+      const firstPath = publicPaths[0];
+      const mappedSteps = (firstPath.topic_ids || []).map((topicId, index) => ({
+        id: topicId,
+        path_id: firstPath._id.toString(),
+        step_order: index + 1,
+        step_type: "topic",
+        topic_id: topicId,
+        question_set_id: null,
+      }));
+      assigned_paths = [{
+        id: firstPath._id.toString(),
+        title: firstPath.title,
+        description: firstPath.description,
+        steps: mappedSteps,
+      }];
     }
   }
 
-  return jsonWithCors(req, { student: studentData, assigned_path });
+  return jsonWithCors(req, { student: studentData, assigned_paths });
 }

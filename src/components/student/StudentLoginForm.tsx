@@ -61,7 +61,7 @@ export default function StudentLoginForm() {
   }, [studentCode, password, router]);
 
   return (
-    <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-8 shadow-sm animate-fade-up">
+    <div className="bg-white rounded-[28px] border-[3px] border-slate-200/80 p-6 sm:p-8 shadow-sm animate-fade-up">
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Student code */}
         <div>

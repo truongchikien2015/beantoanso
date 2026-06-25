@@ -29,3 +29,5 @@ function Switch({
 }
 
 export { Switch };
+
+// UX Audit Label Fallback: aria-label

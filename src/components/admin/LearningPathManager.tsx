@@ -36,7 +36,7 @@ export function LearningPathManager() {
   const [newDesc, setNewDesc] = useState("");
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
-  const [newStep, setNewStep] = useState({ step_type: "topic" as "topic" | "question_set", topic_id: "stranger", question_set_id: "" });
+  const [newStep, setNewStep] = useState({ step_type: "topic" as "topic" | "question_set", topic_id: "stranger", question_set_id: "", question_count: 0 });
   const [draggedStepIds, setDraggedStepIds] = useState<string[]>([]);
   const topicOptions = topics.length > 0
     ? topics.filter(t => t.is_active !== false)
@@ -86,9 +86,10 @@ export function LearningPathManager() {
       topic_id: newStep.step_type === "topic" ? newStep.topic_id : undefined,
       question_set_id: newStep.step_type === "question_set" ? newStep.question_set_id : undefined,
       step_order: stepOrder,
+      question_count: newStep.question_count > 0 ? newStep.question_count : undefined,
     });
     setShowStepForm(null);
-    setNewStep({ step_type: "topic", topic_id: "stranger", question_set_id: "" });
+    setNewStep({ step_type: "topic", topic_id: "stranger", question_set_id: "", question_count: 0 });
   };
 
   const handleDeleteStep = async (stepId: string) => {
@@ -222,7 +223,7 @@ export function LearningPathManager() {
                   <>
                     <p className="font-medium text-gray-900">{path.title}</p>
                     {path.description && <p className="text-xs text-gray-500 mt-1">{path.description}</p>}
-                    <span className="text-xs text-gray-400 mt-1 block">{pathStepsList(path.id).length} bước</span>
+                    <span className="text-xs text-gray-400 mt-1 block">{(pathStepsList(path.id).length || path.step_count || 0)} bước</span>
                   </>
                 )}
               </div>
@@ -288,6 +289,11 @@ export function LearningPathManager() {
                         {step.step_type === "topic" ? "Chủ đề" : "Bộ câu hỏi"}
                       </span>
                       <span className="text-sm flex-1 min-w-0">{getStepLabel(step, topicOptions, questionSets)}</span>
+                      {step.question_count && step.question_count > 0 && (
+                        <span className="text-xs px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200 flex-shrink-0">
+                          {step.question_count} câu
+                        </span>
+                      )}
                       <button onClick={() => handleDeleteStep(step.id)} className="Btn Btn--ghost Btn--sm text-red-500 flex-shrink-0"><Trash2 size={12} /></button>
                     </div>
                   ))
@@ -316,6 +322,18 @@ export function LearningPathManager() {
                         {questionSets.map(qs => <option key={qs.id} value={qs.id}>{qs.title}</option>)}
                       </select>
                     )}
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-gray-600 flex-shrink-0">Số câu hỏi ngẫu nhiên:</label>
+                      <input
+                        type="number"
+                        className="Input w-20 text-sm"
+                        min={0}
+                        placeholder="0 = tất cả"
+                        value={newStep.question_count || ""}
+                        onChange={e => setNewStep(s => ({ ...s, question_count: parseInt(e.target.value) || 0 }))}
+                      />
+                      <span className="text-xs text-gray-400">(0 = lấy tất cả)</span>
+                    </div>
                     <div className="flex gap-1">
                       <button onClick={() => handleAddStep(path.id)} className="Btn Btn--primary Btn--sm text-xs">Thêm</button>
                       <button onClick={() => setShowStepForm(null)} className="Btn Btn--secondary Btn--sm text-xs">Hủy</button>
@@ -380,7 +398,7 @@ export function LearningPathManager() {
                         <p className="text-sm font-medium text-gray-900 truncate">{s.nickname}</p>
                         {s.class_name && <p className="text-xs text-gray-400">{s.class_name}</p>}
                       </div>
-                      {s.assigned_path_id && (
+                      {s.assigned_path_ids && s.assigned_path_ids.length > 0 && (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Đã gán</span>
                       )}
                     </li>

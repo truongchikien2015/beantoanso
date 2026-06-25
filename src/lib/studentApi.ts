@@ -136,11 +136,13 @@ export async function submitStudentDailyQuiz(
 
 export async function fetchStudentSession(): Promise<{
   student: StudentSession & { gender?: string; birthYear?: number; xp?: number };
-  assigned_path: any;
+  assigned_paths: StudentDashboardData["assigned_paths"];
+  assigned_path?: StudentDashboardData["assigned_paths"][number] | null;
 }> {
   return studentFetch<{
     student: StudentSession & { gender?: string; birthYear?: number; xp?: number };
-    assigned_path: any;
+    assigned_paths: StudentDashboardData["assigned_paths"];
+    assigned_path?: StudentDashboardData["assigned_paths"][number] | null;
   }>("/api/student/login");
 }
 

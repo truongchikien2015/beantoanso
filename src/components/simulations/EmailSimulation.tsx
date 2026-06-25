@@ -229,3 +229,5 @@ export function EmailSimulation({ onBack, onComplete }: Props) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

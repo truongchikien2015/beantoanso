@@ -105,7 +105,7 @@ export function StudentChatbot() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-40 flex h-16 w-16 items-center justify-center rounded-[24px] border-[3px] border-white bg-gradient-to-br from-sky-400 via-indigo-400 to-teal-400 text-white shadow-[0_16px_32px_rgba(14,116,144,0.28)] transition hover:-translate-y-1 hover:rotate-2 focus:outline-none focus:ring-4 focus:ring-sky-200 sm:bottom-7 sm:right-7"
+        className="fixed bottom-5 right-5 z-40 flex h-16 w-16 items-center justify-center rounded-[24px] border-[3px] border-white bg-gradient-to-br from-sky-400 via-sky-500 to-teal-400 text-white shadow-[0_16px_32px_rgba(14,116,144,0.28)] transition hover:-translate-y-1 hover:rotate-2 focus:outline-none focus:ring-4 focus:ring-sky-200 sm:bottom-7 sm:right-7"
         aria-label="Mở trợ lý học tập"
       >
         <MessageCircle className="h-7 w-7" aria-hidden="true" />
@@ -129,11 +129,11 @@ export function StudentChatbot() {
           />
 
           <section className="relative w-full max-w-xl overflow-hidden rounded-[30px] border-[3px] border-white bg-[var(--kid-paper)] shadow-[0_28px_70px_rgba(15,23,42,0.25)]">
-            <div className="absolute left-0 top-0 h-2 w-full bg-gradient-to-r from-sky-300 via-indigo-300 to-teal-300" />
+            <div className="absolute left-0 top-0 h-2 w-full bg-gradient-to-r from-sky-300 via-sky-400 to-teal-300" />
             <div className="space-y-4 p-4 sm:p-5">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-b from-sky-400 to-indigo-500 text-2xl shadow-md">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-b from-sky-400 to-teal-500 text-2xl shadow-md">
                     🤖
                   </div>
                   <div>

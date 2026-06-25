@@ -12,6 +12,16 @@ import type { StudentStepContent } from "@/types/teacher-content";
 import { corsOptions, jsonWithCors, withCors } from "@/lib/cors";
 import mongoose from "mongoose";
 
+// Fisher-Yates shuffle for random question selection
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 function toObjectId(id: string): mongoose.Types.ObjectId {
   if (mongoose.Types.ObjectId.isValid(id)) {
     return new mongoose.Types.ObjectId(id);
@@ -100,18 +110,26 @@ export async function GET(
 
   // Verify student is assigned to this path
   const student = await TeacherStudent.findOne({ _id: studentObjectId, is_active: true })
-    .select("assigned_path_id created_by")
+    .select("assigned_path_ids created_by")
     .lean();
 
-  if (!student || student.assigned_path_id?.toString() !== step.path_id.toString()) {
+  if (!student || !(student.assigned_path_ids || []).map((id: any) => id.toString()).includes(step.path_id.toString())) {
     return jsonWithCors(req, { error: "Bạn không có quyền truy cập bước học này" }, { status: 403 });
+  }
+
+  let resolvedTopicId = step.topic_id;
+  if (step.step_type === "question_set" && step.question_set_id && !resolvedTopicId) {
+    const qset = await TeacherQuestionSet.findById(step.question_set_id).select("topic_id").lean();
+    if (qset) {
+      resolvedTopicId = qset.topic_id;
+    }
   }
 
   const result: StudentStepContent = {
     step_id: step._id.toString(),
     path_id: step.path_id.toString(),
     step_type: step.step_type,
-    topic_id: step.topic_id,
+    topic_id: resolvedTopicId,
     question_set_id: step.question_set_id?.toString() ?? null,
     step_order: step.step_order,
   };
@@ -130,14 +148,20 @@ export async function GET(
 
     const setIds = sets.map((set) => set._id);
     if (setIds.length > 0) {
-      const questions = await TeacherQuestion.find({
+      const allQuestions = await TeacherQuestion.find({
         set_id: { $in: setIds },
         is_active: true,
-      })
-        .limit(20)
-        .lean();
+      }).lean();
 
-      result.questions = questions.map((q) => ({
+      // Randomly select question_count questions if configured
+      const limit = step.question_count && step.question_count > 0
+        ? step.question_count
+        : allQuestions.length;
+      const selectedQuestions = limit < allQuestions.length
+        ? shuffleArray(allQuestions).slice(0, limit)
+        : shuffleArray(allQuestions);
+
+      result.questions = selectedQuestions.map((q) => ({
         id: q._id.toString(),
         set_id: q.set_id.toString(),
         question: q.question,
@@ -156,12 +180,20 @@ export async function GET(
   }
 
   if (step.step_type === "question_set" && step.question_set_id) {
-    const questions = await TeacherQuestion.find({
+    const allQuestions = await TeacherQuestion.find({
       set_id: step.question_set_id,
       is_active: true,
     }).lean();
 
-    result.questions = questions.map((q) => ({
+    // Randomly select question_count questions if configured
+    const limit = step.question_count && step.question_count > 0
+      ? step.question_count
+      : allQuestions.length;
+    const selectedQuestions = limit < allQuestions.length
+      ? shuffleArray(allQuestions).slice(0, limit)
+      : shuffleArray(allQuestions);
+
+    result.questions = selectedQuestions.map((q) => ({
       id: q._id.toString(),
       set_id: q.set_id.toString(),
       question: q.question,
@@ -175,7 +207,7 @@ export async function GET(
       created_at: q.created_at.toISOString(),
       updated_at: q.updated_at.toISOString(),
     }));
-    result.question_count = questions.length;
+    result.question_count = selectedQuestions.length;
   }
 
   return jsonWithCors(req, result);

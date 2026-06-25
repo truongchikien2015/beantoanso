@@ -9,6 +9,16 @@ import { PathManager } from "./PathManager";
 import { TeacherManager } from "./TeacherManager";
 import { FeedbackManager } from "./FeedbackManager";
 import { NewsManager } from "./NewsManager";
+import { SocialImpactDashboard } from "../SocialImpactDashboard";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 type AdminTab = "overview" | "questions" | "topics" | "paths" | "students" | "teachers" | "feedbacks" | "news" | "system";
 
@@ -27,9 +37,8 @@ const NAV = [
 export function AdminDashboard({ onBack }: { onBack: () => void }) {
   const [tab, setTab] = useState<AdminTab>("overview");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative" style={{ background: "#f0f9ff" }}>
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col lg:flex-row relative font-sans text-slate-800">
       {/* Backdrop for Mobile Sidebar */}
       {isSidebarOpen && (
         <div
@@ -38,154 +47,132 @@ export function AdminDashboard({ onBack }: { onBack: () => void }) {
         />
       )}
 
-      {/* ── Sidebar ── */}
+      {/* ── Sidebar - Light Mode ── */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-40 w-[240px] flex-shrink-0 flex flex-col overflow-hidden border-r-4 border-sky-200 transition-transform duration-300 lg:static lg:translate-x-0
+          fixed inset-y-0 left-0 z-40 w-64 bg-[#f0f4f8] flex-shrink-0 flex flex-col overflow-hidden border-r border-slate-200 transition-transform duration-300 lg:static lg:translate-x-0
           ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
-        style={{
-          background: "linear-gradient(180deg, #bae6fd 0%, #e0f2fe 100%)",
-        }}
       >
-        {/* Playful background bubbles */}
-        <div className="absolute top-4 left-4 w-12 h-12 rounded-full bg-white/40 pointer-events-none" />
-        <div className="absolute bottom-20 right-4 w-16 h-16 rounded-full bg-white/30 pointer-events-none" />
-
-        {/* Glow accent */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[6px]"
-          style={{ background: "linear-gradient(90deg, #38bdf8, #34d399, #fbbf24)" }}
-        />
-
-        {/* Header */}
-        <div className="relative z-10 px-5 py-6">
-          <div className="flex items-center gap-3 mb-1">
-            <div
-              className="w-10 h-10 rounded-2xl flex items-center justify-center text-white font-black text-[16px] flex-shrink-0"
-              style={{
-                background: "linear-gradient(135deg, #0ea5e9, #0d9488)",
-                boxShadow: "0 4px 10px rgba(14,165,233,0.3)",
-              }}
-            >
-              🤖
-            </div>
-            <div className="min-w-0">
-              <p className="text-sky-950 font-black text-[15px] leading-tight truncate">Bé An Toàn Số</p>
-              <p className="text-sky-600/80 font-bold text-[11px] mt-0.5">Vùng Đất Quản Trị 🏰</p>
-            </div>
+        <div className="pt-8 pb-6 px-4 flex flex-col items-center border-b border-slate-200/60 mb-4">
+          <div className="w-[72px] h-[72px] rounded-full bg-slate-200 overflow-hidden mb-3 border-4 border-white shadow-sm">
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Avatar" className="w-full h-full object-cover" />
           </div>
+          <h2 className="text-lg font-black text-[#0060ac]">Bé An Toàn Số</h2>
+          <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-0.5">Vùng Đất Quản Trị</p>
         </div>
 
-        {/* Nav */}
-        <nav className="relative z-10 flex-1 px-3">
-          <div className="space-y-1.5">
-            {NAV.map((item) => {
-              const active = tab === item.key;
-              return (
-                <button
-                  key={item.key}
-                  onClick={() => {
-                    setTab(item.key);
-                    setIsSidebarOpen(false); // Close sidebar on mobile select
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-[14px] font-extrabold transition-all duration-200 relative group"
-                  style={
-                    active
-                      ? {
-                          background: "#0284c7",
-                          color: "#fff",
-                          boxShadow: "0 4px 12px rgba(2,132,199,0.25)",
-                        }
-                      : {
-                          color: "#0369a1",
-                        }
-                  }
-                >
-                  <span className="text-[16px] flex-shrink-0">
-                    {item.icon}
-                  </span>
-                  <span className="truncate">{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+          {NAV.map((item) => {
+            const isActive = tab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => {
+                  setTab(item.key);
+                  setIsSidebarOpen(false); // Close sidebar on mobile select
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl transition-all ${
+                  isActive
+                    ? "bg-[#0060ac] text-white shadow-md shadow-blue-900/20"
+                    : "text-slate-500 hover:bg-white hover:text-[#0060ac] hover:shadow-sm"
+                }`}
+              >
+                <span className={`text-lg ${isActive ? "opacity-100" : "opacity-70 grayscale"}`}>{item.icon}</span>
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Footer */}
-        <div className="relative z-10 px-3 pb-6 space-y-2">
+        <div className="p-4 border-t border-slate-200/60 mt-auto space-y-1">
           <button
             onClick={onBack}
-            className="w-full flex items-center gap-3 px-4 py-2 rounded-2xl text-[13px] font-bold text-sky-700 hover:bg-white/50 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 hover:bg-white hover:text-[#0060ac] text-sm font-bold transition-all"
           >
-            <span className="text-[15px]">🏠</span>
-            <span className="truncate">Về trang chủ</span>
+            <span className="text-lg opacity-70 grayscale">🏠</span>
+            <span>Về trang chủ</span>
           </button>
           <button
             onClick={() => { Admin.logout(); onBack(); }}
-            className="w-full flex items-center gap-3 px-4 py-2 rounded-2xl text-[13px] font-bold text-rose-500 hover:bg-rose-50 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 text-sm font-bold transition-all"
           >
-            <span className="text-[15px]">🚪</span>
-            <span className="truncate">Đăng xuất</span>
+            <span className="text-lg opacity-70 grayscale">🚪</span>
+            <span>Đăng xuất</span>
           </button>
         </div>
       </aside>
 
-      {/* Mobile Top Header */}
-      <header className="lg:hidden flex items-center justify-between p-4 bg-white border-b-2 border-sky-100 sticky top-0 z-20 shadow-sm">
-        <button
-          onClick={() => setIsSidebarOpen(true)}
-          className="w-10 h-10 rounded-xl bg-sky-50 border-2 border-sky-200 flex items-center justify-center text-[20px] font-black text-sky-700 active:scale-95 transition-transform"
-        >
-          ☰
-        </button>
-        <div className="flex items-center gap-2">
-          <span className="text-xl">🏰</span>
-          <span className="text-sky-950 font-black text-base">Bé An Toàn Số</span>
-        </div>
-        <div className="w-10" /> {/* Visual spacer */}
-      </header>
+      {/* ── Main Content Area ── */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {/* Top Header */}
+        <header className="h-[72px] bg-white border-b border-slate-200 px-4 lg:px-8 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden w-10 h-10 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 active:scale-95 transition-transform"
+            >
+              ☰
+            </button>
+            <span className="text-slate-600 font-bold text-sm hidden sm:block">Chào Quản trị viên!</span>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#0060ac] hover:bg-[#005090] text-white rounded-lg text-xs font-bold transition shadow-sm">
+              <span>⚙️</span>
+              <span>Hệ thống trực tiếp</span>
+            </button>
+            <button className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition relative">
+              <span className="text-xl">🔔</span>
+              <span className="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+            </button>
+            <button className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition overflow-hidden shadow-sm">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin" alt="Avatar" className="w-full h-full object-cover" />
+            </button>
+          </div>
+        </header>
 
-      {/* ── Main Content ── */}
-      <main className="flex-1 overflow-auto min-h-screen min-w-0 w-full">
-        {tab === "overview" && <OverviewTab />}
-        {tab === "questions" && (
-          <AdminContentShell>
-            <AdminQuestions onLogout={() => {}} onHome={onBack} />
-          </AdminContentShell>
-        )}
-        {tab === "topics" && (
-          <AdminContentShell>
-            <TopicManager onLogout={() => {}} onHome={onBack} />
-          </AdminContentShell>
-        )}
-        {tab === "paths" && (
-          <AdminContentShell>
-            <PathManager onLogout={() => {}} onHome={onBack} />
-          </AdminContentShell>
-        )}
-        {tab === "students" && <StudentsTab />}
-        {tab === "teachers" && (
-          <AdminContentShell wide>
-            <TeacherManager onLogout={() => {}} onHome={onBack} />
-          </AdminContentShell>
-        )}
-        {tab === "feedbacks" && (
-          <AdminContentShell>
-            <FeedbackManager onHome={onBack} />
-          </AdminContentShell>
-        )}
-        {tab === "news" && (
-          <AdminContentShell wide>
-            <NewsManager onHome={onBack} />
-          </AdminContentShell>
-        )}
-        {tab === "system" && (
-          <AdminContentShell>
-            <SystemTab />
-          </AdminContentShell>
-        )}
-      </main>
+        {/* Content View */}
+        <main className="flex-1 overflow-auto">
+          {tab === "overview" && <OverviewTab />}
+          {tab === "questions" && (
+            <AdminContentShell>
+              <AdminQuestions onLogout={() => {}} onHome={onBack} />
+            </AdminContentShell>
+          )}
+          {tab === "topics" && (
+            <AdminContentShell>
+              <TopicManager onLogout={() => {}} onHome={onBack} />
+            </AdminContentShell>
+          )}
+          {tab === "paths" && (
+            <AdminContentShell>
+              <PathManager onLogout={() => {}} onHome={onBack} />
+            </AdminContentShell>
+          )}
+          {tab === "students" && <StudentsTab />}
+          {tab === "teachers" && (
+            <AdminContentShell wide>
+              <TeacherManager onLogout={() => {}} onHome={onBack} />
+            </AdminContentShell>
+          )}
+          {tab === "feedbacks" && (
+            <AdminContentShell>
+              <FeedbackManager onHome={onBack} />
+            </AdminContentShell>
+          )}
+          {tab === "news" && (
+            <AdminContentShell wide>
+              <NewsManager onHome={onBack} />
+            </AdminContentShell>
+          )}
+          {tab === "system" && (
+            <AdminContentShell>
+              <SystemTab />
+            </AdminContentShell>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
@@ -213,6 +200,7 @@ function OverviewTab() {
   const answers = StudentAnswers.list();
   const [dbPaths, setDbPaths] = useState<any[]>([]);
   const [dbTopicsCount, setDbTopicsCount] = useState(0);
+  const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">("week");
 
   useEffect(() => {
     const adminPassword = Admin.getPassword();
@@ -263,101 +251,260 @@ function OverviewTab() {
     return Object.values(questionsByTopic).reduce((a, b) => a + b, 0) || 1;
   }, [questionsByTopic]);
 
+  const CHART_DATA = useMemo(() => {
+    const data = [];
+    const now = new Date();
+    
+    if (timeRange === "day") {
+      // Nhóm theo giờ trong ngày hôm nay
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      for (let i = 0; i <= 24; i += 2) {
+        const hourStart = new Date(startOfDay.getTime() + i * 60 * 60 * 1000);
+        const hourEnd = new Date(startOfDay.getTime() + (i + 2) * 60 * 60 * 1000);
+        
+        const active = results.filter(r => {
+          const d = new Date(r.completed_at);
+          return d >= hourStart && d < hourEnd;
+        }).length;
+        
+        const ans = answers.filter(a => {
+          const d = new Date(a.timestamp);
+          return d >= hourStart && d < hourEnd;
+        }).length;
+        
+        data.push({ name: `${i}:00`, active, answers: ans });
+      }
+    } else if (timeRange === "week") {
+      // Nhóm theo thứ trong tuần hiện tại
+      const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay(); // 1=T2, ..., 7=CN
+      const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1);
+      
+      const days = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+      for (let i = 0; i < 7; i++) {
+        const dayStart = new Date(startOfWeek.getTime() + i * 24 * 60 * 60 * 1000);
+        const dayEnd = new Date(startOfWeek.getTime() + (i + 1) * 24 * 60 * 60 * 1000);
+        
+        const active = results.filter(r => {
+          const d = new Date(r.completed_at);
+          return d >= dayStart && d < dayEnd;
+        }).length;
+        
+        const ans = answers.filter(a => {
+          const d = new Date(a.timestamp);
+          return d >= dayStart && d < dayEnd;
+        }).length;
+        
+        data.push({ name: days[i], active, answers: ans });
+      }
+    } else if (timeRange === "month") {
+      // Nhóm theo tuần trong tháng
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      for (let i = 0; i < 4; i++) {
+        const weekStart = new Date(startOfMonth.getTime() + i * 7 * 24 * 60 * 60 * 1000);
+        const weekEnd = new Date(startOfMonth.getTime() + (i + 1) * 7 * 24 * 60 * 60 * 1000);
+        
+        const active = results.filter(r => {
+          const d = new Date(r.completed_at);
+          return d >= weekStart && d < weekEnd;
+        }).length;
+        
+        const ans = answers.filter(a => {
+          const d = new Date(a.timestamp);
+          return d >= weekStart && d < weekEnd;
+        }).length;
+        
+        data.push({ name: `Tuần ${i + 1}`, active, answers: ans });
+      }
+    } else {
+      // Nhóm theo tháng trong năm
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const months = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"];
+      for (let i = 0; i < 12; i++) {
+        const monthStart = new Date(startOfYear.getFullYear(), i, 1);
+        const monthEnd = new Date(startOfYear.getFullYear(), i + 1, 1);
+        
+        const active = results.filter(r => {
+          const d = new Date(r.completed_at);
+          return d >= monthStart && d < monthEnd;
+        }).length;
+        
+        const ans = answers.filter(a => {
+          const d = new Date(a.timestamp);
+          return d >= monthStart && d < monthEnd;
+        }).length;
+        
+        data.push({ name: months[i], active, answers: ans });
+      }
+    }
+    return data;
+  }, [timeRange, results, answers]);
+
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
       {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-3xl border-4 border-sky-100 shadow-sm">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-sky-950 flex items-center gap-2">
-            Chào các thầy cô! 👋
-          </h1>
-          <p className="text-sky-600/90 font-bold text-sm sm:text-base mt-1">
-            Cùng theo dõi tiến trình học tập của các bé trên mạng nhé!
-          </p>
-        </div>
-        <div
-          className="px-4 py-2 rounded-2xl text-xs sm:text-sm font-black shadow-sm align-self-start sm:align-self-auto border-2 border-sky-100"
-          style={{ background: "#e0f2fe", color: "#0369a1" }}
-        >
-          ● Dữ liệu trực tiếp
-        </div>
+      <div>
+        <h1 className="text-3xl font-black text-slate-800 tracking-tight">Báo cáo Tổng hợp</h1>
+        <p className="text-slate-500 font-medium text-sm mt-1.5">
+          Theo dõi tiến trình học tập của toàn hệ thống trong tuần này.
+        </p>
       </div>
 
-      {/* Stat grid 1 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <StatCard label="Tổng lượt học" value={stats.attempts} icon="🏆" accent="#0284c7" bg="#e0f2fe" />
-        <StatCard label="Số bé tham gia" value={stats.players} icon="🧒" accent="#10b981" bg="#d1fae5" />
-        <StatCard label="Điểm trung bình" value={stats.avg} icon="🌟" accent="#f59e0b" bg="#fef3c7" />
-        <StatCard
-          label="Bé xuất sắc nhất"
-          value={stats.topPlayer}
-          subtitle={`Điểm cao: ${stats.topScore}`}
-          icon="🎓" accent="#f43f5e" bg="#ffe4e6"
-        />
-      </div>
-
-      {/* Stat grid 2 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <StatCard label="Câu hỏi sẵn sàng" value={`${stats.active} / ${stats.total}`} icon="❓" accent="#0ea5e9" bg="#e0f2fe" />
-        <StatCard label="Lộ trình hoạt động" value={stats.pathsActive} icon="🗺️" accent="#0d9488" bg="#ccfbf1" />
-        <StatCard label="Chủ đề an toàn" value={stats.topicsCount} icon="📚" accent="#f97316" bg="#ffedd5" />
-        <StatCard label="Câu trả lời" value={stats.answers} icon="💬" accent="#10b981" bg="#d1fae5" />
-      </div>
-
-      {/* Questions by topic */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border-4 border-sky-100 shadow-sm">
-        <div className="mb-4">
-          <h2 className="text-lg sm:text-xl font-black text-sky-950">📊 Câu hỏi theo chủ đề</h2>
-        </div>
-        <div className="space-y-4">
-          {Object.entries(questionsByTopic).map(([k, v]) => {
-            const total = totalActiveQuestions;
-            const pct = Math.round((v / total) * 100);
-            return (
-              <div key={k} className="flex items-center gap-3 sm:gap-4">
-                <span className="w-28 sm:w-40 text-xs sm:text-sm font-bold text-sky-900 truncate">
-                  {topicLabels[k as keyof typeof topicLabels] ?? k}
-                </span>
-                <div className="flex-1 h-3 rounded-full overflow-hidden bg-slate-100 border border-slate-200">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${pct}%`, background: "linear-gradient(90deg, #0ea5e9, #0d9488)" }}
-                  />
-                </div>
-                <span className="text-xs sm:text-sm font-bold text-sky-600 w-8 text-right">{v}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Learning paths */}
-      {dbPaths.length > 0 && (
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border-4 border-sky-100 shadow-sm">
-          <div className="mb-4">
-            <h2 className="text-lg sm:text-xl font-black text-sky-950">🗺️ Lộ trình học tập của bé</h2>
+      {/* 3 Top Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {/* Metric 1 */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-12 h-12 bg-indigo-50 rounded-[16px] flex items-center justify-center text-indigo-500 text-xl">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <span className="bg-sky-50 text-sky-600 font-bold text-[11px] px-2.5 py-1 rounded-md">📈 +25%</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {dbPaths.filter((p: any) => p.is_active).map((p: any) => (
+          <div>
+            <span className="text-4xl font-black text-slate-800 block mb-1">{stats.players}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Bé đã tham gia</span>
+          </div>
+        </div>
+
+        {/* Metric 2 */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-12 h-12 bg-blue-50 rounded-[16px] flex items-center justify-center text-blue-500 text-xl">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            </div>
+          </div>
+          <div>
+            <span className="text-4xl font-black text-slate-800 block mb-1">{stats.attempts}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Lượt học hoàn thành</span>
+          </div>
+        </div>
+
+        {/* Metric 3 */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <div className="w-12 h-12 bg-emerald-50 rounded-[16px] flex items-center justify-center text-emerald-500 text-xl">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <span className="bg-emerald-50 text-emerald-600 font-bold text-[11px] px-2.5 py-1 rounded-md">🌟</span>
+          </div>
+          <div>
+            <span className="text-4xl font-black text-slate-800 block mb-1">{stats.avg}</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Điểm trung bình</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Chart Section */}
+      <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 relative overflow-hidden">
+         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+            <div>
+              <h2 className="text-lg sm:text-xl font-black text-slate-800 tracking-tight">📈 Lưu lượng & Tương tác</h2>
+              <p className="text-xs text-slate-500 font-medium mt-1">Dữ liệu phân tích hành vi người dùng</p>
+            </div>
+            <div className="flex bg-slate-50 p-1 rounded-[16px] border border-slate-100">
+               {["day", "week", "month", "year"].map(r => (
+                 <button 
+                    key={r} 
+                    onClick={() => setTimeRange(r as any)} 
+                    className={`px-4 py-2 rounded-[12px] text-xs font-bold transition-all ${timeRange === r ? "bg-white text-indigo-600 shadow-sm border border-slate-100" : "text-slate-500 hover:text-slate-700 hover:bg-slate-100/50"}`}
+                 >
+                    {r === "day" ? "Ngày" : r === "week" ? "Tuần" : r === "month" ? "Tháng" : "Năm"}
+                 </button>
+               ))}
+            </div>
+         </div>
+         <div className="h-[280px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+               <AreaChart data={CHART_DATA} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                 <defs>
+                   <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
+                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.15}/>
+                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                   </linearGradient>
+                   <linearGradient id="colorAnswers" x1="0" y1="0" x2="0" y2="1">
+                     <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.15}/>
+                     <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                   </linearGradient>
+                 </defs>
+                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f8fafc" />
+                 <XAxis dataKey="name" tick={{fontSize: 12, fill: '#94a3b8', fontWeight: 600}} tickLine={false} axisLine={false} tickMargin={12} />
+                 <YAxis tick={{fontSize: 12, fill: '#94a3b8', fontWeight: 600}} tickLine={false} axisLine={false} />
+                 <RechartsTooltip 
+                   contentStyle={{ borderRadius: '16px', border: '1px solid #f1f5f9', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', fontWeight: 700 }} 
+                   itemStyle={{ fontWeight: 700 }}
+                 />
+                 <Area type="monotone" dataKey="active" name="Học sinh Active" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorActive)" />
+                 <Area type="monotone" dataKey="answers" name="Bài tập hoàn thành" stroke="#14b8a6" strokeWidth={3} fillOpacity={1} fill="url(#colorAnswers)" />
+               </AreaChart>
+            </ResponsiveContainer>
+         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* Questions by topic */}
+        <div className="bg-white rounded-[24px] p-6 sm:p-7 shadow-sm border border-slate-100 flex flex-col">
+          <div className="mb-6 flex justify-between items-end">
+            <h2 className="text-lg sm:text-xl font-black text-slate-800 tracking-tight">📚 Câu hỏi theo chủ đề</h2>
+            <div className="text-indigo-600 font-bold text-xs bg-indigo-50 px-3 py-1.5 rounded-[12px]">{stats.active} tổng số</div>
+          </div>
+          <div className="space-y-5 flex-1">
+            {Object.entries(questionsByTopic).map(([k, v]) => {
+              const total = totalActiveQuestions;
+              const pct = Math.round((v / total) * 100);
+              return (
+                <div key={k}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-bold text-slate-700">
+                      {topicLabels[k as keyof typeof topicLabels] ?? k}
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">{v} câu ({pct}%)</span>
+                  </div>
+                  <div className="w-full h-2.5 rounded-full overflow-hidden bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-indigo-500 transition-all duration-700"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* System Health / Learning paths */}
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border-4 border-emerald-100 shadow-sm flex flex-col">
+          <div className="mb-6">
+            <h2 className="text-lg sm:text-xl font-black text-emerald-950">🗺️ Trạng thái Hệ thống</h2>
+            <p className="text-xs text-emerald-600/80 font-bold mt-1">Các lộ trình học tập đang hoạt động</p>
+          </div>
+          <div className="flex-1 space-y-3">
+            {dbPaths.length > 0 ? dbPaths.filter((p: any) => p.is_active).slice(0,4).map((p: any) => (
               <div
                 key={p.id}
-                className="flex items-center justify-between p-4 sm:p-5 rounded-2xl border-2 border-sky-100 bg-sky-50/50"
+                className="flex items-center justify-between p-4 rounded-2xl border-2 border-emerald-100 bg-emerald-50/50"
               >
                 <div>
-                  <p className="font-extrabold text-sky-950 text-sm sm:text-base">{p.title}</p>
-                  <p className="text-sky-600/80 font-semibold text-[11px] sm:text-xs mt-1">{p.description || "Không có mô tả"}</p>
+                  <p className="font-black text-emerald-950 text-sm">{p.title}</p>
                 </div>
                 <span
-                  className="px-2.5 py-1 rounded-xl text-[11px] font-black flex-shrink-0 ml-2"
-                  style={{ background: "#bae6fd", color: "#0369a1" }}
+                  className="px-3 py-1.5 rounded-xl text-[11px] font-black flex-shrink-0 ml-2"
+                  style={{ background: "#d1fae5", color: "#065f46" }}
                 >
                   {(p.topic_ids || []).length} chủ đề
                 </span>
               </div>
-            ))}
+            )) : (
+               <div className="p-8 text-center text-emerald-700 font-bold text-sm bg-emerald-50 rounded-2xl border-2 border-dashed border-emerald-200">
+                  Hệ thống đang sẵn sàng, chờ tạo lộ trình đầu tiên.
+               </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Social Impact Dashboard Integration */}
+      <div className="pt-8 mt-8 border-t-4 border-slate-100">
+        <SocialImpactDashboard />
+      </div>
     </div>
   );
 }

@@ -113,7 +113,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
   let created = 0;
   if (validQuestions.length > 0) {
     const docs = validQuestions.map((q) => ({
-      question_set_id: toObjectId(q.set_id),
+      set_id: toObjectId(q.set_id),
       question: q.question,
       option_a: q.option_a,
       option_b: q.option_b,

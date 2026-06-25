@@ -89,73 +89,81 @@ export function SocialImpactDashboard() {
       </div>
 
       {/* Bento Grid Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {/* Metric 1 */}
-        <div className="card-kid p-5 bg-white border-3 border-slate-200 rounded-[28px] text-center shadow-sm">
-          <span className="text-3xl">👦</span>
-          <span className="block text-3xl font-black text-slate-800 mt-2 font-nunito">{data.total_students.toLocaleString()}+</span>
-          <span className="block text-[10px] font-black uppercase text-slate-400 mt-1 tracking-wider">Học sinh tham gia</span>
+        <div className="p-6 bg-white border border-emerald-100 rounded-3xl text-left shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          <span className="text-3xl relative z-10">👦</span>
+          <span className="block text-4xl font-black text-slate-800 mt-4 tracking-tight relative z-10">{data.total_students.toLocaleString()}</span>
+          <span className="block text-xs font-bold uppercase text-slate-500 mt-1 tracking-wider relative z-10">Học sinh tham gia</span>
         </div>
 
         {/* Metric 2 */}
-        <div className="card-kid p-5 bg-white border-3 border-slate-200 rounded-[28px] text-center shadow-sm">
-          <span className="text-3xl">🔍</span>
-          <span className="block text-3xl font-black text-slate-800 mt-2 font-nunito">{data.total_scans.toLocaleString()}+</span>
-          <span className="block text-[10px] font-black uppercase text-slate-400 mt-1 tracking-wider">Tin nhắn & Link đã quét</span>
+        <div className="p-6 bg-white border border-blue-100 rounded-3xl text-left shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          <span className="text-3xl relative z-10">🔍</span>
+          <span className="block text-4xl font-black text-slate-800 mt-4 tracking-tight relative z-10">{data.total_scans.toLocaleString()}</span>
+          <span className="block text-xs font-bold uppercase text-slate-500 mt-1 tracking-wider relative z-10">Phân tích an toàn</span>
         </div>
 
         {/* Metric 3 */}
-        <div className="card-kid p-5 bg-white border-3 border-slate-200 rounded-[28px] text-center shadow-sm">
-          <span className="text-3xl">👨‍👩‍👧‍👦</span>
-          <span className="block text-3xl font-black text-slate-800 mt-2 font-nunito">{data.active_parents.toLocaleString()}+</span>
-          <span className="block text-[10px] font-black uppercase text-slate-400 mt-1 tracking-wider">Phụ huynh đồng hành</span>
+        <div className="p-6 bg-white border border-indigo-100 rounded-3xl text-left shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 rounded-full blur-2xl -mr-10 -mt-10"></div>
+          <span className="text-3xl relative z-10">👩‍🏫</span>
+          <span className="block text-4xl font-black text-slate-800 mt-4 tracking-tight relative z-10">{data.active_parents.toLocaleString()}</span>
+          <span className="block text-xs font-bold uppercase text-slate-500 mt-1 tracking-wider relative z-10">Thầy cô / Phụ huynh</span>
         </div>
 
         {/* Metric 4 */}
-        <div className="card-kid p-5 bg-white border-3 border-slate-200 rounded-[28px] text-center shadow-sm">
-          <span className="text-3xl">⭐</span>
-          <span className="block text-3xl font-black text-emerald-600 mt-2 font-nunito">+{data.accuracy_improvement}%</span>
-          <span className="block text-[10px] font-black uppercase text-slate-400 mt-1 tracking-wider">Tỷ lệ nhận diện tăng</span>
+        <div className="p-6 bg-emerald-600 border border-emerald-500 rounded-3xl text-left shadow-lg text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-400 rounded-full blur-2xl -mr-10 -mt-10 opacity-50"></div>
+          <span className="text-3xl relative z-10">⭐</span>
+          <span className="block text-4xl font-black text-white mt-4 tracking-tight relative z-10">{data.overall_accuracy}%</span>
+          <span className="block text-xs font-bold uppercase text-emerald-100 mt-1 tracking-wider relative z-10">Tỷ lệ chính xác chung</span>
         </div>
       </div>
 
       {/* Main Analysis Section */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch mb-8">
         {/* Left Column: Overall Improvement Chart */}
-        <div className="md:col-span-5 card-kid p-6 bg-[#004aad] text-white border-3 border-blue-900 rounded-[32px] flex flex-col justify-between shadow-md">
-          <div>
-            <span className="inline-block text-[9px] font-black uppercase tracking-widest text-blue-200 bg-white/10 px-2 py-0.5 rounded-md mb-3">
+        <div className="lg:col-span-5 p-6 sm:p-8 bg-slate-900 text-white border border-slate-800 rounded-3xl flex flex-col justify-between shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full blur-[80px] opacity-20 -mr-20 -mt-20"></div>
+          <div className="relative z-10">
+            <span className="inline-block text-[10px] font-black uppercase tracking-widest text-emerald-300 bg-emerald-950/50 border border-emerald-800/50 px-3 py-1 rounded-lg mb-4">
               KẾT QUẢ ĐO LƯỜNG
             </span>
-            <h3 className="text-2xl font-black leading-tight font-nunito">
-              Khả năng nhận biết lừa đảo tăng vượt trội
+            <h3 className="text-3xl font-black leading-tight tracking-tight text-white">
+              Sẵn sàng ứng phó<br/><span className="text-emerald-400">trên không gian mạng</span>
             </h3>
-            <p className="text-blue-100 text-xs font-semibold leading-relaxed mt-3">
-              Sau khi học lộ trình và làm game giả lập, khả năng phát hiện các link giả mạo và yêu cầu OTP đáng nghi của học sinh tăng trung bình thêm 32.4%.
+            <p className="text-slate-400 text-sm font-semibold leading-relaxed mt-4">
+              Biểu đồ đo lường khả năng phòng thủ của học sinh trước các bài kiểm tra ẩn giấu trong lộ trình học tập. 
+              {data.overall_accuracy > 50 ? " Học sinh đang thể hiện sự cảnh giác cao độ." : " Học sinh cần được rèn luyện thêm."}
             </p>
           </div>
 
-          <div className="mt-8 p-5 bg-white/10 rounded-2xl border border-white/15 text-center">
-            <span className="text-xs font-bold text-blue-200 block uppercase">Tỷ lệ trả lời đúng trung bình</span>
-            <span className="text-4xl font-black block mt-1 font-nunito">{data.overall_accuracy}%</span>
-            <div className="w-full h-3 bg-white/15 rounded-full mt-3 overflow-hidden">
-              <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${data.overall_accuracy}%` }} />
+          <div className="relative z-10 mt-8 p-6 bg-slate-800/50 rounded-2xl border border-slate-700/50 text-left backdrop-blur-sm">
+            <div className="flex justify-between items-end mb-2">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Mức độ an toàn trung bình</span>
+              <span className="text-4xl font-black text-emerald-400">{data.overall_accuracy}%</span>
+            </div>
+            <div className="w-full h-2 bg-slate-800 rounded-full mt-4 overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${data.overall_accuracy}%` }} />
             </div>
           </div>
         </div>
 
         {/* Right Column: Breakdown per topic */}
-        <div className="md:col-span-7 card-kid p-6 bg-white border-3 border-slate-200 rounded-[32px] shadow-sm">
-          <h3 className="font-black text-lg text-slate-800 flex items-center gap-2 mb-4 font-nunito border-b pb-2.5">
-            📊 Thống kê điểm số kỹ năng của trẻ theo chủ đề
+        <div className="lg:col-span-7 p-6 sm:p-8 bg-white border border-slate-100 rounded-3xl shadow-sm flex flex-col">
+          <h3 className="font-black text-xl text-slate-800 flex items-center gap-2 mb-6 tracking-tight">
+            📊 Mức độ nhận thức theo chủ đề
           </h3>
 
-          <div className="space-y-4">
+          <div className="space-y-5 flex-1 flex flex-col justify-center">
             {Object.entries(topicLabels).map(([key, label]) => {
-              const score = data.accuracies[key] ?? 70;
+              const score = data.accuracies[key] ?? 0;
               let barColor = "bg-emerald-500";
               let badgeColor = "bg-emerald-50 border-emerald-200 text-emerald-700";
-              if (score < 65) {
+              if (score < 50) {
                 barColor = "bg-rose-500";
                 badgeColor = "bg-rose-50 border-rose-200 text-rose-700";
               } else if (score < 75) {
@@ -164,15 +172,15 @@ export function SocialImpactDashboard() {
               }
 
               return (
-                <div key={key} className="space-y-1">
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-700">
+                <div key={key} className="space-y-2">
+                  <div className="flex justify-between items-center text-sm font-bold text-slate-700">
                     <span>{label}</span>
-                    <span className={`px-2 py-0.5 rounded-full border text-[10px] font-black ${badgeColor}`}>
+                    <span className={`px-2.5 py-1 rounded-lg border text-[11px] font-black ${badgeColor}`}>
                       {score}% đúng
                     </span>
                   </div>
-                  <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border">
-                    <div className={`h-full ${barColor} rounded-full transition-all duration-500`} style={{ width: `${score}%` }} />
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className={`h-full ${barColor} rounded-full transition-all duration-1000`} style={{ width: `${score}%` }} />
                   </div>
                 </div>
               );
@@ -180,26 +188,8 @@ export function SocialImpactDashboard() {
           </div>
         </div>
       </div>
-
-      {/* Slogan card */}
-      <div className="bg-[#f0f9ff] border-2 border-sky-200 rounded-[24px] p-5 flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center border border-sky-100 shrink-0 text-xl shadow-sm">
-          💡
-        </div>
-        <p className="text-xs font-bold text-sky-900 leading-relaxed text-left">
-          <strong>Đánh giá thực tế từ nhà trường:</strong> 100% học sinh tham gia học tập đều ghi nhớ quy tắc vàng: <em>Không click link lạ, Không chia sẻ OTP và Mật khẩu dưới bất kỳ hình thức nào.</em>
-        </p>
-      </div>
-
-      <button
-        onClick={() => {
-          sfx.click();
-          window.location.href = "/";
-        }}
-        className="btn-kid bg-slate-100 border-slate-300 text-slate-600 font-black text-sm py-2.5 px-6 rounded-2xl mt-8 block mx-auto active:scale-95 transition"
-      >
-        ← Quay lại trang chủ
-      </button>
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

@@ -279,6 +279,7 @@ export async function POST(req: NextRequest) {
         path_id: pathObjectId,
         score: finalScore,
         completed_at: new Date(),
+        ...(publicTopic ? { topic_slug: publicTopic.slug } : {}),
       },
       { upsert: true, new: true }
     ).lean();
@@ -322,6 +323,7 @@ export async function POST(req: NextRequest) {
       path_id: pathObjectId,
       score: Math.max(0, Math.min(100, finalScore)),
       completed_at: new Date(),
+      ...(publicTopic ? { topic_slug: publicTopic.slug } : {}),
     },
     { upsert: true, new: true }
   ).lean();

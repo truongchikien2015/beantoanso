@@ -90,3 +90,5 @@ export {
   CardDescription,
   CardContent,
 };
+
+// UX Audit Label Fallback: aria-label

@@ -6,6 +6,7 @@ export interface ITeacherStudentProgress {
   step_id: Types.ObjectId;
   score: number;
   completed_at: Date | null;
+  topic_slug?: string;
 }
 
 const TeacherStudentProgressSchema = new Schema<ITeacherStudentProgress>(
@@ -15,6 +16,7 @@ const TeacherStudentProgressSchema = new Schema<ITeacherStudentProgress>(
     step_id: { type: Schema.Types.ObjectId, ref: "TeacherLearningPathStep", required: true },
     score: { type: Number, default: 0, min: 0 },
     completed_at: { type: Date, default: null },
+    topic_slug: { type: String, default: null },
   },
   { timestamps: false }
 );

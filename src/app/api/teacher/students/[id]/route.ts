@@ -41,7 +41,7 @@ export async function GET(req: NextRequest, context: RouteContext) {
     class_name: student.class_name,
     student_code: student.student_code,
     parent_access_code: student.parent_access_code ?? null,
-    assigned_path_id: student.assigned_path_id?.toString() ?? null,
+    assigned_path_ids: (student.assigned_path_ids || []).map(id => id.toString()),
     assigned_at: student.assigned_at,
     is_active: student.is_active,
     created_at: student.created_at,

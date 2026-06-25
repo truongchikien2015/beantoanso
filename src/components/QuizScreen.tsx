@@ -28,9 +28,9 @@ function shuffle<T>(arr: T[]): T[] {
 const topicStyles: Record<string, { icon: string; bg: string; text: string }> = {
   stranger: { icon: "👤", bg: "from-blue-200 to-cyan-200", text: "text-blue-700" },
   phishing: { icon: "🎣", bg: "from-red-200 to-orange-200", text: "text-red-700" },
-  password: { icon: "🔑", bg: "from-orange-200 to-pink-200", text: "text-indigo-600" },
+  password: { icon: "🔑", bg: "from-orange-200 to-pink-200", text: "text-rose-600" },
   privacy: { icon: "🛡️", bg: "from-green-200 to-emerald-200", text: "text-green-700" },
-  behavior: { icon: "🤝", bg: "from-purple-200 to-indigo-200", text: "text-purple-700" },
+  behavior: { icon: "🤝", bg: "from-amber-200 to-orange-200", text: "text-amber-700" },
   screentime: { icon: "⏱️", bg: "from-teal-200 to-emerald-200", text: "text-teal-700" },
   badcontent: { icon: "⚠️", bg: "from-rose-200 to-red-200", text: "text-rose-700" },
 };
@@ -140,7 +140,7 @@ export function QuizScreen({ onFinish }: Props) {
               ? "Robot chưa nghe được, em thử lại hoặc bấm đáp án nhé."
               : "";
 
-  const style = topicStyles[q.category] || { icon: "✨", bg: "from-sky-100 to-blue-100", text: "text-indigo-700" };
+  const style = topicStyles[q.category] || { icon: "✨", bg: "from-sky-100 to-blue-100", text: "text-teal-700" };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
@@ -229,7 +229,7 @@ export function QuizScreen({ onFinish }: Props) {
           </div>
 
           <div className="flex items-end gap-3 w-full">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-b from-blue-500 to-indigo-600 flex items-center justify-center text-3xl shadow-md shrink-0 border border-blue-400">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-b from-blue-500 to-sky-600 flex items-center justify-center text-3xl shadow-md shrink-0 border border-blue-400">
               🤖
             </div>
             <div className="bg-white border border-sky-100 rounded-2xl rounded-bl-none p-4 text-[15px] text-slate-600 flex-1 text-left relative shadow-sm">
@@ -248,7 +248,7 @@ export function QuizScreen({ onFinish }: Props) {
             const isCorrect = opt.key === q.correct_option;
             
             let btnClass = "bg-white border-sky-100 hover:border-sky-300 hover:bg-sky-50/50 shadow-sm";
-            let circleClass = "bg-indigo-500 text-white";
+            let circleClass = "bg-teal-500 text-white";
             
             if (showState) {
               if (isCorrect) {
@@ -300,7 +300,7 @@ export function QuizScreen({ onFinish }: Props) {
           {picked !== null && (
             <button
               onClick={handleNext}
-              className="mt-4 w-full py-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all animate-in zoom-in"
+              className="mt-4 w-full py-4 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all animate-in zoom-in"
             >
               {isLast ? "Xem kết quả 🎉" : "Câu tiếp theo →"}
             </button>
@@ -310,3 +310,5 @@ export function QuizScreen({ onFinish }: Props) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

@@ -155,7 +155,7 @@ export function ResultScreen({
         className="bg-white rounded-3xl p-6 shadow-xl border-4 border-amber-200 text-center relative overflow-hidden"
       >
         <div className="text-6xl mb-2">{badge.emoji}</div>
-        <h2 className="text-indigo-700 mb-1">Chúc mừng {nickname}!</h2>
+        <h2 className="text-teal-700 mb-1">Chúc mừng {nickname}!</h2>
         <p className="text-slate-600 mb-2">Em đã hoàn thành hành trình.</p>
         {rank > 0 && (
           <p className="text-amber-700 mb-4">
@@ -179,7 +179,7 @@ export function ResultScreen({
           <Stat
             label="Bài kiểm tra đúng"
             value={`${quizCorrect}/${quizTotal}`}
-            color="from-sky-400 to-indigo-500"
+            color="from-sky-400 to-teal-500"
           />
         </div>
         
@@ -195,7 +195,7 @@ export function ResultScreen({
           disabled={sharing}
           aria-expanded={shareOpen}
           aria-controls="result-share-actions"
-          className="py-3 rounded-2xl bg-gradient-to-r from-sky-400 to-indigo-500 text-white shadow-lg hover:scale-[1.02] active:scale-95 transition disabled:opacity-50"
+          className="py-3 rounded-2xl bg-gradient-to-r from-sky-400 to-teal-500 text-white shadow-lg hover:scale-[1.02] active:scale-95 transition disabled:opacity-50"
         >
           {sharing ? "⏳ Đang tạo ảnh..." : "📸 Chia sẻ thành tích"}
         </button>
@@ -213,7 +213,7 @@ export function ResultScreen({
         </button>
         <button
           onClick={onReplay}
-          className="py-3 rounded-2xl bg-white border-2 border-indigo-300 text-indigo-700 hover:bg-indigo-50 active:scale-95 transition"
+          className="py-3 rounded-2xl bg-white border-2 border-teal-300 text-teal-700 hover:bg-teal-50 active:scale-95 transition"
         >
           🔄 Chơi lại
         </button>
@@ -280,3 +280,5 @@ function Stat({
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label

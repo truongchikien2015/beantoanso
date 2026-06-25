@@ -43,6 +43,7 @@ export interface TeacherLearningPath {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  step_count?: number;
 }
 
 export type LearningPathStepType = "topic" | "question_set";
@@ -54,6 +55,7 @@ export interface TeacherLearningPathStep {
   step_type: LearningPathStepType;
   topic_id: string | null;
   question_set_id: string | null;
+  question_count?: number;
 }
 
 export interface TeacherStudent {
@@ -65,7 +67,7 @@ export interface TeacherStudent {
   student_code: string;
   parent_access_code: string | null;
   password_hash: string;
-  assigned_path_id: string | null;
+  assigned_path_ids: string[];
   assigned_at: string | null;
   is_active: boolean;
   created_at: string;
@@ -79,6 +81,7 @@ export interface TeacherStudentProgress {
   step_id: string;
   score: number;
   completed_at: string | null;
+  topic_slug?: string | null;
 }
 
 export interface StudentRewardStats {
@@ -149,6 +152,7 @@ export interface CreatePathStepInput {
   step_type: LearningPathStepType;
   topic_id?: string;
   question_set_id?: string;
+  question_count?: number;
 }
 
 export interface ReorderStepsInput {
@@ -320,13 +324,13 @@ export interface StudentSession {
   email: string | null;
   class_name: string | null;
   student_code: string;
-  assigned_path_id: string | null;
+  assigned_path_ids: string[];
   parent_access_code?: string | null;
 }
 
 export interface StudentDashboardData {
   student: StudentSession;
-  assigned_path: StudentLearningPathWithSteps | null;
+  assigned_paths: StudentLearningPathWithSteps[];
   progress: TeacherStudentProgress[];
   stats: StudentRewardStats;
 }

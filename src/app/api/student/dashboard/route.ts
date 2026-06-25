@@ -5,6 +5,7 @@ import { TeacherStudent } from "@/lib/db/models/TeacherStudent";
 import { TeacherLearningPath } from "@/lib/db/models/TeacherLearningPath";
 import { TeacherLearningPathStep } from "@/lib/db/models/TeacherLearningPathStep";
 import { TeacherStudentProgress } from "@/lib/db/models/TeacherStudentProgress";
+import { TeacherQuestionSet } from "@/lib/db/models/TeacherQuestionSet";
 import { Profile } from "@/lib/db/models/Profile";
 import { getAnyStudentId } from "@/lib/auth-helpers";
 import { ensureStudentStats } from "@/lib/server/studentRewards";
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
     const { LearningPath } = await import("@/lib/db/models/LearningPath");
     const publicPaths = await LearningPath.find({ is_active: true }).sort({ createdAt: 1 }).lean();
     
-    let assigned_path: any = null;
+    let assigned_paths: any[] = [];
     if (publicPaths.length > 0) {
       const firstPath = publicPaths[0];
       const mappedSteps = (firstPath.topic_ids || []).map((topicId, index) => ({
@@ -43,13 +44,13 @@ export async function GET(req: NextRequest) {
         question_set_id: null,
       }));
       
-      assigned_path = {
+      assigned_paths = [{
         id: firstPath._id.toString(),
         title: firstPath.title,
         description: firstPath.description,
         steps: mappedSteps,
         step_count: mappedSteps.length,
-      };
+      }];
     }
 
     // Get progress for self-registered student
@@ -57,13 +58,14 @@ export async function GET(req: NextRequest) {
       student_id: studentId,
     }).lean();
 
-    const mappedProgress = progress.map((p) => ({
+    const mappedProgress = progress.map((p: any) => ({
       id: p._id.toString(),
       student_id: p.student_id.toString(),
       path_id: p.path_id.toString(),
       step_id: p.step_id.toString(),
       score: p.score,
       completed_at: p.completed_at,
+      topic_slug: p.topic_slug || null,
     }));
 
     return jsonWithCors(req, {
@@ -73,9 +75,9 @@ export async function GET(req: NextRequest) {
         email: null,
         class_name: "Tự do",
         student_code: "",
-        assigned_path_id: assigned_path?.id ?? null,
+        assigned_path_ids: assigned_paths.map(p => p.id),
       },
-      assigned_path,
+      assigned_paths,
       progress: mappedProgress,
       stats,
     });
@@ -83,7 +85,7 @@ export async function GET(req: NextRequest) {
 
   // Get student info
   const student = await TeacherStudent.findOne({ _id: studentId, is_active: true })
-    .select("nickname email class_name student_code assigned_path_id parent_access_code")
+    .select("nickname email class_name student_code assigned_path_ids parent_access_code")
     .lean();
 
   if (!student) {
@@ -96,79 +98,137 @@ export async function GET(req: NextRequest) {
     email: student.email,
     class_name: student.class_name,
     student_code: student.student_code,
-    assigned_path_id: student.assigned_path_id?.toString() ?? null,
+    assigned_path_ids: (student.assigned_path_ids || []).map((id: any) => id.toString()),
     parent_access_code: student.parent_access_code || null,
   };
 
-  // No assigned path → return empty
-  if (!student.assigned_path_id) {
+  // No assigned path → fallback to public paths from Admin
+  if (!student.assigned_path_ids || student.assigned_path_ids.length === 0) {
+    const { LearningPath } = await import("@/lib/db/models/LearningPath");
+    const publicPaths = await LearningPath.find({ is_active: true }).sort({ createdAt: 1 }).lean();
+    
+    let assigned_paths: any[] = [];
+    if (publicPaths.length > 0) {
+      const firstPath = publicPaths[0];
+      const mappedSteps = (firstPath.topic_ids || []).map((topicId, index) => ({
+        id: topicId, // Use topicId directly as step_id for self-learning
+        path_id: firstPath._id.toString(),
+        step_order: index + 1,
+        step_type: "topic",
+        topic_id: topicId,
+        question_set_id: null,
+      }));
+      
+      assigned_paths = [{
+        id: firstPath._id.toString(),
+        title: firstPath.title,
+        description: firstPath.description,
+        steps: mappedSteps,
+        step_count: mappedSteps.length,
+      }];
+    }
+
+    const progress = await TeacherStudentProgress.find({
+      student_id: studentId,
+    }).lean();
+
+    const mappedProgress = progress.map((p: any) => ({
+      id: p._id.toString(),
+      student_id: p.student_id.toString(),
+      path_id: p.path_id.toString(),
+      step_id: p.step_id.toString(),
+      score: p.score,
+      completed_at: p.completed_at,
+      topic_slug: p.topic_slug || null,
+    }));
+
     return jsonWithCors(req, {
       student: studentData,
-      assigned_path: null,
-      progress: [],
+      assigned_paths,
+      progress: mappedProgress,
       stats,
     });
   }
 
-  // Get assigned path
-  const path = await TeacherLearningPath.findOne({
-    _id: student.assigned_path_id,
+  // Get assigned paths
+  const paths = await TeacherLearningPath.find({
+    _id: { $in: student.assigned_path_ids },
     is_active: true,
   })
     .select("title description created_at")
     .lean();
 
-  if (!path) {
+  if (paths.length === 0) {
     return jsonWithCors(req, {
       student: studentData,
-      assigned_path: null,
+      assigned_paths: [],
       progress: [],
       stats,
     });
   }
 
-  // Get steps in order
-  const steps = await TeacherLearningPathStep.find({ path_id: path._id })
+  // Get all steps for all paths
+  const steps = await TeacherLearningPathStep.find({ path_id: { $in: paths.map(p => p._id) } })
     .sort({ step_order: 1 })
     .select("path_id step_order step_type topic_id question_set_id")
     .lean();
 
-  const mappedSteps = steps.map((s) => ({
-    id: s._id.toString(),
-    path_id: s.path_id.toString(),
-    step_order: s.step_order,
-    step_type: s.step_type,
-    topic_id: s.topic_id,
-    question_set_id: s.question_set_id?.toString() ?? null,
-  }));
+  // Fetch all referenced question sets to get their topic_ids for question_set step types
+  const qSetIds = steps
+    .filter((s) => s.step_type === "question_set" && s.question_set_id)
+    .map((s) => s.question_set_id);
 
-  // Get progress for this student + path
-  const progress = await TeacherStudentProgress.find({
-    student_id: studentId,
-    path_id: path._id,
-  })
-    .select("student_id path_id step_id score completed_at")
+  const questionSets = await TeacherQuestionSet.find({ _id: { $in: qSetIds } })
+    .select("_id topic_id")
     .lean();
 
-  const mappedProgress = progress.map((p) => ({
+  const qSetTopicMap = new Map<string, string>(
+    questionSets.map((qs) => [qs._id.toString(), qs.topic_id])
+  );
+
+  const assigned_paths = paths.map(path => {
+    const pathSteps = steps.filter(s => s.path_id.toString() === path._id.toString()).map(s => {
+      const qsetTopic = s.question_set_id ? qSetTopicMap.get(s.question_set_id.toString()) : null;
+      return {
+        id: s._id.toString(),
+        path_id: s.path_id.toString(),
+        step_order: s.step_order,
+        step_type: s.step_type,
+        topic_id: s.topic_id || qsetTopic || null,
+        question_set_id: s.question_set_id?.toString() ?? null,
+      };
+    });
+    
+    return {
+      id: path._id.toString(),
+      title: path.title,
+      description: path.description,
+      created_at: path.created_at,
+      steps: pathSteps,
+      step_count: pathSteps.length,
+    };
+  });
+
+  // Get progress for this student (all paths including public)
+  const progress = await TeacherStudentProgress.find({
+    student_id: studentId,
+  })
+    .select("student_id path_id step_id score completed_at topic_slug")
+    .lean();
+
+  const mappedProgress = progress.map((p: any) => ({
     id: p._id.toString(),
     student_id: p.student_id.toString(),
     path_id: p.path_id.toString(),
     step_id: p.step_id.toString(),
     score: p.score,
     completed_at: p.completed_at,
+    topic_slug: p.topic_slug || null,
   }));
 
   return jsonWithCors(req, {
     student: studentData,
-    assigned_path: {
-      id: path._id.toString(),
-      title: path.title,
-      description: path.description,
-      created_at: path.created_at,
-      steps: mappedSteps,
-      step_count: mappedSteps.length,
-    },
+    assigned_paths,
     progress: mappedProgress,
     stats,
   });

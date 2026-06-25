@@ -59,10 +59,10 @@ const COLOR_BG: Record<string, string> = {
   rose: "bg-rose-100 text-rose-700",
   amber: "bg-amber-100 text-amber-700",
   sky: "bg-sky-100 text-sky-700",
-  violet: "bg-violet-100 text-violet-700",
+  pink: "bg-pink-100 text-pink-700",
   teal: "bg-teal-100 text-teal-700",
   orange: "bg-orange-100 text-orange-700",
-  fuchsia: "bg-fuchsia-100 text-fuchsia-700",
+  blue: "bg-blue-100 text-blue-700",
   cyan: "bg-cyan-100 text-cyan-700",
 };
 

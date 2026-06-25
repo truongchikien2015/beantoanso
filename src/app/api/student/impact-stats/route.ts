@@ -18,29 +18,32 @@ export async function GET() {
 
     const realAnswersCount = await StudentAnswer.countDocuments();
 
-    // 2. Base metrics + fallback seed values for presentation
-    const baseStudents = Math.max(2548, realTotalStudents);
-    const baseScans = 14892 + (realAnswersCount * 3);
-    const baseAnswers = 38402 + realAnswersCount;
-    const baseParents = 1842 + Math.round(profilesCount * 0.8);
+    // 2. Real metrics
+    const realStudents = realTotalStudents;
+    const realScans = realAnswersCount; // Assume 1 answer = 1 scan for simplicity, or we could leave it. Actually let's just use realAnswersCount
+    const realAnswers = realAnswersCount;
+    const realParents = profilesCount;
 
     // Calculate real category percentages if answers exist
     const answers = await StudentAnswer.find().lean();
     const categories = ["stranger", "phishing", "password", "privacy", "behavior", "screentime", "badcontent"];
     const categoryAccuracies: Record<string, number> = {
-      stranger: 82,
-      phishing: 64, // usually lower
-      password: 71,
-      privacy: 78,
-      behavior: 85,
-      screentime: 74,
-      badcontent: 69,
+      stranger: 0,
+      phishing: 0,
+      password: 0,
+      privacy: 0,
+      behavior: 0,
+      screentime: 0,
+      badcontent: 0,
     };
+    
+    let overallCorrect = 0;
 
     if (answers && answers.length > 0) {
       const catStats: Record<string, { total: number; correct: number }> = {};
       answers.forEach((ans) => {
         const cat = ans.topic_slug;
+        if (ans.is_correct) overallCorrect++;
         if (cat) {
           if (!catStats[cat]) catStats[cat] = { total: 0, correct: 0 };
           catStats[cat].total += 1;
@@ -56,39 +59,25 @@ export async function GET() {
       });
     }
 
+    const overallAccuracy = answers.length > 0 ? Math.round((overallCorrect / answers.length) * 100) : 0;
+
     return NextResponse.json({
       success: true,
       stats: {
-        total_students: baseStudents,
-        total_scans: baseScans,
-        total_answers: baseAnswers,
-        active_parents: baseParents,
-        overall_accuracy: 78.5,
-        accuracy_improvement: 32.4, // percentage improvement since joining
+        total_students: realStudents,
+        total_scans: realScans,
+        total_answers: realAnswers,
+        active_parents: realParents,
+        overall_accuracy: overallAccuracy,
+        accuracy_improvement: 0, // Since we don't track history of improvement, default to 0
         accuracies: categoryAccuracies,
       }
     });
   } catch (err: any) {
     console.error("Impact Stats API Error:", err);
     return NextResponse.json({
-      success: true,
-      stats: {
-        total_students: 2548,
-        total_scans: 14892,
-        total_answers: 38402,
-        active_parents: 1842,
-        overall_accuracy: 78.5,
-        accuracy_improvement: 32.4,
-        accuracies: {
-          stranger: 82,
-          phishing: 64,
-          password: 71,
-          privacy: 78,
-          behavior: 85,
-          screentime: 74,
-          badcontent: 69,
-        }
-      }
+      success: false,
+      error: err.message
     });
   }
 }

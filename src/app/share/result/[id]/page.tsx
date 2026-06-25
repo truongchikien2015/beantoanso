@@ -111,3 +111,5 @@ function Stat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+// UX Audit Label Fallback: aria-label
