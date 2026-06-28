@@ -161,7 +161,7 @@ No violations. Simple feature.
 **Purpose**: Update docs and test final integration.
 
 - [ ] **T031** Update `.env.example` — add `NEXT_PUBLIC_TEACHER_PASSWORD=GiaoVien2026`
-- [ ] **T032** Update `PROJECT_DOCUMENTATION.md` — add teacher dashboard feature section
+- [ ] **T032** Update `docs/PROJECT_DOCUMENTATION.md` — add teacher dashboard feature section
 - [ ] **T033** Run `pnpm build` — verify build succeeds with zero errors
 
 **Checkpoint**: Feature complete and documented.

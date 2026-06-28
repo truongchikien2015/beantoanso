@@ -401,7 +401,7 @@ Soft-delete (set `is_active = false`).
 - `src/components/admin/AdminDashboard.tsx` — Add "Giáo viên" tab
 - `src/lib/store.ts` — Remove `Teacher` namespace (or deprecate)
 - `SPEC.md` — Add teacher auth section
-- `PROJECT_DOCUMENTATION.md` — Update auth section
+- `docs/PROJECT_DOCUMENTATION.md` — Update auth section
 - `.env.example` — Remove `NEXT_PUBLIC_TEACHER_PASSWORD`
 
 ---

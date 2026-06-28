@@ -241,11 +241,11 @@ Update section 6 (Authentication Mechanisms) to reflect new teacher auth.
 
 **Files**: `SPEC.md` (MODIFY)
 
-#### Task 14: Update PROJECT_DOCUMENTATION.md
+#### Task 14: Update docs/PROJECT_DOCUMENTATION.md
 
 Update teacher authentication section.
 
-**Files**: `PROJECT_DOCUMENTATION.md` (MODIFY)
+**Files**: `docs/PROJECT_DOCUMENTATION.md` (MODIFY)
 
 #### Task 15: Run build
 
@@ -276,7 +276,7 @@ Fix any TypeScript errors.
 | 4 | Remove old Teacher namespace | src/lib/store.ts | ⬜ |
 | 4 | Update .env.example | .env.example | ⬜ |
 | 4 | Update SPEC.md | SPEC.md | ⬜ |
-| 4 | Update PROJECT_DOCUMENTATION.md | PROJECT_DOCUMENTATION.md | ⬜ |
+| 4 | Update docs/PROJECT_DOCUMENTATION.md | docs/PROJECT_DOCUMENTATION.md | ⬜ |
 | 4 | Run build | — | ⬜ |
 
 **Total: 15 tasks**

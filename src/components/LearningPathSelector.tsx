@@ -110,15 +110,16 @@ export function LearningPathSelector({
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const savedNickname = localStorage.getItem("bats:student:nickname") || nickname;
-      const savedSlogan = localStorage.getItem("bats:slogan") || "Internet net binh con ono!";
-      const savedAvatar = getSelectedAvatar();
+      const studentId = assignedStudent?.id || "guest";
+      const savedNickname = localStorage.getItem(`bats:student:nickname_${studentId}`) || nickname;
+      const savedSlogan = localStorage.getItem(`bats:slogan_${studentId}`) || "Internet net binh con ono!";
+      const savedAvatar = getSelectedAvatar(studentId);
 
       setCustomNickname(savedNickname);
       setCustomSlogan(savedSlogan);
       setSelectedAvatarId(savedAvatar);
     }
-  }, [nickname]);
+  }, [nickname, assignedStudent?.id]);
 
   const handleSave = () => {
     sfx.click();
@@ -127,10 +128,11 @@ export function LearningPathSelector({
       return;
     }
 
+    const studentId = assignedStudent?.id || "guest";
     // Save locally
-    localStorage.setItem("bats:student:nickname", editName.trim());
-    localStorage.setItem("bats:slogan", editSlogan.trim());
-    setSelectedAvatar(editAvatarId);
+    localStorage.setItem(`bats:student:nickname_${studentId}`, editName.trim());
+    localStorage.setItem(`bats:slogan_${studentId}`, editSlogan.trim());
+    setSelectedAvatar(editAvatarId, studentId);
 
     // Update local state
     setCustomNickname(editName.trim());

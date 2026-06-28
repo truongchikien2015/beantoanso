@@ -227,7 +227,7 @@ export type Teacher = {
 - [ ] T080 [P] Remove old `Teacher` namespace from `src/lib/store.ts` — delete `TEACHER_PASSWORD`, `Teacher.isLoggedIn()`, `Teacher.login()`, `Teacher.logout()`, `teacher: "bats:teacher_auth"` from KEYS (keep `TeacherStats` — data helpers)
 - [ ] T081 [P] Remove `NEXT_PUBLIC_TEACHER_PASSWORD=` from `.env.example`
 - [ ] T082 Update `SPEC.md` (root) — update teacher auth section to reflect Supabase Auth
-- [ ] T083 Update `PROJECT_DOCUMENTATION.md` — update teacher authentication section
+- [ ] T083 Update `docs/PROJECT_DOCUMENTATION.md` — update teacher authentication section
 - [ ] T084 Verify `pnpm build` passes — zero errors
 - [ ] T085 Run `tsc --strict` — zero TypeScript errors
 - [ ] T086 Manual smoke test: admin creates teacher → teacher logs in → teacher logs out

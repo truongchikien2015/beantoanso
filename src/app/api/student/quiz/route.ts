@@ -9,6 +9,9 @@ import { TeacherStudentProgress } from "@/lib/db/models/TeacherStudentProgress";
 import { Question } from "@/lib/db/models/Question";
 import { Topic } from "@/lib/db/models/Topic";
 import { getStudentId } from "@/lib/auth-helpers";
+import { StudentAnswer } from "@/lib/db/models/StudentAnswer";
+import { Profile } from "@/lib/db/models/Profile";
+import { TeacherTopic } from "@/lib/db/models/TeacherTopic";
 import {
   XP_PER_CORRECT_ANSWER,
   XP_TOPIC_COMPLETE,
@@ -283,6 +286,52 @@ export async function POST(req: NextRequest) {
       },
       { upsert: true, new: true }
     ).lean();
+
+    // Save individual student answers to MongoDB
+    try {
+      let studentNickname = "Học sinh";
+      const tsDoc = await TeacherStudent.findById(studentObjectId).lean();
+      if (tsDoc) {
+        studentNickname = tsDoc.nickname;
+      } else {
+        const profDoc = await Profile.findById(studentObjectId).lean();
+        if (profDoc) {
+          studentNickname = profDoc.full_name || "Học sinh";
+        }
+      }
+
+      if (answerBreakdown && answerBreakdown.length > 0) {
+        for (const item of answerBreakdown) {
+          let topicSlug = "";
+          let topicLabel = "";
+          if (publicTopic) {
+            topicSlug = publicTopic.slug;
+            topicLabel = publicTopic.label;
+          } else if (step) {
+            topicSlug = step.topic_id || "topic";
+            if (step.topic_id) {
+              const tObj = await TeacherTopic.findById(step.topic_id).lean();
+              topicLabel = tObj ? tObj.label : "Chủ đề học";
+            } else {
+              topicLabel = "Chủ đề học";
+            }
+          }
+
+          await StudentAnswer.create({
+            player_id: studentId,
+            nickname: studentNickname,
+            topic_slug: topicSlug,
+            topic_label: topicLabel,
+            selected_option: item.selected_option as "A" | "B" | "C",
+            correct_option: item.correct_option as "A" | "B" | "C",
+            is_correct: item.is_correct,
+            timestamp: new Date(),
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Failed to save StudentAnswer records to DB:", err);
+    }
 
     const xpAwarded = correct * XP_PER_CORRECT_ANSWER;
     const stats = await awardStudentXp({

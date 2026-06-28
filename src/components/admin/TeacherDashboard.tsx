@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -10,12 +10,14 @@ import {
   topicLabels,
   SortOption,
 } from "../../lib/store";
+import { useTeacherContentStore } from "@/lib/teacherContentStore";
 import { QuestionSetManager } from "./QuestionSetManager";
 import { LearningPathManager } from "./LearningPathManager";
 import { StudentImportManager } from "./StudentImportManager";
 import { TeacherScenarioManager } from "./TeacherScenarioManager";
+import { AttendanceManager } from "./AttendanceManager";
 
-type TeacherTab = "overview" | "students" | "chart" | "question-sets" | "learning-paths" | "students-manage" | "scenarios";
+type TeacherTab = "overview" | "students" | "chart" | "question-sets" | "learning-paths" | "students-manage" | "scenarios" | "attendance";
 
 export default function TeacherDashboard({
   onLogout,
@@ -27,8 +29,77 @@ export default function TeacherDashboard({
   const [tab, setTab] = useState<TeacherTab>(initialTab);
   const [isPrinting, setIsPrinting] = useState(false);
 
-  const allRows = useMemo(() => TeacherStats.aggregate(), []);
-  const stats = useMemo(() => TeacherStats.overview(), []);
+  const { students, fetchStudents } = useTeacherContentStore();
+  const [selectedClass, setSelectedClass] = useState<string>("all");
+  const [dbResults, setDbResults] = useState<any[]>([]);
+  const [dbAnswers, setDbAnswers] = useState<any[]>([]);
+  const [loadingReports, setLoadingReports] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [teacherProfile, setTeacherProfile] = useState<{ name: string; email: string; school_id: string | null; avatar_url?: string | null } | null>(null);
+
+  const fetchReports = useCallback(async () => {
+    setLoadingReports(true);
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      const res = await fetch("/api/teacher/reports", {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDbResults(data.results || []);
+        setDbAnswers(data.answers || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch reports:", err);
+    } finally {
+      setLoadingReports(false);
+    }
+  }, []);
+
+  const fetchProfile = useCallback(async () => {
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      const res = await fetch("/api/teacher/profile", {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setTeacherProfile(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch teacher profile:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStudents();
+    fetchReports();
+    fetchProfile();
+  }, [fetchStudents, fetchReports, fetchProfile]);
+
+  const classNames = useMemo(() => {
+    const list = new Set<string>();
+    
+    // 1. From database students
+    students.forEach((s) => {
+      if (s.class_name && s.is_active) list.add(s.class_name);
+    });
+
+    // 2. From Results list (e.g. demo data which has class_name)
+    const results = TeacherStats.aggregate(dbResults, dbAnswers, "all", students);
+    results.forEach((r: any) => {
+      if (r.class_name) list.add(r.class_name);
+    });
+
+    return Array.from(list).sort((a, b) => a.localeCompare(b, "vi"));
+  }, [students, dbResults, dbAnswers]);
+
+  const allRows = useMemo(() => TeacherStats.aggregate(dbResults, dbAnswers, selectedClass, students), [dbResults, dbAnswers, selectedClass, students]);
+  const stats = useMemo(() => TeacherStats.overview(dbResults, selectedClass, students), [dbResults, selectedClass, students]);
 
   const NAV_ITEMS: { key: TeacherTab; label: string; icon: string }[] = [
     { key: "overview", label: "Tổng quan", icon: "📊" },
@@ -45,11 +116,24 @@ export default function TeacherDashboard({
       {/* Sidebar - Light Mode */}
       <aside className="w-64 bg-[#f0f4f8] flex flex-col min-h-screen flex-shrink-0 border-r border-slate-200">
         <div className="pt-8 pb-6 px-4 flex flex-col items-center border-b border-slate-200/60 mb-4">
-          <div className="w-[72px] h-[72px] rounded-full bg-slate-200 overflow-hidden mb-3 border-4 border-white shadow-sm">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher" alt="Avatar" className="w-full h-full object-cover" />
+          <div
+            onClick={() => setShowProfileModal(true)}
+            className="w-[72px] h-[72px] rounded-full bg-slate-200 overflow-hidden mb-3 border-4 border-white shadow-sm cursor-pointer hover:scale-105 transition transform duration-200 group"
+            title="Quản lý thông tin giáo viên"
+          >
+            <img src={teacherProfile?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher"} alt="Avatar" className="w-full h-full object-cover group-hover:opacity-95" />
           </div>
-          <h2 className="text-lg font-black text-[#0060ac]">Bé An Toàn Số</h2>
-          <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-0.5">Admin Portal</p>
+          <h2
+            onClick={() => setShowProfileModal(true)}
+            className="text-lg font-black text-[#0060ac] text-center px-2 truncate w-full cursor-pointer hover:underline"
+            title="Quản lý thông tin giáo viên"
+          >
+            {teacherProfile?.name || "Bé An Toàn Số"}
+          </h2>
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">
+            {teacherProfile?.email ? "Giáo viên" : "Admin Portal"}
+          </span>
+          <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mt-0.5">Teacher Portal</p>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
@@ -91,27 +175,56 @@ export default function TeacherDashboard({
       <div className="flex-1 flex flex-col min-w-0 max-h-screen">
         {/* Top Header */}
         <header className="h-[72px] bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
-          <span className="text-slate-600 font-bold text-sm">Chào các thầy cô!</span>
+          <div className="flex items-center gap-6">
+            <span className="text-slate-600 font-bold text-sm">Chào các thầy cô!</span>
+            
+            {/* Class Selector Dropdown */}
+            {(tab === "overview" || tab === "students" || tab === "chart") && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">Lớp học:</span>
+                <select
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                  className="px-3 py-1.5 rounded-lg border border-slate-300 outline-none focus:border-indigo-400 text-xs font-bold bg-white text-slate-700 cursor-pointer shadow-sm"
+                >
+                  <option value="all">Tất cả các lớp</option>
+                  {classNames.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#0060ac] hover:bg-[#005090] text-white rounded-lg text-xs font-bold transition shadow-sm">
+            <button
+              onClick={fetchReports}
+              disabled={loadingReports}
+              className="flex items-center gap-2 px-4 py-2 bg-[#0060ac] hover:bg-[#005090] text-white rounded-lg text-xs font-bold transition shadow-sm disabled:opacity-50 cursor-pointer"
+            >
               <span>⚡</span>
-              <span>Dữ liệu trực tiếp</span>
+              <span>{loadingReports ? "Đang tải..." : "Dữ liệu trực tiếp"}</span>
             </button>
             <button className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 transition relative">
               <span className="text-xl">🔔</span>
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
             </button>
-            <button className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition overflow-hidden shadow-sm">
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher" alt="Avatar" className="w-full h-full object-cover" />
+            <button
+              onClick={() => setShowProfileModal(true)}
+              className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition overflow-hidden shadow-sm cursor-pointer hover:scale-105 duration-200"
+              title="Quản lý thông tin giáo viên"
+            >
+              <img src={teacherProfile?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher"} alt="Avatar" className="w-full h-full object-cover" />
             </button>
           </div>
         </header>
 
         {/* Content View */}
         <main className="flex-1 overflow-auto p-8">
-          {tab === "overview" && <OverviewTab stats={stats} />}
-          {tab === "students" && <StudentsTab allRows={allRows} onPrint={() => setIsPrinting(true)} />}
-          {tab === "chart" && <ChartTab />}
+          {tab === "overview" && <OverviewTab stats={stats} selectedClass={selectedClass} />}
+          {tab === "students" && <StudentsTab allRows={allRows} dbAnswers={dbAnswers} onPrint={() => setIsPrinting(true)} selectedClass={selectedClass} />}
+          {tab === "chart" && <ChartTab dbAnswers={dbAnswers} selectedClass={selectedClass} students={students} />}
           {tab === "question-sets" && (
             <ManagerShell>
               <QuestionSetManager />
@@ -132,6 +245,11 @@ export default function TeacherDashboard({
               <StudentImportManager />
             </ManagerShell>
           )}
+          {tab === "attendance" && (
+            <ManagerShell>
+              <AttendanceManager />
+            </ManagerShell>
+          )}
         </main>
       </div>
 
@@ -140,9 +258,18 @@ export default function TeacherDashboard({
           <PrintableReport
             rows={allRows}
             stats={stats}
+            selectedClass={selectedClass}
             onClose={() => setIsPrinting(false)}
           />
         </div>
+      )}
+
+      {showProfileModal && (
+        <TeacherProfileModal
+          profile={teacherProfile}
+          onClose={() => setShowProfileModal(false)}
+          onSaveSuccess={(updated) => setTeacherProfile(updated)}
+        />
       )}
     </div>
   );
@@ -159,7 +286,7 @@ function ManagerShell({ children }: { children: ReactNode }) {
 }
 
 // === Overview Tab ===
-function OverviewTab({ stats }: { stats: any }) {
+function OverviewTab({ stats, selectedClass = "all" }: { stats: any; selectedClass?: string }) {
   const seedDemoData = () => {
     const students = [
       { nickname: "Bé Minh", scores: [80, 70] },
@@ -205,6 +332,7 @@ function OverviewTab({ stats }: { stats: any }) {
         id: `res-${idx}`,
         player_id: playerId,
         nickname: s.nickname,
+        class_name: idx % 2 === 0 ? "Lớp 5A" : "Lớp 5B",
         mission_score: missionScore,
         quiz_score: quizScore,
         total_score: totalScore,
@@ -234,6 +362,7 @@ function OverviewTab({ stats }: { stats: any }) {
           id: `ans-${idx}-${t}`,
           playerId,
           nickname: s.nickname,
+          class_name: idx % 2 === 0 ? "Lớp 5A" : "Lớp 5B",
           topicId: t,
           topicLabel: topicLabels[t],
           selectedOption: isCorrect ? "B" : "A",
@@ -253,9 +382,11 @@ function OverviewTab({ stats }: { stats: any }) {
     <div className="space-y-8 max-w-[1200px] mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-slate-800 tracking-tight">Báo cáo Lớp 5A</h1>
+        <h1 className="text-3xl font-black text-slate-800 tracking-tight">
+          Báo cáo {selectedClass === "all" ? "Tất cả các lớp" : selectedClass}
+        </h1>
         <p className="text-slate-500 font-medium text-sm mt-1.5">
-          Theo dõi tiến trình học tập của lớp trong tuần này.
+          Theo dõi tiến trình học tập của {selectedClass === "all" ? "tất cả các lớp" : selectedClass} trong tuần này.
         </p>
       </div>
 
@@ -415,10 +546,14 @@ function OverviewTab({ stats }: { stats: any }) {
 // === Students Tab ===
 function StudentsTab({
   allRows,
+  dbAnswers = [],
   onPrint,
+  selectedClass = "all",
 }: {
   allRows: any[];
+  dbAnswers?: any[];
   onPrint: () => void;
+  selectedClass?: string;
 }) {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("newest");
@@ -468,7 +603,8 @@ function StudentsTab({
     }, [] as number[]);
     worksheet["!cols"] = max_len.map((len) => ({ wch: len + 3 }));
 
-    XLSX.writeFile(workbook, `Bao_cao_Lop_5A_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    const classSuffix = selectedClass === "all" ? "Tat_ca_cac_lop" : selectedClass.replace(/\s+/g, "_");
+    XLSX.writeFile(workbook, `Bao_cao_${classSuffix}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   const handleSortChange = (newSort: SortOption) => {
@@ -484,7 +620,9 @@ function StudentsTab({
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">👨‍🎓 Học sinh</h1>
+        <h1 className="text-2xl font-bold text-slate-800">
+          👨‍🎓 Học sinh - {selectedClass === "all" ? "Tất cả các lớp" : selectedClass}
+        </h1>
         <div className="flex gap-2">
           <button
             onClick={handleExportExcel}
@@ -617,7 +755,7 @@ function StudentsTab({
       {showModal && selectedPlayerId && (
         <StudentDetailModal
           playerId={selectedPlayerId}
-          answers={StudentAnswers.byPlayer(selectedPlayerId)}
+          answers={dbAnswers.filter((a) => a.playerId === selectedPlayerId)}
           onClose={() => {
             setShowModal(false);
             setSelectedPlayerId(null);
@@ -629,8 +767,8 @@ function StudentsTab({
 }
 
 // === Chart Tab ===
-function ChartTab() {
-  const stats = useMemo(() => TeacherStats.topicChart(), []);
+function ChartTab({ dbAnswers = [], selectedClass = "all", students = [] }: { dbAnswers?: any[]; selectedClass?: string; students?: any[] }) {
+  const stats = useMemo(() => TeacherStats.topicChart(dbAnswers, selectedClass, students), [dbAnswers, selectedClass, students]);
   const maxAnswers = useMemo(
     () => Math.max(...stats.map((s) => s.totalAnswers), 1),
     [stats]
@@ -648,7 +786,9 @@ function ChartTab() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-slate-800">📈 Câu hỏi theo chủ đề</h1>
+      <h1 className="text-2xl font-bold text-slate-800">
+        📈 Câu hỏi theo chủ đề - {selectedClass === "all" ? "Tất cả các lớp" : selectedClass}
+      </h1>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <p className="text-slate-600 text-sm mb-6">
@@ -854,10 +994,12 @@ function StudentDetailModal({
 function PrintableReport({
   rows,
   stats,
+  selectedClass = "all",
   onClose,
 }: {
   rows: any[];
   stats: any;
+  selectedClass?: string;
   onClose: () => void;
 }) {
   useEffect(() => {
@@ -873,10 +1015,11 @@ function PrintableReport({
       <style>{`
         @media print {
           body {
+            visibility: hidden;
             background-color: white !important;
           }
-          body > *:not(.printable-report) {
-            display: none !important;
+          .printable-report, .printable-report * {
+            visibility: visible;
           }
           .printable-report {
             display: block !important;
@@ -885,13 +1028,16 @@ function PrintableReport({
             top: 0 !important;
             width: 100% !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 24px !important;
+            background-color: white !important;
           }
         }
       `}</style>
       <div className="text-center border-b-2 border-indigo-600 pb-4 mb-6">
         <h1 className="text-2xl font-black text-slate-900 uppercase">BÁO CÁO TIẾN BỘ HỌC TẬP - BÉ AN TOÀN SỐ 🛡️</h1>
-        <p className="text-slate-500 font-bold text-sm mt-1">Lớp học: Lớp 5A | Giáo viên chủ nhiệm: Cô Hoa</p>
+        <p className="text-slate-500 font-bold text-sm mt-1">
+          Lớp học: {selectedClass === "all" ? "Tất cả các lớp" : selectedClass} | Giáo viên chủ nhiệm: Cô Hoa
+        </p>
         <p className="text-xs text-slate-400 mt-0.5">Ngày xuất báo cáo: {new Date().toLocaleDateString("vi-VN")}</p>
       </div>
 
@@ -941,6 +1087,246 @@ function PrintableReport({
       <div className="mt-8 flex justify-between text-xs text-slate-400 font-bold border-t border-slate-200 pt-4">
         <span>Hệ thống giáo dục an toàn trực tuyến Bé An Toàn Số</span>
         <span>Ký tên Giáo viên chủ nhiệm</span>
+      </div>
+    </div>
+  );
+}
+
+// === Teacher Profile Modal ===
+function TeacherProfileModal({
+  profile,
+  onClose,
+  onSaveSuccess,
+}: {
+  profile: { name: string; email: string; school_id: string | null; avatar_url?: string | null } | null;
+  onClose: () => void;
+  onSaveSuccess: (updated: { name: string; email: string; school_id: string | null; avatar_url?: string | null }) => void;
+}) {
+  const [name, setName] = useState(profile?.name || "");
+  const [email, setEmail] = useState(profile?.email || "");
+  const [schoolId, setSchoolId] = useState(profile?.school_id || "");
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingAvatar(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      const res = await fetch("/api/media/upload", {
+        method: "POST",
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setAvatarUrl(data.url);
+      } else {
+        setError(data.error || "Lỗi upload ảnh đại diện.");
+      }
+    } catch (err) {
+      console.error("Avatar upload error:", err);
+      setError("Không thể kết nối tới máy chủ khi upload ảnh.");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim()) {
+      setError("Họ tên và email là bắt buộc.");
+      return;
+    }
+    setError(null);
+    setSaving(true);
+    setSuccess(false);
+
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      const res = await fetch("/api/teacher/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          school_id: schoolId.trim() || null,
+          avatar_url: avatarUrl || null,
+          password: password.trim() || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setSuccess(true);
+        setPassword("");
+        onSaveSuccess({
+          name: data.name,
+          email: data.email,
+          school_id: data.school_id,
+          avatar_url: data.avatar_url,
+        });
+        setTimeout(() => {
+          onClose();
+        }, 1200);
+      } else {
+        setError(data.error || "Có lỗi xảy ra khi cập nhật thông tin.");
+      }
+    } catch (err) {
+      console.error("Profile save error:", err);
+      setError("Không thể kết nối tới máy chủ.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden transform transition-all duration-300 animate-in fade-in zoom-in-95">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">👩‍🏫</span>
+            <h3 className="font-bold text-lg">Thông tin giáo viên</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/20 transition text-white font-bold"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Content */}
+        <form onSubmit={handleSave} className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 bg-rose-50 text-rose-600 text-xs font-bold rounded-lg border border-rose-200 animate-pulse">
+              ⚠️ {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="p-3 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-lg border border-emerald-200">
+              ✅ Cập nhật thông tin thành công!
+            </div>
+          )}
+
+          {/* Avatar Upload */}
+          <div className="flex flex-col items-center gap-2 pb-2">
+            <div
+              onClick={() => !uploadingAvatar && fileInputRef.current?.click()}
+              className="relative w-24 h-24 rounded-full bg-slate-100 border-4 border-white overflow-hidden cursor-pointer hover:scale-105 transition transform duration-200 group shadow-md"
+              title="Click để đổi ảnh đại diện"
+            >
+              <img
+                src={avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Teacher"}
+                alt="Avatar Preview"
+                className="w-full h-full object-cover group-hover:opacity-75"
+              />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
+                <span className="text-white text-[10px] font-bold uppercase tracking-wider text-center px-1">
+                  {uploadingAvatar ? "Đang tải..." : "Đổi ảnh"}
+                </span>
+              </div>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              className="hidden"
+              disabled={uploadingAvatar}
+            />
+            <p className="text-[10px] text-slate-400 font-semibold">Định dạng hỗ trợ: JPG, PNG, WEBP (Tối đa 5MB)</p>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Họ và tên</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nhập họ và tên giáo viên"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-sm font-semibold transition bg-slate-50 hover:bg-white focus:bg-white text-slate-800"
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Email đăng nhập</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Nhập email"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-sm font-semibold transition bg-slate-50 hover:bg-white focus:bg-white text-slate-800"
+              required
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Mã trường học (Không bắt buộc)</label>
+            <input
+              type="text"
+              value={schoolId}
+              onChange={(e) => setSchoolId(e.target.value)}
+              placeholder="Nhập mã trường học"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-sm font-semibold transition bg-slate-50 hover:bg-white focus:bg-white text-slate-800"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Mật khẩu mới (Để trống nếu không đổi)</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Tối thiểu 6 ký tự"
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 text-sm font-semibold transition bg-slate-50 hover:bg-white focus:bg-white text-slate-800"
+              minLength={6}
+            />
+          </div>
+
+          <div className="pt-4 flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-sm transition"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={saving || uploadingAvatar}
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold text-sm transition shadow-md disabled:opacity-50"
+            >
+              {saving ? "Đang lưu..." : "Lưu thay đổi"}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

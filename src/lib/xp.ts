@@ -49,17 +49,19 @@ export function getAvatars() {
 
 const AVATAR_KEY = "bats:avatar";
 
-export function getSelectedAvatar(): string {
+export function getSelectedAvatar(studentId?: string): string {
   try {
-    return localStorage.getItem(AVATAR_KEY) || "kid";
+    const key = studentId ? `${AVATAR_KEY}_${studentId}` : AVATAR_KEY;
+    return localStorage.getItem(key) || "kid";
   } catch {
     return "kid";
   }
 }
 
-export function setSelectedAvatar(id: string) {
+export function setSelectedAvatar(id: string, studentId?: string) {
   try {
-    localStorage.setItem(AVATAR_KEY, id);
+    const key = studentId ? `${AVATAR_KEY}_${studentId}` : AVATAR_KEY;
+    localStorage.setItem(key, id);
   } catch {
     // ignore
   }

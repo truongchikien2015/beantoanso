@@ -64,3 +64,12 @@ export type { INewsCategory } from "./NewsCategory";
 
 export { NewsArticle } from "./NewsArticle";
 export type { INewsArticle } from "./NewsArticle";
+
+export { TeacherClass } from "./TeacherClass";
+export type { ITeacherClass } from "./TeacherClass";
+
+export { AttendanceSession } from "./AttendanceSession";
+export type { IAttendanceSession } from "./AttendanceSession";
+
+export { AttendanceRecord } from "./AttendanceRecord";
+export type { IAttendanceRecord } from "./AttendanceRecord";

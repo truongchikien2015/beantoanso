@@ -175,8 +175,23 @@ export const Results = {
     return item;
   },
   leaderboard(limit = 10): FinalResult[] {
-    return read<FinalResult[]>(KEYS.results, [])
-      .slice()
+    const all = read<FinalResult[]>(KEYS.results, []);
+    
+    const bestPerPlayer = new Map<string, FinalResult>();
+    for (const r of all) {
+      const existing = bestPerPlayer.get(r.player_id);
+      if (!existing || r.total_score > existing.total_score) {
+        bestPerPlayer.set(r.player_id, r);
+      } else if (r.total_score === existing.total_score) {
+        const rTime = new Date(r.completed_at).getTime();
+        const existingTime = new Date(existing.completed_at).getTime();
+        if (rTime < existingTime) {
+          bestPerPlayer.set(r.player_id, r);
+        }
+      }
+    }
+
+    return Array.from(bestPerPlayer.values())
       .sort((a, b) => {
         if (b.total_score !== a.total_score)
           return b.total_score - a.total_score;
@@ -408,6 +423,7 @@ export type SortOption = "newest" | "score" | "az" | "za";
 export type StudentAggregate = {
   playerId: string;
   nickname: string;
+  class_name?: string | null;
   missionScore: number;
   quizScore: number;
   totalScore: number;
@@ -443,8 +459,16 @@ const SORT_COMPARATORS: Record<SortOption, (a: StudentAggregate, b: StudentAggre
 };
 
 export const TeacherStats = {
-  overview(): TeacherOverviewStats {
-    const results = Results.list();
+  overview(resultsList?: any[], selectedClass?: string, students?: any[]): TeacherOverviewStats {
+    let results = resultsList || Results.list();
+    if (selectedClass && selectedClass !== "all") {
+      results = results.filter((r) => {
+        if ((r as any).class_name === selectedClass) return true;
+        const student = students?.find((s) => s.id === r.player_id || s.student_code === r.player_id);
+        return student?.class_name === selectedClass;
+      });
+    }
+
     if (results.length === 0) {
       return { totalAttempts: 0, averageScore: 0, topScore: 0, topStudent: null };
     }
@@ -461,9 +485,23 @@ export const TeacherStats = {
     };
   },
 
-  aggregate(): StudentAggregate[] {
-    const results = Results.list();
-    const answers = StudentAnswers.list();
+  aggregate(resultsList?: any[], answersList?: any[], selectedClass?: string, students?: any[]): StudentAggregate[] {
+    let results = resultsList || Results.list();
+    let answers = answersList || StudentAnswers.list();
+
+    if (selectedClass && selectedClass !== "all") {
+      results = results.filter((r) => {
+        if ((r as any).class_name === selectedClass) return true;
+        const student = students?.find((s) => s.id === r.player_id || s.student_code === r.player_id);
+        return student?.class_name === selectedClass;
+      });
+      answers = answers.filter((a) => {
+        if ((a as any).class_name === selectedClass) return true;
+        const student = students?.find((s) => s.id === a.playerId || s.student_code === a.playerId);
+        return student?.class_name === selectedClass;
+      });
+    }
+
     return results.map((r) => {
       const playerAnswers = answers.filter((a) => a.playerId === r.player_id);
       const uniqueTopics = new Set(playerAnswers.map((a) => a.topicId));
@@ -472,6 +510,7 @@ export const TeacherStats = {
       return {
         playerId: r.player_id,
         nickname: r.nickname,
+        class_name: (r as any).class_name || (students?.find((s) => s.id === r.player_id || s.student_code === r.player_id)?.class_name) || null,
         missionScore: r.mission_score,
         quizScore: r.quiz_score,
         totalScore: r.total_score,
@@ -486,8 +525,16 @@ export const TeacherStats = {
     });
   },
 
-  topicChart(): TopicStats[] {
-    const answers = StudentAnswers.list();
+  topicChart(answersList?: any[], selectedClass?: string, students?: any[]): TopicStats[] {
+    let answers = answersList || StudentAnswers.list();
+    if (selectedClass && selectedClass !== "all") {
+      answers = answers.filter((a) => {
+        if ((a as any).class_name === selectedClass) return true;
+        const student = students?.find((s) => s.id === a.playerId || s.student_code === a.playerId);
+        return student?.class_name === selectedClass;
+      });
+    }
+
     const topicMap = new Map<string, StudentAnswer[]>();
     for (const a of answers) {
       const existing = topicMap.get(a.topicId) ?? [];

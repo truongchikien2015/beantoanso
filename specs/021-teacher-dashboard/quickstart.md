@@ -48,7 +48,7 @@ pnpm dev
 | Create dashboard | `src/components/admin/TeacherDashboard.tsx` |
 | Extract modal | `src/components/admin/StudentModal.tsx` (shared) |
 | Update env example | `.env.example` |
-| Update docs | `PROJECT_DOCUMENTATION.md` |
+| Update docs | `docs/PROJECT_DOCUMENTATION.md` |
 
 ---
 
