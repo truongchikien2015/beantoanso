@@ -2,10 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   AdminQuestion,
   Admin,
-  Questions,
   TOPIC_VALUES,
   topicLabels,
-  Topics,
 } from "../../lib/store";
 import { QuizTopic } from "../../data/quizQuestions";
 import { QuestionForm } from "./QuestionForm";
@@ -92,7 +90,7 @@ export function AdminQuestions({
   onLogout: () => void;
   onHome: () => void;
 }) {
-  const [items, setItems] = useState<AdminQuestion[]>(() => Questions.list());
+  const [items, setItems] = useState<AdminQuestion[]>([]);
   const [loading, setLoading] = useState(false);
   const [usingDb, setUsingDb] = useState(false);
   const [loadError, setLoadError] = useState("");
@@ -134,12 +132,12 @@ export function AdminQuestions({
       } else {
         setUsingDb(false);
         setLoadError(`Không tải được câu hỏi: ${body.error ?? "Lỗi máy chủ"}`);
-        setItems(Questions.list());
+        setItems([]);
       }
     } catch (err: any) {
       setUsingDb(false);
       setLoadError(`Không tải được câu hỏi: ${err.message}`);
-      setItems(Questions.list());
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -153,6 +151,8 @@ export function AdminQuestions({
     void loadQuestions();
     
     async function loadTopics() {
+      const seedDefaults = () =>
+        setDbTopics(TOPIC_VALUES.map((t) => ({ slug: t, label: topicLabels[t] })));
       try {
         const adminPassword = Admin.getPassword();
         const res = await fetch("/api/admin/topics", {
@@ -162,20 +162,12 @@ export function AdminQuestions({
         if (res.ok && body.data) {
           setDbTopics(body.data.map((t: any) => ({ slug: t.slug, label: t.label })));
         } else {
-          const local = Topics.list();
-          if (local && local.length > 0) {
-            setDbTopics(local.map(t => ({ slug: t.slug, label: t.label })));
-          } else {
-            setDbTopics(TOPIC_VALUES.map(t => ({ slug: t, label: topicLabels[t] })));
-          }
+          console.error("Failed to load topics from API:", body.error);
+          seedDefaults();
         }
-      } catch {
-        const local = Topics.list();
-        if (local && local.length > 0) {
-          setDbTopics(local.map(t => ({ slug: t.slug, label: t.label })));
-        } else {
-          setDbTopics(TOPIC_VALUES.map(t => ({ slug: t, label: topicLabels[t] })));
-        }
+      } catch (err) {
+        console.error("Failed to load topics from API:", err);
+        seedDefaults();
       }
     }
     void loadTopics();

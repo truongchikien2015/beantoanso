@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { Admin, Questions, Paths, Results, StudentAnswers, TOPIC_VALUES, topicLabels } from "../../lib/store";
+import { Admin, TOPIC_VALUES, topicLabels } from "../../lib/store";
 import { downloadBackup, restoreBackup } from "../../lib/backupService";
 import { AdminQuestions } from "./AdminQuestions";
 import { QuestionForm } from "./QuestionForm";
@@ -194,33 +194,67 @@ function AdminContentShell({
 }
 
 // ── Overview Tab ──────────────────────────────────────────────────────────────
+type OverviewResult = {
+  id: string;
+  player_id: string;
+  nickname: string;
+  mission_score: number;
+  quiz_score: number;
+  total_score: number;
+  title: string;
+  badge: string;
+  completed_at: string;
+};
+
+type OverviewQuestion = {
+  id: string;
+  topic_slug: string;
+  is_active: boolean;
+};
+
+type OverviewAnswer = {
+  id: string;
+  playerId: string;
+  isCorrect: boolean;
+  timestamp: string;
+};
+
 function OverviewTab() {
-  const results = Results.list();
-  const questions = Questions.list();
-  const answers = StudentAnswers.list();
+  const [results, setResults] = useState<OverviewResult[]>([]);
+  const [questions, setQuestions] = useState<OverviewQuestion[]>([]);
+  const [answers, setAnswers] = useState<OverviewAnswer[]>([]);
   const [dbPaths, setDbPaths] = useState<any[]>([]);
   const [dbTopicsCount, setDbTopicsCount] = useState(0);
   const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">("week");
 
   useEffect(() => {
     const adminPassword = Admin.getPassword();
-    fetch("/api/admin/learning-paths", {
-      headers: { "x-admin-password": adminPassword },
-    })
+    const headers = { "x-admin-password": adminPassword };
+
+    fetch("/api/admin/learning-paths", { headers })
       .then((res) => res.json())
-      .then((body) => {
-        if (body.data) setDbPaths(body.data);
-      })
+      .then((body) => { if (body.data) setDbPaths(body.data); })
       .catch((err) => console.error("Failed to load paths for dashboard overview:", err));
 
-    fetch("/api/admin/topics", {
-      headers: { "x-admin-password": adminPassword },
-    })
+    fetch("/api/admin/topics", { headers })
       .then((res) => res.json())
-      .then((body) => {
-        if (body.data) setDbTopicsCount(body.data.length);
-      })
+      .then((body) => { if (body.data) setDbTopicsCount(body.data.length); })
       .catch((err) => console.error("Failed to load topics count for dashboard overview:", err));
+
+    fetch("/api/admin/results", { headers })
+      .then((res) => res.json())
+      .then((body) => { if (body.data) setResults(body.data); })
+      .catch((err) => console.error("Failed to load results for dashboard overview:", err));
+
+    fetch("/api/admin/questions", { headers })
+      .then((res) => res.json())
+      .then((body) => { if (body.data) setQuestions(body.data); })
+      .catch((err) => console.error("Failed to load questions for dashboard overview:", err));
+
+    fetch("/api/admin/student-answers", { headers })
+      .then((res) => res.json())
+      .then((body) => { if (body.data) setAnswers(body.data); })
+      .catch((err) => console.error("Failed to load student answers for dashboard overview:", err));
   }, []);
 
   const stats = useMemo(() => {
@@ -242,7 +276,7 @@ function OverviewTab() {
   const questionsByTopic = useMemo(() => {
     const byTopic: Record<string, number> = {};
     for (const q of questions.filter((q) => q.is_active)) {
-      byTopic[q.category] = (byTopic[q.category] || 0) + 1;
+      byTopic[q.topic_slug] = (byTopic[q.topic_slug] || 0) + 1;
     }
     return byTopic;
   }, [questions]);
@@ -1065,15 +1099,55 @@ function ResetTeacherStudentPasswordModal({ student, onClose }: { student: Admin
   );
 }
 
-// ── Completed Results View (journeys finished, from localStorage) ───────────────
+// ── Completed Results View (journeys finished, loaded from DB) ─────────────────
+type CompletedResult = OverviewResult;
+type CompletedAnswer = {
+  id: string;
+  playerId: string;
+  nickname: string;
+  topicSlug: string;
+  topicLabel: string;
+  selectedOption: "A" | "B" | "C";
+  correctOption: "A" | "B" | "C";
+  isCorrect: boolean;
+  timestamp: string;
+};
+
 function CompletedResultsView() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [results, setResults] = useState<CompletedResult[]>([]);
+  const [answers, setAnswers] = useState<CompletedAnswer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const PAGE_SIZE = 20;
-  const results = Results.list();
-  const answers = StudentAnswers.list();
+
+  useEffect(() => {
+    let cancelled = false;
+    const pw = Admin.getPassword();
+    const headers = { "x-admin-password": pw };
+
+    Promise.all([
+      fetch("/api/admin/results", { headers }).then((r) => r.json()),
+      fetch("/api/admin/student-answers", { headers }).then((r) => r.json()),
+    ])
+      .then(([resultsBody, answersBody]) => {
+        if (cancelled) return;
+        if (resultsBody.data) setResults(resultsBody.data);
+        if (answersBody.data) setAnswers(answersBody.data);
+        setError("");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Failed to load completed results:", err);
+        setError(err instanceof Error ? err.message : "Lỗi tải kết quả hoàn thành");
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
+  }, []);
 
   const filtered = useMemo(() => {
     const t = search.trim().toLowerCase();
@@ -1130,7 +1204,13 @@ function CompletedResultsView() {
               </tr>
             </thead>
             <tbody>
-              {paged.map((r) => (
+              {loading && (
+                <tr><td colSpan={7} className="text-center py-16 font-bold text-slate-400">⏳ Đang tải kết quả...</td></tr>
+              )}
+              {!loading && error && (
+                <tr><td colSpan={7} className="text-center py-16 font-bold text-rose-500">⚠️ {error}</td></tr>
+              )}
+              {!loading && !error && paged.map((r) => (
                 <tr key={r.id} className="TableTr hover:bg-sky-50/20 border-b border-sky-100">
                   <td className="TableTd font-black text-sky-950 px-3 py-3.5 text-xs sm:text-sm">{r.nickname}</td>
                   <td className="TableTd text-slate-600 font-bold px-3 py-3.5 text-xs sm:text-sm">{r.mission_score}</td>
@@ -1145,7 +1225,7 @@ function CompletedResultsView() {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {!loading && !error && filtered.length === 0 && (
                 <tr><td colSpan={7} className="text-center py-16 font-bold text-slate-400">Chưa có bé nào tham gia học tập.</td></tr>
               )}
             </tbody>
@@ -1178,7 +1258,7 @@ function CompletedResultsView() {
 
 function StudentModal({ playerId, answers, onClose }: {
   playerId: string;
-  answers: ReturnType<typeof StudentAnswers.list>;
+  answers: CompletedAnswer[];
   onClose: () => void;
 }) {
   const name = answers[0]?.nickname ?? playerId;

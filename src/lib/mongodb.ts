@@ -29,9 +29,22 @@ export async function connectDB(): Promise<typeof mongoose> {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
-    });
+    // Windows + mongodb+srv:// often fails because the OS DNS resolver either
+    // does not return SRV records (corporate/ISP DNS) or prefers IPv6 (AAAA)
+    // and the fallback to IPv4 times out before serverSelection succeeds.
+    // family: 4 forces IPv4; timeouts surface the error fast instead of hanging.
+    cached.promise = mongoose
+      .connect(MONGODB_URI, {
+        bufferCommands: false,
+        family: 4,
+        serverSelectionTimeoutMS: 10_000,
+        socketTimeoutMS: 45_000,
+      })
+      .catch((err) => {
+        console.error("[mongodb] connect failed:", err?.name, err?.message);
+        cached.promise = null;
+        throw err;
+      });
   }
 
   cached.conn = await cached.promise;
