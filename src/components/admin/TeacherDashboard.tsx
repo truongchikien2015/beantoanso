@@ -6,8 +6,6 @@ import * as XLSX from "xlsx";
 import {
   TeacherStats,
   StudentAnswers,
-  TOPIC_VALUES,
-  topicLabels,
   SortOption,
 } from "../../lib/store";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
