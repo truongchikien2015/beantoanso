@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chọn lộ trình học tập</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed": "#23005c",
+                        "background": "#f7f9fb",
+                        "inverse-primary": "#b4c5ff",
+                        "outline": "#737686",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "secondary-container": "#8455ef",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-surface": "#191c1e",
+                        "on-background": "#191c1e",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#ffeed3",
+                        "tertiary": "#6d5000",
+                        "surface-tint": "#0053db",
+                        "surface-container-highest": "#e0e3e5",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#fffbff",
+                        "surface": "#f7f9fb",
+                        "on-surface-variant": "#434655",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-on-surface": "#eff1f3",
+                        "tertiary-container": "#8b6700",
+                        "surface-container": "#eceef0",
+                        "surface-bright": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "surface-variant": "#e0e3e5",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#2563eb",
+                        "secondary-fixed": "#e9ddff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "tertiary-fixed": "#ffdf9f",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-dim": "#d8dadc",
+                        "primary-fixed": "#dbe1ff",
+                        "on-error-container": "#93000a",
+                        "primary": "#004ac6",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c3c6d7",
+                        "secondary": "#6b38d4",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-primary-container": "#eeefff",
+                        "route-blue": "#e6f0ff",
+                        "route-blue-border": "#b3d1ff",
+                        "route-pink": "#ffeeef",
+                        "route-pink-border": "#ffc2c9",
+                        "route-yellow": "#fffbeb",
+                        "route-yellow-border": "#fde68a",
+                        "route-green": "#f0fdf4",
+                        "route-green-border": "#bbf7d0",
+                        "icon-green-bg": "#4ade80"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "lg": "40px",
+                        "base": "8px",
+                        "xl": "64px",
+                        "max-width-content": "1100px",
+                        "md": "24px",
+                        "margin-desktop": "auto",
+                        "sm": "12px"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Be Vietnam Pro"],
+                        "headline-lg": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display-mobile": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "label-bold": ["Be Vietnam Pro"]
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "700" }],
+                        "headline-lg": ["32px", { lineHeight: "1.2", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "500" }],
+                        "label-md": ["14px", { lineHeight: "1", fontWeight: "500" }],
+                        "display-mobile": ["32px", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "800" }],
+                        "display-lg": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
+                        "body-md": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+                        "label-bold": ["14px", { lineHeight: "1", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .tactile-card {
+            box-shadow: 0 4px 0 0 var(--tw-shadow-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .tactile-card:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 0 var(--tw-shadow-color);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24 font-body-md">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-surface dark:bg-on-surface flex items-center justify-between px-margin-mobile py-base w-full max-w-content mx-auto sticky z-40 flat no shadows">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-variant flex-shrink-0">
+<img alt="Ảnh đại diện của bé" class="w-full h-full object-cover" data-alt="A cheerful, illustrative style avatar of a young child, simple shapes, bright colors, light mode UI aesthetic, vector art style, flat colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSasfCFbEUwnc9ROmHDWB_Guvk38RgsvlD6QWSfnrcA1A95pBNmT2uVVpXIdsCvku8dvFDf4l1Sjx-7f_fy9sD0UzikX-ofYeITBMUhLbCR5VW3BIoUOtF9wJk5eVxlr1SUHovTyXMfG37UtOgIsWFrjqRGu2LRZa2zt8_mECu_BaYf-BTwu1nW4cKpvqUVm4JV9vg48UPydxAtdje6Q7-JwzA9QhqfDr2Okg8_naHTbEjMNWzF_65PRrtxPyvxhs5Mz6YtdWaOK4"/>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed truncate max-w-[200px] md:max-w-none">
+                Chào con, bạn nhỏ!
+            </h1>
+</div>
+<button aria-label="Notifications" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant text-primary dark:text-primary-fixed hover:opacity-80 Active: scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</header>
+<main class="w-full max-w-content mx-auto px-margin-mobile pt-lg pb-xl space-y-lg">
+<!-- Header Section -->
+<section class="text-center space-y-sm">
+<h2 class="font-display-mobile text-display-mobile text-on-surface">Chọn lộ trình học tập</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Hãy chọn lộ trình phù hợp với con để bắt đầu hành trình nhé!</p>
+</section>
+<!-- Mascot & Message Bubble -->
+<section class="flex flex-col md:flex-row items-center justify-center gap-md max-w-2xl mx-auto">
+<div class="w-20 h-20 flex-shrink-0">
+<img alt="Cú Cú An Toàn Mascot" class="w-full h-full object-contain" data-alt="A cute 3D rendered mascot character resembling an owl ('Cú Cú') in a playful, modern style. Bright colors, soft lighting, expressive large eyes, welcoming pose. Light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk3_0Nre-I-CgyxW8eImLCM8oujFLcC7jX_vdaZMuSJKtqEA8eHBCid-TNj0MiYYYg45MkxbqYJH2L5Qni-aa0iatkv986Ba8vqPiQygy_uG0ESu8rbdF_o9hj_6SBlppgz8rFhjRUNIKIyDJ0wKfA_vYrm6ulCAvhoTwadYFY-_-Z2r69EIZzZYwgoJ_fhLAwMr4YXWFMtU0fWPTNUP6NkEX02_bU9c8GP2M7VN8SMeTMitfzTkBKiCyqWp2werqiaE0P9H1BEwY"/>
+</div>
+<div class="bg-surface-container rounded-xl p-md relative max-w-md shadow-sm border border-surface-variant">
+<div class="absolute -left-3 top-1/2 -translate-y-1/2 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-surface-container hidden md:block"></div>
+<div class="absolute left-1/2 -top-3 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-b-8 border-b-surface-container md:hidden"></div>
+<p class="font-body-md text-body-md text-on-surface">Mỗi lộ trình có các chủ đề khác nhau. Con hãy chọn lộ trình muốn học nhé!</p>
+</div>
+</section>
+<!-- Main Routes Grid -->
+<section class="space-y-md">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">local_police</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Thực hành tình huống thực tế</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Route 1: Chat -->
+<a class="block bg-route-blue border-2 border-route-blue-border rounded-xl p-md tactile-card shadow-[var(--tw-colors-route-blue-border)] flex flex-col h-full group" href="#">
+<div class="bg-white w-12 h-12 rounded-full flex items-center justify-center mb-sm shadow-sm border border-route-blue-border group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">chat_bubble</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-xs">Chat với người lạ</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md flex-grow">Tập xử lý khi người lạ nhắn tin, ảnh riêng tư hoặc tặng quà game.</p>
+<div class="flex items-center text-primary font-label-bold text-label-bold mt-auto group-hover:translate-x-1 transition-transform">
+                        Bắt đầu ngay <span class="material-symbols-outlined ml-1 text-[18px]">arrow_forward</span>
+</div>
+</a>
+<!-- Route 2: Email -->
+<a class="block bg-route-pink border-2 border-route-pink-border rounded-xl p-md tactile-card shadow-[var(--tw-colors-route-pink-border)] flex flex-col h-full group" href="#">
+<div class="bg-white w-12 h-12 rounded-full flex items-center justify-center mb-sm shadow-sm border border-route-pink-border group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 0;">mail</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-xs">Vạch trần Email lừa đảo</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md flex-grow">Rà soát hòm thư, tìm và bấm vào các điểm đáng ngờ.</p>
+<div class="flex items-center text-error font-label-bold text-label-bold mt-auto group-hover:translate-x-1 transition-transform">
+                        Bắt đầu ngay <span class="material-symbols-outlined ml-1 text-[18px]">arrow_forward</span>
+</div>
+</a>
+<!-- Route 3: Game -->
+<a class="block bg-route-yellow border-2 border-route-yellow-border rounded-xl p-md tactile-card shadow-[var(--tw-colors-route-yellow-border)] flex flex-col h-full group" href="#">
+<div class="bg-white w-12 h-12 rounded-full flex items-center justify-center mb-sm shadow-sm border border-route-yellow-border group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">sports_esports</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-on-surface mb-xs">Phân loại thông tin</h4>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md flex-grow">Trò chơi phân loại thông tin nào có thể chia sẻ và thông tin cần giữ bí mật.</p>
+<div class="flex items-center text-tertiary-container font-label-bold text-label-bold mt-auto group-hover:translate-x-1 transition-transform">
+                        Chơi game <span class="material-symbols-outlined ml-1 text-[18px]">arrow_forward</span>
+</div>
+</a>
+</div>
+</section>
+<!-- Available Routes -->
+<section class="space-y-md">
+<h3 class="font-headline-md text-headline-md text-on-surface text-center mb-md mt-lg">Các lộ trình có sẵn</h3>
+<a class="block bg-route-green border-2 border-route-green-border rounded-xl p-md tactile-card shadow-[var(--tw-colors-route-green-border)] max-w-2xl mx-auto flex flex-col sm:flex-row sm:items-center gap-md group" href="#">
+<div class="bg-icon-green-bg w-16 h-16 rounded-xl flex items-center justify-center shadow-inner flex-shrink-0 group-hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-white text-[32px]" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-headline-md text-headline-md text-on-surface mb-xs">Cơ bản</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">6 chủ đề nền tảng về an toàn số.</p>
+</div>
+<div class="flex items-center justify-center w-10 h-10 bg-white rounded-full border border-route-green-border text-icon-green-bg flex-shrink-0 sm:ml-auto">
+<span class="material-symbols-outlined">chevron_right</span>
+</div>
+</a>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container dark:bg-inverse-surface border-t-4 border-surface-variant dark:border-outline-variant shadow-lg rounded-t-lg md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-bold text-[10px] whitespace-nowrap">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 translate-y-[-2px] shadow-[0_4px_0_0_rgba(0,74,198,1)] transition-all duration-100 Active: translate-y-0 w-24" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-bold text-[10px] whitespace-nowrap">Luyện kỹ năng</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 w-16 relative" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">security</span>
+<span class="font-label-bold text-[10px] whitespace-nowrap">Quét nguy hiểm</span>
+<!-- SOS Badge -->
+<span class="absolute -top-1 -right-1 bg-error text-on-error text-[8px] font-bold px-1 rounded-full border border-surface">SOS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-bold text-[10px] whitespace-nowrap">Hồ sơ</span>
+</a>
+</nav>
+<!-- Desktop Nav Shell (Hidden on Mobile) -->
+<div class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-surface-container border-r border-surface-variant flex-col p-md z-30 pt-24">
+<a class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-bright mb-2" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-bold">Trang chủ</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-xl bg-primary-container text-on-primary-container font-bold mb-2 shadow-sm" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="font-label-bold">Luyện kỹ năng</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-bright mb-2 relative" href="#">
+<span class="material-symbols-outlined">security</span>
+<span class="font-label-bold">Quét nguy hiểm</span>
+<span class="ml-auto bg-error text-on-error text-[10px] font-bold px-2 py-0.5 rounded-full">SOS</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-xl text-on-surface-variant hover:bg-surface-bright mt-auto" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-bold">Hồ sơ</span>
+</a>
+</div>
+<!-- Main Content wrapper adjustment for desktop nav -->
+<style>
+        @media (min-width: 768px) {
+            main {
+                padding-left: calc(16rem + 24px); /* 64 w-64 + gap */
+            }
+        }
+    </style>
+</body></html>

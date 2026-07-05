@@ -1,0 +1,146 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4] [cursor=pointer]:
+        - img [ref=e6]
+        - generic [ref=e8]: Bé An Toàn Số
+      - navigation [ref=e9]:
+        - button "Khóa học" [ref=e10] [cursor=pointer]
+        - button "Thử thách" [ref=e11] [cursor=pointer]
+        - button "Bảng xếp hạng" [ref=e12] [cursor=pointer]
+        - button "Về chúng tôi" [ref=e13] [cursor=pointer]
+      - generic [ref=e14]:
+        - button "Đăng nhập" [ref=e15] [cursor=pointer]
+        - button "Đăng ký" [ref=e16] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e22] [cursor=pointer]:
+    - img [ref=e23]
+  - alert [ref=e26]
+  - generic [ref=e27]:
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - generic [ref=e31]: 🛡️ Dành cho học sinh Tiểu học & THCS
+        - heading "Học Internet an toàn cùng Bé An Toàn Số" [level=1] [ref=e32]:
+          - text: Học Internet an toàn
+          - text: cùng Bé An Toàn Số
+        - paragraph [ref=e33]: Biến hành trình khám phá không gian mạng của con thành một cuộc phiêu lưu thú vị, an toàn và bổ ích cùng người bạn đồng hành Cú Cú.
+        - generic [ref=e34]:
+          - button "🚀 Bắt đầu hành trình ngay" [ref=e35] [cursor=pointer]
+          - button "Xem giới thiệu" [ref=e36] [cursor=pointer]:
+            - img [ref=e37]
+            - text: Xem giới thiệu
+      - img "Cú Cú - Mascot Bé An Toàn Số" [ref=e41]
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - img "Bé An Toàn Số Mobile App Mockup" [ref=e47]
+          - generic [ref=e48]:
+            - img "QR Code" [ref=e49]
+            - generic [ref=e50]: Quét để tải app
+        - generic [ref=e51]:
+          - generic [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: 🍎
+            - generic [ref=e54]:
+              - paragraph [ref=e55]: Download on the
+              - paragraph [ref=e56]: App Store
+          - generic [ref=e57] [cursor=pointer]:
+            - generic [ref=e58]: 🤖
+            - generic [ref=e59]:
+              - paragraph [ref=e60]: Get it on
+              - paragraph [ref=e61]: Google Play
+      - generic [ref=e62]:
+        - heading "Mang cả thế giới an toàn vào túi của con" [level=2] [ref=e63]:
+          - text: Mang cả thế giới an toàn vào túi
+          - text: của con
+        - paragraph [ref=e64]: Ứng dụng di động giúp trẻ học mọi lúc, mọi nơi thông qua các công cụ bảo vệ thông minh nhất.
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - generic [ref=e67]: 🎮
+            - generic [ref=e68]:
+              - heading "Học qua trò chơi" [level=4] [ref=e69]
+              - paragraph [ref=e70]: Biến kiến thức bảo mật khô khan thành những thử thách game hấp dẫn.
+          - generic [ref=e71]:
+            - generic [ref=e72]: 🔍
+            - generic [ref=e73]:
+              - heading "Quét mối nguy hiểm" [level=4] [ref=e74]
+              - paragraph [ref=e75]: Công cụ tự động phát hiện các liên kết và trang web độc hại dành riêng cho trẻ.
+          - generic [ref=e76]:
+            - generic [ref=e77]: 🦉
+            - generic [ref=e78]:
+              - heading "Hỏi đáp cùng AI" [level=4] [ref=e79]
+              - paragraph [ref=e80]: Người bạn AI Cú Cú luôn sẵn sàng giải đáp mọi thắc mắc về an toàn mạng 24/7.
+    - generic [ref=e82]:
+      - heading "Khám phá lộ trình học thú vị" [level=2] [ref=e83]
+      - paragraph [ref=e84]: Nội dung được thiết kế bởi các chuyên gia giáo dục hàng đầu, phù hợp với từng độ tuổi của trẻ.
+      - generic [ref=e85]:
+        - generic [ref=e86]:
+          - generic [ref=e87]:
+            - generic [ref=e88]: 🔐
+            - heading "An toàn bảo mật" [level=3] [ref=e89]
+            - paragraph [ref=e90]: Học cách tạo mật khẩu siêu mạnh và bảo vệ thông tin cá nhân như một hiệp sĩ số thực thụ.
+          - button "Tìm hiểu thêm" [ref=e91]
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]: 🔍
+            - heading "Nhận diện lừa đảo" [level=3] [ref=e95]
+            - paragraph [ref=e96]: Trang bị kính lúp kỹ thuật số để soi rõ những chiêu trò lừa đảo tinh vi trên mạng xã hội.
+          - button "Tìm hiểu thêm" [ref=e97]
+        - generic [ref=e98]:
+          - generic [ref=e99]:
+            - generic [ref=e100]: 👥
+            - heading "Ứng xử văn minh" [level=3] [ref=e101]
+            - paragraph [ref=e102]: Trở thành công dân số lịch sự, biết cách giao tiếp và tôn trọng người khác trên không gian mạng.
+          - button "Tìm hiểu thêm" [ref=e103]
+    - generic [ref=e105]:
+      - generic [ref=e106]:
+        - heading "Mạng lưới học tập an toàn ngày càng lớn mạnh" [level=3] [ref=e107]:
+          - text: Mạng lưới học tập an toàn ngày
+          - text: càng lớn mạnh
+        - paragraph [ref=e108]: Tham gia cùng hàng nghìn bạn nhỏ khác trong hành trình trở thành Hiệp sĩ An toàn số.
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - generic [ref=e111]: 2,500+
+          - generic [ref=e112]: Học sinh tham gia
+        - generic [ref=e113]:
+          - generic [ref=e114]: 50+
+          - generic [ref=e115]: Bài học tương tác
+    - generic [ref=e116]:
+      - generic [ref=e117]:
+        - generic [ref=e118]: 👦
+        - generic [ref=e119]: 👧
+        - generic [ref=e120]: 👦
+      - heading "Sẵn sàng để bắt đầu cuộc phiêu lưu số?" [level=2] [ref=e121]
+      - paragraph [ref=e122]: Hoàn toàn miễn phí và luôn luôn như vậy. Đăng ký tài khoản ngay hôm nay để nhận huy hiệu 'Người mới bắt đầu'.
+      - button "Bắt đầu hành trình ngay" [ref=e123] [cursor=pointer]
+      - generic [ref=e124]: "* Không cần thẻ tín dụng • Đăng ký trong 30 giây"
+    - contentinfo [ref=e125]:
+      - generic [ref=e126]:
+        - generic [ref=e127]:
+          - heading "Bé An Toàn Số" [level=4] [ref=e128]
+          - paragraph [ref=e129]: © 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt trên không gian mạng.
+        - generic [ref=e130]:
+          - generic [ref=e131]:
+            - link "Điều khoản" [ref=e132] [cursor=pointer]:
+              - /url: "#"
+            - link "Bảo mật" [ref=e133] [cursor=pointer]:
+              - /url: "#"
+            - link "Liên hệ" [ref=e134] [cursor=pointer]:
+              - /url: "#"
+            - link "Trợ giúp" [ref=e135] [cursor=pointer]:
+              - /url: "#"
+          - generic [ref=e136]:
+            - button "📎" [ref=e137]
+            - button "✉️" [ref=e138]
+    - generic [ref=e140]:
+      - generic [ref=e141]:
+        - img "Chân dung tác giả Trương Chí Kiên" [ref=e143]
+        - generic [ref=e144]:
+          - generic [ref=e145]: 🎓
+          - generic [ref=e146]:
+            - paragraph [ref=e147]: Tác giả
+            - paragraph [ref=e148]: Trương Chí Kiên
+      - generic [ref=e149]:
+        - generic [ref=e150]: ❤️ Tâm sự từ người sáng lập
+        - heading "Xây dựng không gian mạng an toàn cho trẻ em" [level=2] [ref=e151]
+        - generic [ref=e152]:
+          - paragraph [ref=e153]: Xin chào! Mình là Trương Chí Kiên. Nhận thấy trẻ em ngày nay tiếp xúc với Internet từ rất sớm nhưng lại thiếu các kỹ năng tự bảo vệ, mình đã tạo ra "Bé An Toàn Số" với mong muốn đóng góp một phần nhỏ bé cho cộng đồng.
+          - paragraph [ref=e154]: Trang web được thiết kế như một trò chơi tương tác, nơi các em có thể hóa thân thành những "Hiệp sĩ không gian mạng", trải qua các thử thách để học cách nhận biết lừa đảo, bảo vệ thông tin cá nhân và ứng xử văn minh trên môi trường số.

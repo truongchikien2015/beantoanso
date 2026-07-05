@@ -1,0 +1,36 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4] [cursor=pointer]:
+        - img [ref=e6]
+        - generic [ref=e8]: Bé An Toàn Số
+      - navigation [ref=e9]:
+        - button "Khóa học" [ref=e10] [cursor=pointer]
+        - button "Thử thách" [ref=e11] [cursor=pointer]
+        - button "Bảng xếp hạng" [ref=e12] [cursor=pointer]
+        - button "Về chúng tôi" [ref=e13] [cursor=pointer]
+      - generic [ref=e14]:
+        - button "Đăng nhập" [ref=e15] [cursor=pointer]
+        - button "Đăng ký" [ref=e16] [cursor=pointer]
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - button "← Trang chủ" [ref=e20] [cursor=pointer]
+      - heading "⚡ Thử thách Hằng ngày" [level=1] [ref=e21]
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]: ⚡ Thử thách hôm nay
+        - generic [ref=e25]: "🔥 Streak: 0 ngày"
+      - generic [ref=e27]: 🏷️ Nội dung xấu và tin giả
+      - paragraph [ref=e28]: "❓ Em thấy thử thách nguy hiểm trên TikTok, em sẽ:"
+      - generic [ref=e29]:
+        - button "A Thử ngay" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: A
+          - generic [ref=e32]: Thử ngay
+        - button "B Không làm theo, báo người lớn" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: B
+          - generic [ref=e35]: Không làm theo, báo người lớn
+        - button "C Quay video làm thử" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: C
+          - generic [ref=e38]: Quay video làm thử
+  - button "Open Next.js Dev Tools" [ref=e44] [cursor=pointer]:
+    - img [ref=e45]

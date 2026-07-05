@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chọn bạn đồng hành - Bé An Toàn Số</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Brand Anchors -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f7f9fb",
+                    "on-surface-variant": "#434655",
+                    "on-surface": "#191c1e",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#d8dadc",
+                    "secondary-fixed-dim": "#d0bcff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-secondary-fixed-variant": "#5516be",
+                    "on-background": "#191c1e",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c3c6d7",
+                    "on-primary": "#ffffff",
+                    "background": "#f7f9fb",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#2563eb",
+                    "on-error-container": "#93000a",
+                    "outline": "#737686",
+                    "on-tertiary-fixed": "#261a00",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "secondary": "#6b38d4",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-primary-fixed": "#00174b",
+                    "surface-container-high": "#e6e8ea",
+                    "on-secondary-container": "#fffbff",
+                    "surface-tint": "#0053db",
+                    "tertiary-container": "#8b6700",
+                    "on-tertiary-container": "#ffeed3",
+                    "on-secondary-fixed": "#23005c",
+                    "inverse-primary": "#b4c5ff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#ffdf9f",
+                    "surface-container-low": "#f2f4f6",
+                    "surface-container": "#eceef0",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-highest": "#e0e3e5",
+                    "primary-fixed": "#dbe1ff",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#f7f9fb",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "primary": "#004ac6",
+                    "inverse-surface": "#2d3133",
+                    "secondary-fixed": "#e9ddff",
+                    "secondary-container": "#8455ef",
+                    "surface-variant": "#e0e3e5",
+                    "tertiary-fixed-dim": "#f9bd22",
+                    "tertiary": "#6d5000",
+                    "on-primary-container": "#eeefff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "base": "8px",
+                    "sm": "12px",
+                    "max-width-content": "1100px",
+                    "xl": "64px",
+                    "margin-desktop": "auto",
+                    "lg": "40px",
+                    "md": "24px",
+                    "gutter": "20px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Be Vietnam Pro", "sans-serif"],
+                    "body-md": ["Be Vietnam Pro", "sans-serif"],
+                    "body-lg": ["Be Vietnam Pro", "sans-serif"],
+                    "label-md": ["Be Vietnam Pro", "sans-serif"],
+                    "headline-lg": ["Be Vietnam Pro", "sans-serif"],
+                    "label-bold": ["Be Vietnam Pro", "sans-serif"],
+                    "headline-md": ["Be Vietnam Pro", "sans-serif"],
+                    "display-mobile": ["Be Vietnam Pro", "sans-serif"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "label-bold": ["14px", {"lineHeight": "1", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "display-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "800"}]
+            }
+          }
+        }
+      }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        /* Custom tactile shadows based on brand guidance */
+        .tactile-shadow-primary { box-shadow: 0 6px 0 0 #003ea8; }
+        .tactile-shadow-primary-active { box-shadow: 0 2px 0 0 #003ea8; }
+        
+        .tactile-shadow-card { box-shadow: 0 4px 0 0 #e0e3e5; }
+        .tactile-shadow-card-active { box-shadow: 0 2px 0 0 #e0e3e5; }
+        
+        .tactile-shadow-selected { box-shadow: 0 6px 0 0 #004ac6; }
+        
+        /* Hide scrollbar for grid but allow scrolling */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col pb-[100px] selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Header Section: Mascot & Instructions -->
+<header class="px-margin-mobile pt-lg pb-md w-full max-w-max-width-content mx-auto">
+<div class="flex items-end gap-sm md:gap-md relative">
+<!-- Mascot Character -->
+<div class="shrink-0 w-24 h-24 md:w-32 md:h-32 relative z-10 animate-[bounce_3s_ease-in-out_infinite]">
+<img alt="Cú Cú Mascot" class="w-full h-full object-contain drop-shadow-xl" src="https://lh3.googleusercontent.com/aida/AP1WRLtD8TgCYHhNGPUcR1HFEgW0UAXPQdD34asu3T047iNi2e7LqBmrmiAosUj-oo2BZT-No5NbMzazIbGVqK_tqiCap30dr-2EeR-6Mqc52_46EWotCGn_WWpJ-q3-wJhvP4JVmaP4ikecR_lIvHK9R9Gd_y0wfQlEc5dq7cMygidKBLr6sJq1BWGXnLHfl9nipz4lh_COZBXHRrKRGrZOck3yWbR4AuKHM-RV1lURPuGQmzRAI1L51fxBdPo"/>
+</div>
+<!-- Speech Bubble Card -->
+<div class="bg-surface-container-lowest border-2 border-outline-variant p-4 md:p-6 rounded-[2rem] rounded-bl-none tactile-shadow-card relative flex-1 max-w-md">
+<!-- Chat tail connector -->
+<div class="absolute -left-3 bottom-0 w-4 h-4 bg-surface-container-lowest border-l-2 border-b-2 border-outline-variant z-0 transform rotate-45 rounded-bl-sm"></div>
+<h1 class="font-headline-md text-headline-md text-primary mb-xs md:mb-base relative z-10">Chọn bạn đồng hành</h1>
+<p class="font-body-md text-body-md text-on-surface-variant relative z-10">Chọn một nhân vật đại diện cho con trong hành trình này nhé!</p>
+</div>
+</div>
+</header>
+<!-- Main Content: Avatar Grid -->
+<main class="flex-1 px-margin-mobile w-full max-w-max-width-content mx-auto">
+<!-- 
+            Fluid grid: 2 cols on mobile, 3 on tablet, matching the 
+            "Room to breathe" and "large tap targets" requirement.
+        -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-sm md:gap-md pb-xl">
+<!-- Avatar 1: Selected State -->
+<button class="relative bg-primary-fixed border-[3px] border-primary rounded-[24px] p-4 flex flex-col items-center justify-center transition-transform duration-200 tactile-shadow-selected group outline-none focus-visible:ring-4 focus-visible:ring-primary-fixed-dim">
+<!-- Checkmark Badge -->
+<div class="absolute -top-3 -right-3 bg-tertiary-fixed-dim border-[3px] border-surface-container-lowest text-on-tertiary-fixed rounded-full p-1.5 shadow-md flex items-center justify-center animate-[popIn_0.3s_ease-out]">
+<span class="material-symbols-outlined text-base font-bold" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-surface-container-lowest border-2 border-primary-fixed-dim overflow-hidden mb-3 relative group-hover:scale-105 transition-transform">
+<img class="w-full h-full object-cover" data-alt="A friendly and cute Vietnamese school boy character with neat, short black hair. He is wearing a modern, casual bright blue t-shirt. The illustration is in a high-quality, modern flat vector style with vibrant but safe colors, set against a solid light background. High-key lighting, soft rounded shapes, projecting a trustworthy and encouraging mood suitable for a children's app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRK9Ix5tvkWNlCsvnU4zm4H6Cg2qVYHEYq5eLnJpRtdQjtS4AGmAdpnhYBQc3dQu8RfLw8BnkwrW_Vn7_30XU7EyQBoGw2NwjiVcjpugOkV6ACxheCJONLCsnsIOyIPWV8_4MS01zf3jbDaE37lMAMeLkq8PctxFWrz9YR2XGdpCIlVfH6npafDaSjzh8-81sxpkM5JRyQC9_VPzsC1w2JCFzaLqE-lzacJ2QUkdB6tKXrpjF9T6BiNT-2e9na1n8NSf2dXXAJQDs"/>
+</div>
+<span class="font-label-bold text-label-bold text-on-primary-fixed">Bé Nam</span>
+</button>
+<!-- Avatar 2: Unselected State -->
+<button class="bg-surface-container-lowest border-2 border-outline-variant rounded-[24px] p-4 flex flex-col items-center justify-center transition-all duration-200 tactile-shadow-card hover:-translate-y-1 hover:tactile-shadow-card group outline-none focus-visible:ring-4 focus-visible:ring-primary-fixed-dim active:translate-y-1 active:tactile-shadow-card-active">
+<div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-surface-container overflow-hidden mb-3 border-2 border-surface-variant group-hover:border-primary-fixed-dim transition-colors relative">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" data-alt="A cheerful Vietnamese school girl character with short black bob hair and cute bangs. She is wearing a soft pink casual dress. The illustration is in a high-quality, modern flat vector style with vibrant but safe colors, set against a solid light background. High-key lighting, soft rounded shapes, projecting a playful and approachable mood suitable for a kids educational interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUEnbKHxRkTfulFx19afIXhpkie3ymqHNyOswgROYBRMj_Cdx6U8J-UyAf-YYlv0-MklwONq7cZCS4c9VIVMBXhaJdV0sn6WZ8dMmOnGI5s9hcUv-i7ULeOxqJ5iSfu4q-FCPCqdx4rT1DYy14b2YpoMGD7VzfCdoW4xu0MCk0CAAA_z2H2YHv_lWSsj7qUQ9yxOnveMf5MAa1nXPmsVHbs5VPFJPqpZYmK1moFeSk_7gBHu0l8JNKc1gUBMyzt0XwlzkYRTmhqpw"/>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors">Bé Mai</span>
+</button>
+<!-- Avatar 3: Unselected State -->
+<button class="bg-surface-container-lowest border-2 border-outline-variant rounded-[24px] p-4 flex flex-col items-center justify-center transition-all duration-200 tactile-shadow-card hover:-translate-y-1 hover:tactile-shadow-card group outline-none focus-visible:ring-4 focus-visible:ring-primary-fixed-dim active:translate-y-1 active:tactile-shadow-card-active">
+<div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-surface-container overflow-hidden mb-3 border-2 border-surface-variant group-hover:border-primary-fixed-dim transition-colors relative">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" data-alt="An energetic Vietnamese school boy character with slightly messy, spiky black hair. He is wearing a bright yellow hoodie. The illustration is in a high-quality, modern flat vector style with vibrant but safe colors, set against a solid light background. High-key lighting, soft rounded shapes, projecting an active and encouraging mood suitable for a children's app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvV5h2TOEdqgd9rwtDttdVZJybGF6hXFkiEOzgsW2oXLXcZrcghuuggl4b-_bb5qR-JASWUsnywhXZql3yQulhvJd8-AhunbY6_NCh7aOXe1u3EasWQXLvF2UnY_rQ391Jxkjh1UGN2gHy5hBATuuD4RIo57rmOzZumL4ixHqfoh9PQicWOZ39bnuzzyjjzqoN9LgGPQxLtLccOWWzVfdPyo1UH84qhqIyXiYtBK819cXH9QiFnT8TmsAMCfaWuIEDMsf8Scbg6r0"/>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors">Bé Huy</span>
+</button>
+<!-- Avatar 4: Unselected State -->
+<button class="bg-surface-container-lowest border-2 border-outline-variant rounded-[24px] p-4 flex flex-col items-center justify-center transition-all duration-200 tactile-shadow-card hover:-translate-y-1 hover:tactile-shadow-card group outline-none focus-visible:ring-4 focus-visible:ring-primary-fixed-dim active:translate-y-1 active:tactile-shadow-card-active">
+<div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-surface-container overflow-hidden mb-3 border-2 border-surface-variant group-hover:border-primary-fixed-dim transition-colors relative">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" data-alt="A smart-looking Vietnamese school girl character with her hair tied up in a neat ponytail and wearing rounded glasses. She wears a light green polo shirt. The illustration is in a high-quality, modern flat vector style with vibrant but safe colors, set against a solid light background. High-key lighting, soft rounded shapes, projecting an intelligent and trustworthy mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwlFEEiVq5U8De0DZTaVs6ejQE1fo46p6SX5pyR3oBFBVAArQnyyXD9XeJnXBCO6jCOcEfQtggjML_evWqDiCwpMFJiIfSsByTVZWIOWnridTMAGaf0ZwGgUwlZYV4atTtJFgSesRejwaWgSMB88i9HK2ZOUwnfQCwvKEykQbXWDuwR61AoO1Z5UloSYscGQOdgzJ2xpMHnz5qak_n_CEF9TtALPiiB2VelcCcIo0oWys7ipiB4kNljz-IzobtVzLsqVxKOvTZ4aY"/>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors">Bé Lan</span>
+</button>
+<!-- Avatar 5: Unselected State -->
+<button class="bg-surface-container-lowest border-2 border-outline-variant rounded-[24px] p-4 flex flex-col items-center justify-center transition-all duration-200 tactile-shadow-card hover:-translate-y-1 hover:tactile-shadow-card group outline-none focus-visible:ring-4 focus-visible:ring-primary-fixed-dim active:translate-y-1 active:tactile-shadow-card-active">
+<div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-surface-container overflow-hidden mb-3 border-2 border-surface-variant group-hover:border-primary-fixed-dim transition-colors relative">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" data-alt="A cute chubby Vietnamese boy character with short hair and a big smile. He is wearing an orange t-shirt with a small star logo. The illustration is in a high-quality, modern flat vector style with vibrant but safe colors, set against a solid light background. High-key lighting, soft rounded shapes, projecting a friendly and approachable mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAceak9G50vhPujVewM4F-31ZJO0kvS4lVHzqfMa5WZJZ38tpLi_nqg-sur7E5nXH2AdW7m-dqUes2Ml_xKth4q2eVJXIWdJ_n2mAZFZ6y684p-TKE_Y_FMSKo5lHD0Lxi7XqXskZKvsoFDrat5cCyR7MFX7ce5m84-lT0gngpAFUjW3FWNTXzY8Nz6bFu59G78VjlpqclFA0yKnBU-V1nyygqicrc_ysWmG-P9vhS4hyZplk6ANhna_lSfSDE4AzC03UNNkPy4fE"/>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors">Bé Khoa</span>
+</button>
+<!-- Avatar 6: Unselected State -->
+<button class="bg-surface-container-lowest border-2 border-outline-variant rounded-[24px] p-4 flex flex-col items-center justify-center transition-all duration-200 tactile-shadow-card hover:-translate-y-1 hover:tactile-shadow-card group outline-none focus-visible:ring-4 focus-visible:ring-primary-fixed-dim active:translate-y-1 active:tactile-shadow-card-active">
+<div class="w-20 h-20 md:w-28 md:h-28 rounded-full bg-surface-container overflow-hidden mb-3 border-2 border-surface-variant group-hover:border-primary-fixed-dim transition-colors relative">
+<img class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" data-alt="A sweet Vietnamese school girl character with two braided pigtails. She is wearing a soft purple sweater. The illustration is in a high-quality, modern flat vector style with vibrant but safe colors, set against a solid light background. High-key lighting, soft rounded shapes, projecting a gentle and safe mood suitable for a children's app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN-HlOMuIZRWJv2pUIB8UXR-hKvBCk1t32XFMnNxn3G3geqMY4e2uHX8Mb_Xg1sFBFdDbiT_4FYoEPTi9z2zqkeYT3v-XrwOLGFRqacN3IFETF_dJFcwKHRlizp0jisIIb1doIPFDhPPfgduuHVjoQqYmpIppVJm4dtErRYJOUH8CfVI474KF1UILCiZMouy5ECvRcbNojV8kJjagcTRIfJK3s2Pf3GX3HCX4qXMK8EMTNuZT6YxnDHNAG3dJnBL0_Zxs07KA7x6s"/>
+</div>
+<span class="font-body-lg text-body-lg text-on-surface-variant group-hover:text-on-surface transition-colors">Bé Ngọc</span>
+</button>
+</div>
+</main>
+<!-- Bottom Action Bar (Fixed) -->
+<!-- Navigation shell suppressed due to linear/transactional intent (Onboarding) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface/90 backdrop-blur-sm border-t border-surface-variant z-50 pt-3 pb-6 px-margin-mobile">
+<div class="w-full max-w-max-width-content mx-auto">
+<!-- Chunky Button Style per guidance -->
+<button class="w-full min-h-[56px] bg-primary text-on-primary font-headline-md text-headline-md rounded-[20px] tactile-shadow-primary active:translate-y-[4px] active:tactile-shadow-primary-active transition-all duration-150 flex items-center justify-center gap-2 group">
+<span>Hoàn tất</span>
+<span class="material-symbols-outlined transition-transform group-hover:translate-x-1" style="font-variation-settings: 'FILL' 1, 'wght' 700;">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Minimal JS for interactivity simulation (Active state toggling) -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const avatarButtons = document.querySelectorAll('main button');
+            
+            avatarButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Reset all buttons to unselected state
+                    avatarButtons.forEach(btn => {
+                        // Remove selected classes
+                        btn.classList.remove('bg-primary-fixed', 'border-[3px]', 'border-primary', 'tactile-shadow-selected');
+                        // Add unselected classes back
+                        btn.classList.add('bg-surface-container-lowest', 'border-2', 'border-outline-variant', 'tactile-shadow-card', 'hover:-translate-y-1', 'hover:tactile-shadow-card', 'active:translate-y-1', 'active:tactile-shadow-card-active');
+                        
+                        // Remove checkmark badge
+                        const badge = btn.querySelector('.absolute.-top-3');
+                        if (badge) badge.remove();
+
+                        // Adjust text and image classes
+                        const textSpan = btn.querySelector('span:not(.material-symbols-outlined)');
+                        textSpan.classList.replace('font-label-bold', 'font-body-lg');
+                        textSpan.classList.replace('text-label-bold', 'text-body-lg');
+                        textSpan.classList.replace('text-on-primary-fixed', 'text-on-surface-variant');
+
+                        const imgContainer = btn.querySelector('.rounded-full');
+                        imgContainer.classList.replace('border-primary-fixed-dim', 'border-surface-variant');
+                        
+                        const img = imgContainer.querySelector('img');
+                        img.classList.add('opacity-90');
+                    });
+
+                    // Set clicked button to selected state
+                    this.classList.remove('bg-surface-container-lowest', 'border-2', 'border-outline-variant', 'tactile-shadow-card', 'hover:-translate-y-1', 'hover:tactile-shadow-card', 'active:translate-y-1', 'active:tactile-shadow-card-active');
+                    this.classList.add('bg-primary-fixed', 'border-[3px]', 'border-primary', 'tactile-shadow-selected');
+
+                    // Add checkmark badge
+                    const checkmarkHTML = `
+                        <div class="absolute -top-3 -right-3 bg-tertiary-fixed-dim border-[3px] border-surface-container-lowest text-on-tertiary-fixed rounded-full p-1.5 shadow-md flex items-center justify-center animate-[popIn_0.3s_ease-out]">
+                            <span class="material-symbols-outlined text-base font-bold" style="font-variation-settings: 'FILL' 1;">check</span>
+                        </div>
+                    `;
+                    this.insertAdjacentHTML('afterbegin', checkmarkHTML);
+
+                    // Adjust text and image classes for active state
+                    const textSpan = this.querySelector('span:not(.material-symbols-outlined)');
+                    textSpan.classList.replace('font-body-lg', 'font-label-bold');
+                    textSpan.classList.replace('text-body-lg', 'text-label-bold');
+                    textSpan.classList.replace('text-on-surface-variant', 'text-on-primary-fixed');
+
+                    const imgContainer = this.querySelector('.rounded-full');
+                    imgContainer.classList.replace('border-surface-variant', 'border-primary-fixed-dim');
+                    
+                    const img = imgContainer.querySelector('img');
+                    img.classList.remove('opacity-90');
+                });
+            });
+        });
+    </script>
+<style>
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</body></html>

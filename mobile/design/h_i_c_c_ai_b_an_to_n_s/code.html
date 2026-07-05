@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cú Cú AI Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#c3c6d7",
+                    "background": "#f7f9fb",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e0e3e5",
+                    "inverse-on-surface": "#eff1f3",
+                    "surface": "#f7f9fb",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#f7f9fb",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "on-surface": "#191c1e",
+                    "on-primary-fixed": "#00174b",
+                    "tertiary-container": "#8b6700",
+                    "surface-container": "#eceef0",
+                    "on-secondary-fixed": "#23005c",
+                    "primary-fixed": "#dbe1ff",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#eeefff",
+                    "secondary-fixed": "#e9ddff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#ffeed3",
+                    "on-surface-variant": "#434655",
+                    "secondary": "#6b38d4",
+                    "tertiary-fixed-dim": "#f9bd22",
+                    "surface-tint": "#0053db",
+                    "inverse-primary": "#b4c5ff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-background": "#191c1e",
+                    "on-secondary-container": "#fffbff",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#6d5000",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "primary-container": "#2563eb",
+                    "inverse-surface": "#2d3133",
+                    "primary": "#004ac6",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e6e8ea",
+                    "tertiary-fixed": "#ffdf9f",
+                    "on-secondary-fixed-variant": "#5516be",
+                    "on-tertiary-fixed": "#261a00",
+                    "outline": "#737686",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "secondary-container": "#8455ef",
+                    "secondary-fixed-dim": "#d0bcff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "auto",
+                    "max-width-content": "1100px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "xl": "64px",
+                    "margin-mobile": "16px",
+                    "base": "8px",
+                    "gutter": "20px",
+                    "md": "24px",
+                    "lg": "40px"
+            },
+            "fontFamily": {
+                    "display-mobile": [
+                            "Be Vietnam Pro"
+                    ],
+                    "headline-md": [
+                            "Be Vietnam Pro"
+                    ],
+                    "body-lg": [
+                            "Be Vietnam Pro"
+                    ],
+                    "label-bold": [
+                            "Be Vietnam Pro"
+                    ],
+                    "headline-lg": [
+                            "Be Vietnam Pro"
+                    ],
+                    "label-md": [
+                            "Be Vietnam Pro"
+                    ],
+                    "display-lg": [
+                            "Be Vietnam Pro"
+                    ],
+                    "body-md": [
+                            "Be Vietnam Pro"
+                    ]
+            },
+            "fontSize": {
+                    "display-mobile": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "label-bold": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "800"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col pb-[80px]">
+<!-- Top App Bar -->
+<header class="bg-surface docked full-width top-0 sticky z-50">
+<div class="flex items-center justify-between px-margin-mobile py-base w-full max-w-content mx-auto">
+<div class="flex items-center gap-sm">
+<button aria-label="Back" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface">arrow_back</span>
+</button>
+<div class="flex items-center gap-sm">
+<img alt="Cú Cú An Toàn Avatar" class="w-12 h-12 rounded-full border-2 border-primary-container bg-white object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxqKieRxuS3MlvFe2cUnNR3xK_033-2ZIKKhCqMbQ_uku6a2hY3L1UzXq2bvR53R0WTwcbkyNHgRMejtetleztnt1smzaF0Qnl_CYCaUmkN3M-gc-4WL6z1AWBHRKXf_AIob8kS3hUUxBgCTFbC7nqlcChbF-Xjq1Tt2Rfe0IqtS3TGD_d22qxciCMXeMO8VxPXhpQrc3sDjG-bVS8kMlqVOE10wvLHe7ZBt_vvmVW4F-a4VXXEDY_VkIcUkkCi0z-tL0ZXqAkATQ"/>
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Cú Cú An Toàn</h1>
+<p class="font-label-md text-label-md text-primary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>
+                            Luôn sẵn sàng giúp con
+                        </p>
+</div>
+</div>
+</div>
+<button aria-label="Options" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Chat Area -->
+<main class="flex-grow w-full max-w-content mx-auto px-margin-mobile py-md flex flex-col gap-lg pb-32">
+<!-- Chat Date/Time Separator -->
+<div class="flex justify-center">
+<span class="bg-surface-container-low px-4 py-1 rounded-full font-label-md text-label-md text-on-surface-variant">Hôm nay</span>
+</div>
+<!-- Student Message -->
+<div class="flex justify-end mb-sm">
+<div class="max-w-[85%] md:max-w-[70%]">
+<div class="bg-primary-container text-on-primary-container p-4 rounded-t-2xl rounded-l-2xl rounded-br-sm shadow-[0_4px_0_0_rgba(0,74,198,1)]">
+<p class="font-body-lg text-body-lg">Có người bảo nạp thẻ game để nhận kim cương, con có nên làm không?</p>
+</div>
+<div class="flex justify-end mt-1">
+<span class="font-label-md text-label-md text-outline">10:14 AM</span>
+</div>
+</div>
+</div>
+<!-- Cú Cú Response -->
+<div class="flex justify-start mb-sm gap-sm items-end">
+<img alt="Cú Cú An Toàn Avatar" class="w-8 h-8 rounded-full border border-surface-variant bg-white object-cover hidden md:block" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxqKieRxuS3MlvFe2cUnNR3xK_033-2ZIKKhCqMbQ_uku6a2hY3L1UzXq2bvR53R0WTwcbkyNHgRMejtetleztnt1smzaF0Qnl_CYCaUmkN3M-gc-4WL6z1AWBHRKXf_AIob8kS3hUUxBgCTFbC7nqlcChbF-Xjq1Tt2Rfe0IqtS3TGD_d22qxciCMXeMO8VxPXhpQrc3sDjG-bVS8kMlqVOE10wvLHe7ZBt_vvmVW4F-a4VXXEDY_VkIcUkkCi0z-tL0ZXqAkATQ"/>
+<div class="max-w-[85%] md:max-w-[70%]">
+<div class="bg-surface-container text-on-surface p-4 rounded-t-2xl rounded-r-2xl rounded-bl-sm shadow-[0_4px_0_0_#d8dadc]">
+<p class="font-body-lg text-body-lg">Con không nên nạp thẻ hoặc gửi mã thẻ cho người lạ nhé. Đây có thể là lừa đảo. Con hãy hỏi bố mẹ hoặc thầy cô trước khi làm.</p>
+</div>
+<div class="flex justify-start mt-1">
+<span class="font-label-md text-label-md text-outline">10:15 AM</span>
+</div>
+</div>
+</div>
+<!-- Quick Chips Suggestions -->
+<div class="flex flex-wrap gap-sm mt-md">
+<button class="bg-surface-container-lowest border-2 border-primary text-primary px-4 py-3 rounded-full font-label-bold text-label-bold flex items-center gap-xs shadow-[0_4px_0_0_rgba(0,74,198,1)] hover:bg-primary-fixed transition-colors active:translate-y-[2px] active:shadow-[0_2px_0_0_rgba(0,74,198,1)]">
+<span class="material-symbols-outlined text-primary text-sm">chat</span>
+                Kiểm tra tin nhắn
+            </button>
+<button class="bg-surface-container-lowest border-2 border-primary text-primary px-4 py-3 rounded-full font-label-bold text-label-bold flex items-center gap-xs shadow-[0_4px_0_0_rgba(0,74,198,1)] hover:bg-primary-fixed transition-colors active:translate-y-[2px] active:shadow-[0_2px_0_0_rgba(0,74,198,1)]">
+<span class="material-symbols-outlined text-primary text-sm">school</span>
+                Học về lừa đảo game
+            </button>
+<button class="bg-surface-container-lowest border-2 border-primary text-primary px-4 py-3 rounded-full font-label-bold text-label-bold flex items-center gap-xs shadow-[0_4px_0_0_rgba(0,74,198,1)] hover:bg-primary-fixed transition-colors active:translate-y-[2px] active:shadow-[0_2px_0_0_rgba(0,74,198,1)]">
+<span class="material-symbols-outlined text-primary text-sm">shield_person</span>
+                Báo người lớn
+            </button>
+</div>
+</main>
+<!-- Chat Input Area -->
+<div class="fixed bottom-[80px] md:bottom-0 left-0 w-full bg-surface-bright border-t border-surface-variant p-margin-mobile z-40">
+<div class="max-w-content mx-auto flex items-end gap-sm">
+<button aria-label="Attach" class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-surface-container text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<div class="flex-grow relative">
+<textarea class="w-full bg-surface-container-lowest border-2 border-outline-variant rounded-3xl py-3 px-4 pr-12 font-body-lg text-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-0 resize-none max-h-32 min-h-[56px] shadow-[0_2px_0_0_#e0e3e5]" placeholder="Hỏi Cú Cú về an toàn trên mạng..." rows="1" style="scrollbar-width: none;"></textarea>
+<button aria-label="Send" class="absolute right-2 bottom-2 w-10 h-10 flex items-center justify-center rounded-full bg-primary text-on-primary hover:bg-primary-fixed-variant transition-colors shadow-[0_2px_0_0_#00174b] active:translate-y-[1px] active:shadow-[0_1px_0_0_#00174b]">
+<span class="material-symbols-outlined fill-icon">send</span>
+</button>
+</div>
+<button aria-label="Voice input" class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-surface-container text-on-surface hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+</div>
+<!-- Red SOS FAB -->
+<button aria-label="SOS Alert" class="fixed bottom-24 right-4 md:bottom-24 md:right-[calc(50%-530px)] z-50 w-16 h-16 bg-error text-on-error rounded-full flex items-center justify-center shadow-[0_6px_0_0_#93000a] hover:bg-error-container hover:text-on-error-container active:translate-y-[2px] active:shadow-[0_4px_0_0_#93000a] transition-all">
+<span class="material-symbols-outlined text-[32px] fill-icon">sos</span>
+</button>
+<!-- Bottom Nav Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 bg-surface-container rounded-t-lg shadow-lg border-t-4 border-surface-variant">
+<button class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-bright rounded-xl transition-all w-16">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-bold text-[10px]">Trang chủ</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-2 translate-y-[-2px] shadow-[0_4px_0_0_rgba(0,74,198,1)] transition-all min-w-[72px]">
+<span class="material-symbols-outlined mb-1 fill-icon">school</span>
+<span class="font-label-bold text-[10px]">Luyện kỹ năng</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-bright rounded-xl transition-all w-16">
+<span class="material-symbols-outlined mb-1">security</span>
+<span class="font-label-bold text-[10px]">Quét nguy hiểm</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:bg-surface-bright rounded-xl transition-all w-16">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-bold text-[10px]">Hồ sơ</span>
+</button>
+</nav>
+<script>
+        // Auto-resize textarea
+        const textarea = document.querySelector('textarea');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if(this.value === '') {
+                this.style.height = '56px';
+            }
+        });
+    </script>
+</body></html>

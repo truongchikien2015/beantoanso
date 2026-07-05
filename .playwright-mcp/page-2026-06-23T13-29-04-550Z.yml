@@ -1,0 +1,158 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - button "Bé An Toàn Số" [ref=e5]:
+          - img "Bé An Toàn Số" [ref=e6]
+        - generic [ref=e7]: 👨‍👩‍👧‍👦 Cổng Phụ Huynh
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: 🛡️ Theo dõi hành trình học tập của con
+        - heading "Đồng hành cùng con an toàn số" [level=1] [ref=e12]
+        - paragraph [ref=e13]: Tra cứu kết quả học tập, phát hiện điểm yếu kỹ năng và nhận các gợi ý hướng dẫn con tự bảo vệ tại nhà.
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: 2,500+
+            - generic [ref=e17]: Học sinh
+          - generic [ref=e18]:
+            - generic [ref=e19]: "7"
+            - generic [ref=e20]: Chủ đề kỹ năng
+          - generic [ref=e21]:
+            - generic [ref=e22]: 14k+
+            - generic [ref=e23]: Bài tập hoàn thành
+      - generic [ref=e25]:
+        - heading "Tra cứu tiến độ của con" [level=2] [ref=e26]
+        - paragraph [ref=e27]: Nhập mã liên kết hiển thị trên trang cá nhân hoặc bản đồ học tập của con.
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - generic [ref=e30]: Mã liên kết của con
+            - 'textbox "Ví dụ: PH-XXXXXXXX" [ref=e31]': PH-D1U6OH3QI1
+            - paragraph [ref=e32]: "* Mã hiển thị tại Trang cá nhân hoặc Bản đồ học tập của con."
+          - button "🔍 Xem báo cáo của con" [ref=e33] [cursor=pointer]
+    - generic [ref=e53]:
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]: B
+          - generic [ref=e58]:
+            - heading "Bé Kim" [level=2] [ref=e59]
+            - paragraph [ref=e60]: "Lớp: Lớp 5A"
+        - generic [ref=e61]:
+          - generic [ref=e62]: XP tích lũy
+          - generic [ref=e63]: "495"
+          - generic [ref=e64]: Cấp độ 5
+        - generic [ref=e65]:
+          - generic [ref=e66]: Đánh giá kỹ năng
+          - generic [ref=e67]: Hoàn thành tốt
+          - generic [ref=e68]: 21 câu đã làm
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - heading "Kết quả chi tiết theo chủ đề" [level=3] [ref=e71]
+          - generic [ref=e72]: Tổng hợp từ 21 câu trả lời
+        - generic [ref=e73]:
+          - generic [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]: 💬
+              - generic [ref=e78]: Người lạ trên mạng
+            - generic [ref=e79]: 0%
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - generic [ref=e84]: 🔑
+              - generic [ref=e85]: Bảo vệ mật khẩu
+            - generic [ref=e86]: 100%
+          - generic [ref=e90]:
+            - generic [ref=e91]:
+              - generic [ref=e92]: 🔒
+              - generic [ref=e93]: Quyền riêng tư
+            - generic [ref=e94]: 67%
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - generic [ref=e100]: 🌐
+              - generic [ref=e101]: Ứng xử văn minh
+            - generic [ref=e102]: 67%
+          - generic [ref=e106]:
+            - generic [ref=e107]:
+              - generic [ref=e108]: ⏰
+              - generic [ref=e109]: Thời gian màn hình
+            - generic [ref=e110]: 67%
+          - generic [ref=e114]:
+            - generic [ref=e115]:
+              - generic [ref=e116]: 🚫
+              - generic [ref=e117]: Nội dung xấu
+            - generic [ref=e118]: 67%
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - generic [ref=e124]: 🎣
+              - generic [ref=e125]: Lừa đảo trực tuyến
+            - generic [ref=e126]: 33%
+          - generic [ref=e129]:
+            - generic [ref=e130]: Điểm trung bình
+            - generic [ref=e131]: 57%
+            - generic [ref=e132]: toàn bộ 7 chủ đề
+      - generic [ref=e133]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e136]: ⚠️
+            - heading "Điểm yếu cần cải thiện" [level=3] [ref=e138]
+          - list [ref=e139]:
+            - listitem [ref=e140]:
+              - generic [ref=e141]: ●
+              - generic [ref=e142]: Con chưa cảnh giác cao độ khi có người lạ tiếp cận, nhắn tin xin thông tin cá nhân trên mạng xã hội.
+            - listitem [ref=e143]:
+              - generic [ref=e144]: ●
+              - generic [ref=e145]: Con dễ bị hấp dẫn bởi các phần quà game miễn phí (kim cương, trang phục) và click vào link lạ.
+            - listitem [ref=e146]:
+              - generic [ref=e147]: ●
+              - generic [ref=e148]: Con chưa biết cách bảo mật quyền riêng tư tài khoản cá nhân, dễ đăng tải thông tin nhạy cảm.
+            - listitem [ref=e149]:
+              - generic [ref=e150]: ●
+              - generic [ref=e151]: Con dễ tham gia vào các cuộc đùa cợt, nói xấu hoặc ứng xử chưa văn minh trong các nhóm chat học sinh.
+            - listitem [ref=e152]:
+              - generic [ref=e153]: ●
+              - generic [ref=e154]: Con sử dụng thiết bị điện tử quá thời gian quy định, khó kiểm soát thời gian giải trí.
+            - listitem [ref=e155]:
+              - generic [ref=e156]: ●
+              - generic [ref=e157]: Con tò mò click vào các nội dung bạo lực, giật gân hoặc không phù hợp với lứa tuổi.
+        - generic [ref=e158]:
+          - generic [ref=e159]:
+            - generic [ref=e160]: 💡
+            - heading "Gợi ý hướng dẫn tại nhà" [level=3] [ref=e162]
+          - list [ref=e163]:
+            - listitem [ref=e164]:
+              - generic [ref=e165]: ✓
+              - generic [ref=e166]: "Phụ huynh nhắc nhở con: Tuyệt đối không chia sẻ ảnh cá nhân, số điện thoại, địa chỉ nhà cho người không quen biết."
+            - listitem [ref=e167]:
+              - generic [ref=e168]: ✓
+              - generic [ref=e169]: Hướng dẫn con thói quen rà soát địa chỉ email gửi đến và không bao giờ nhập thông tin tài khoản vào link không chính thức.
+            - listitem [ref=e170]:
+              - generic [ref=e171]: ✓
+              - generic [ref=e172]: Xem lại các thiết lập bảo mật mạng xã hội của con và giải thích những gì đăng lên mạng sẽ tồn tại mãi mãi.
+            - listitem [ref=e173]:
+              - generic [ref=e174]: ✓
+              - generic [ref=e175]: "Nhắc nhở con quy tắc ứng xử trên mạng: Không nói những lời gây tổn thương người khác như khi giao tiếp trực tiếp."
+            - listitem [ref=e176]:
+              - generic [ref=e177]: ✓
+              - generic [ref=e178]: Thỏa thuận với con thời gian biểu rõ ràng (ví dụ tối đa 1 tiếng/ngày) và sử dụng các ứng dụng quản lý thời gian.
+            - listitem [ref=e179]:
+              - generic [ref=e180]: ✓
+              - generic [ref=e181]: Cài đặt bộ lọc tìm kiếm an toàn (SafeSearch) và khuyên con hãy tắt tab ngay và báo cho cha mẹ khi gặp nội dung xấu.
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - paragraph [ref=e185]: Muốn con tiếp tục luyện tập?
+          - paragraph [ref=e186]: Khám phá toàn bộ hành trình học tập và các bài thử thách.
+        - link "🚀 Về trang chủ" [ref=e187] [cursor=pointer]:
+          - /url: /
+    - contentinfo [ref=e34]:
+      - generic [ref=e35]:
+        - generic [ref=e36]:
+          - heading "Bé An Toàn Số" [level=4] [ref=e37]
+          - paragraph [ref=e38]: © 2026 Bé An Toàn Số. Đồng hành cùng trẻ em Việt trên không gian mạng.
+        - generic [ref=e39]:
+          - link "Điều khoản" [ref=e40] [cursor=pointer]:
+            - /url: "#"
+          - link "Bảo mật" [ref=e41] [cursor=pointer]:
+            - /url: "#"
+          - link "Liên hệ" [ref=e42] [cursor=pointer]:
+            - /url: "#"
+  - button "Open Next.js Dev Tools" [ref=e48] [cursor=pointer]:
+    - img [ref=e49]
+  - alert [ref=e188]

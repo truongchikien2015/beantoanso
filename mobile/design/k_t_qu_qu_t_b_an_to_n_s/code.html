@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quét Nguy Hiểm - Kết Quả</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c3c6d7",
+                        "background": "#f7f9fb",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed": "#00174b",
+                        "tertiary-container": "#8b6700",
+                        "surface-container": "#eceef0",
+                        "on-secondary-fixed": "#23005c",
+                        "primary-fixed": "#dbe1ff",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#eeefff",
+                        "secondary-fixed": "#e9ddff",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#ffeed3",
+                        "on-surface-variant": "#434655",
+                        "secondary": "#6b38d4",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "surface-tint": "#0053db",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-background": "#191c1e",
+                        "on-secondary-container": "#fffbff",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#6d5000",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "inverse-surface": "#2d3133",
+                        "primary": "#004ac6",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "tertiary-fixed": "#ffdf9f",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "on-tertiary-fixed": "#261a00",
+                        "outline": "#737686",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-container": "#8455ef",
+                        "secondary-fixed-dim": "#d0bcff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "auto",
+                        "max-width-content": "1100px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "xl": "64px",
+                        "margin-mobile": "16px",
+                        "base": "8px",
+                        "gutter": "20px",
+                        "md": "24px",
+                        "lg": "40px"
+                    },
+                    "fontFamily": {
+                        "display-mobile": ["Be Vietnam Pro"],
+                        "headline-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "label-bold": ["Be Vietnam Pro"],
+                        "headline-lg": ["Be Vietnam Pro"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "display-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "display-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "500"}],
+                        "label-bold": ["14px", {"lineHeight": "1", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .chunky-shadow-error { box-shadow: 0 6px 0 0 theme('colors.on-error-container'); }
+        .chunky-shadow-primary { box-shadow: 0 6px 0 0 theme('colors.on-primary-fixed-variant'); }
+        .chunky-shadow-secondary { box-shadow: 0 6px 0 0 theme('colors.on-secondary-fixed-variant'); }
+        .chunky-card-shadow { box-shadow: 0 4px 0 0 theme('colors.surface-variant'); }
+        
+        .active-press:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 0 currentColor;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex flex-col">
+<!-- TopAppBar (From JSON) -->
+<header class="bg-surface dark:bg-on-surface docked full-width top-0 bg-surface dark:bg-on-surface flex items-center justify-between px-margin-mobile py-base w-full max-w-content mx-auto z-40 sticky">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label-bold text-label-bold overflow-hidden border-2 border-primary-container">
+<span class="material-symbols-outlined" data-icon="face" style="font-variation-settings: 'FILL' 1;">face</span>
+</div>
+<h1 class="font-headline-md text-headline-md dark:text-inverse-on-surface text-primary dark:text-primary-fixed">Chào con, bạn nhỏ!</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors hover:opacity-80 text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-max-width-content mx-margin-desktop px-margin-mobile pt-md pb-32 flex flex-col gap-xl">
+<!-- Hero Alert Section -->
+<section class="flex flex-col items-center text-center gap-md mt-sm">
+<div class="w-24 h-24 rounded-full bg-error-container flex items-center justify-center relative animate-pulse shadow-lg">
+<span class="material-symbols-outlined text-[48px] text-error" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div class="absolute -inset-2 border-4 border-error/30 rounded-full animate-ping"></div>
+</div>
+<div>
+<h2 class="font-display-mobile text-display-mobile text-error">Có dấu hiệu lừa đảo</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs">Đừng bấm link và không gửi mã OTP.</p>
+</div>
+</section>
+<!-- Risk Cards (Bento Grid) -->
+<section>
+<h3 class="font-label-bold text-label-bold text-on-surface mb-sm tracking-wider uppercase opacity-80">Dấu hiệu nhận biết</h3>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container-lowest p-sm rounded-[24px] chunky-card-shadow border border-surface-variant flex flex-col gap-xs items-start">
+<div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined" data-icon="card_giftcard" style="font-variation-settings: 'FILL' 1;">card_giftcard</span>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface">Hứa quà miễn phí bất thường</p>
+</div>
+<div class="bg-surface-container-lowest p-sm rounded-[24px] chunky-card-shadow border border-surface-variant flex flex-col gap-xs items-start">
+<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center text-on-error-container">
+<span class="material-symbols-outlined" data-icon="password" style="font-variation-settings: 'FILL' 1;">password</span>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface">Yêu cầu cung cấp mã OTP</p>
+</div>
+<div class="bg-surface-container-lowest p-sm rounded-[24px] chunky-card-shadow border border-surface-variant flex flex-col gap-xs items-start">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="timer" style="font-variation-settings: 'FILL' 1;">timer</span>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface">Tạo cảm giác phải làm ngay</p>
+</div>
+<div class="bg-surface-container-lowest p-sm rounded-[24px] chunky-card-shadow border border-surface-variant flex flex-col gap-xs items-start">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+</div>
+<p class="font-label-bold text-label-bold text-on-surface">Có đường link không rõ nguồn</p>
+</div>
+</div>
+</section>
+<!-- Checklist Section -->
+<section>
+<h3 class="font-headline-md text-headline-md text-on-background mb-md">Con nên làm gì?</h3>
+<div class="flex flex-col gap-sm">
+<div class="bg-surface-container-lowest p-md rounded-[24px] chunky-card-shadow flex items-center gap-md border border-surface-variant">
+<div class="w-12 h-12 shrink-0 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="do_not_touch">do_not_touch</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface font-bold">Không bấm vào link</p>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-[24px] chunky-card-shadow flex items-center gap-md border border-surface-variant">
+<div class="w-12 h-12 shrink-0 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="visibility_off">visibility_off</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface font-bold">Không gửi mã OTP</p>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-[24px] chunky-card-shadow flex items-center gap-md border border-surface-variant">
+<div class="w-12 h-12 shrink-0 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="screenshot">screenshot</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface font-bold">Chụp màn hình lại</p>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-[24px] chunky-card-shadow flex items-center gap-md border border-surface-variant">
+<div class="w-12 h-12 shrink-0 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface font-bold">Báo cho bố mẹ hoặc thầy cô</p>
+</div>
+</div>
+</section>
+<!-- Mascot Encouragement -->
+<section class="bg-surface-container-low rounded-[32px] p-md flex items-center gap-md">
+<img alt="" class="w-24 h-24 object-contain shrink-0 drop-shadow-md" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxqKieRxuS3MlvFe2cUnNR3xK_033-2ZIKKhCqMbQ_uku6a2hY3L1UzXq2bvR53R0WTwcbkyNHgRMejtetleztnt1smzaF0Qnl_CYCaUmkN3M-gc-4WL6z1AWBHRKXf_AIob8kS3hUUxBgCTFbC7nqlcChbF-Xjq1Tt2Rfe0IqtS3TGD_d22qxciCMXeMO8VxPXhpQrc3sDjG-bVS8kMlqVOE10wvLHe7ZBt_vvmVW4F-a4VXXEDY_VkIcUkkCi0z-tL0ZXqAkATQ"/>
+<div class="relative bg-surface-container-lowest p-sm rounded-[24px] rounded-tl-none chunky-card-shadow flex-1">
+<p class="font-body-md text-body-md text-on-surface font-medium">Bình tĩnh nhé! Chỉ cần con không làm theo yêu cầu của họ là an toàn rồi.</p>
+</div>
+</section>
+<!-- Action Buttons -->
+<section class="flex flex-col gap-md mt-auto pt-lg">
+<button class="w-full min-h-[64px] bg-error text-on-error rounded-full font-headline-md text-headline-md chunky-shadow-error active-press flex items-center justify-center gap-sm transition-transform">
+<span class="material-symbols-outlined text-display-mobile" data-icon="shield_person" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+                Báo người lớn
+            </button>
+<button class="w-full min-h-[64px] bg-secondary text-on-secondary rounded-full font-headline-md text-headline-md chunky-shadow-secondary active-press flex items-center justify-center gap-sm transition-transform">
+<span class="material-symbols-outlined text-display-mobile" data-icon="school">school</span>
+                Luyện bài về OTP
+            </button>
+</section>
+</main>
+<!-- Contextual SOS FAB -->
+<button class="fixed bottom-[100px] right-margin-mobile w-16 h-16 bg-error text-on-error rounded-full shadow-lg flex items-center justify-center z-40 chunky-shadow-error active-press">
+<span class="material-symbols-outlined text-[32px]" data-icon="sos" style="font-variation-settings: 'FILL' 1;">sos</span>
+</button>
+<!-- BottomNavBar (From JSON) -->
+<nav class="bg-surface dark:bg-inverse-surface docked full-width bottom-0 rounded-t-lg fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-4 pt-2 border-t-0 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<!-- Tab 1: Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 rounded-xl w-16" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+<span class="font-label-bold text-label-bold mt-1 text-[10px]">Trang chủ</span>
+</a>
+<!-- Tab 2: Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 rounded-xl w-16" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="school">school</span>
+<span class="font-label-bold text-label-bold mt-1 text-[10px] text-center leading-tight w-full">Luyện kỹ năng</span>
+</a>
+<!-- Tab 3: Active (Quét nguy hiểm) -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary text-on-primary-container dark:text-on-primary rounded-xl px-4 py-2 translate-y-[-2px] shadow-[0_4px_0_0_rgba(0,74,198,1)] transition-all duration-100 w-20" href="#">
+<span class="material-symbols-outlined text-[28px]" data-icon="security" style="font-variation-settings: 'FILL' 1;">security</span>
+<span class="font-label-bold text-label-bold mt-1 text-[10px] text-center leading-tight w-full">Quét nguy hiểm</span>
+</a>
+<!-- Tab 4: Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-2 hover:bg-surface-bright dark:hover:bg-surface-container-highest transition-all duration-100 rounded-xl w-16" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="person">person</span>
+<span class="font-label-bold text-label-bold mt-1 text-[10px]">Hồ sơ</span>
+</a>
+</nav>
+<script>
+        // Simple logic for material symbols parsing just in case
+        document.addEventListener('DOMContentLoaded', () => {
+            const icons = document.querySelectorAll('[data-icon]');
+            icons.forEach(icon => {
+                icon.textContent = icon.getAttribute('data-icon');
+                icon.classList.add('material-symbols-outlined');
+            });
+        });
+    </script>
+</body></html>

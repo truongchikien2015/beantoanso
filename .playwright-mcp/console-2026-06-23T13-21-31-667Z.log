@@ -1,0 +1,551 @@
+[     320ms] [LOG] [Fast Refresh] done in 360ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[     382ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[     657ms] [LOG] [Fast Refresh] done in 275ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[    1332ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[    1367ms] [LOG] [HMR] connected @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[    2277ms] [WARNING] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio @ webpack-internal:///(app-pages-browser)/./src/lib/sound.ts:15
+[    2277ms] [WARNING] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio @ webpack-internal:///(app-pages-browser)/./src/lib/sound.ts:39
+[    2277ms] [WARNING] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio @ webpack-internal:///(app-pages-browser)/./src/lib/sound.ts:39
+[    2277ms] [WARNING] The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio @ webpack-internal:///(app-pages-browser)/./src/lib/sound.ts:39
+[  123126ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  124952ms] [LOG] [Fast Refresh] done in 1827ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  168095ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  168259ms] [LOG] [Fast Refresh] done in 165ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  197680ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  197784ms] [LOG] [HMR] connected @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  198082ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  198405ms] [LOG] [Fast Refresh] done in 323ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  198539ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  198827ms] [LOG] [Fast Refresh] done in 288ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  199231ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/favicon.ico:0
+[  206190ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  206715ms] [LOG] [Fast Refresh] done in 524ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  206724ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  206933ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'dynamic' has already been declared (291:13)
+|     }
+| }
+> export const dynamic = "force-dynamic";
+| export const runtime = "nodejs";
+| export async function GET(req) {
+
+Import trace for requested module:
+./src/app/api/parent/child-stats/route.ts @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57
+[  210067ms] [LOG] [Fast Refresh] done in 3342ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  212011ms] [LOG] [Fast Refresh] done in 5286ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  212095ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  212241ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'dynamic' has already been declared (291:13)
+|     }
+| }
+> export const dynamic = "force-dynamic";
+| export const runtime = "nodejs";
+| export async function GET(req) {
+
+Import trace for requested module:
+./src/app/api/parent/child-stats/route.ts @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/userspace/app/errors/intercept-console-error.js:57
+[  212938ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/parent?code=PH-D1U6OH3QI1&_rsc=4w9yk:0
+[  213084ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/parent?code=PH-D1U6OH3QI1&_rsc=4w9yk:0
+[  213451ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/parent?code=PH-D1U6OH3QI1&_rsc=4w9yk:0
+[  214102ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/parent?code=PH-D1U6OH3QI1:0
+[  214665ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom.development.js:29889
+[  214744ms] ModuleParseError: Module parse failed: Identifier 'dynamic' has already been declared (291:13)
+File was processed with these loaders:
+ * ./node_modules/next/dist/build/webpack/loaders/next-flight-loader/index.js
+ * ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+You may need an additional loader to handle the result of these loaders.
+|     }
+| }
+> export const dynamic = "force-dynamic";
+| export const runtime = "nodejs";
+| export async function GET(req) {
+    at <unknown> (File was processed with these loaders:)
+    at handleParseError (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:410388)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:412004)
+    at processResult (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:407869)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:408891)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8727)
+    at iterateNormalLoaders (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5565)
+    at iterateNormalLoaders (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5650)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5879)
+    at r.callback (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+    at Object.transformSource (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/build/webpack/loaders/next-flight-loader/index.js:191:10)
+    at LOADER_EXECUTION (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4134)
+    at runSyncOrAsync (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4145)
+    at iterateNormalLoaders (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5782)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5142)
+    at r.callback (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js:226:23)
+[  214748ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  214763ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'dynamic' has already been declared (291:13)
+|     }
+| }
+> export const dynamic = "force-dynamic";
+| export const runtime = "nodejs";
+| export async function GET(req) { @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  233647ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  233647ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  233923ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  234062ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  234062ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  234327ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB();
+
+Import trace for requested module:
+./src/app/api/parent/child-stats/route.ts @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  234474ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  234475ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  234530ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB();
+
+Import trace for requested module:
+./src/app/api/parent/child-stats/route.ts @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  234742ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/parent?code=PH-D1U6OH3QI1:0
+[  234802ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom.development.js:29889
+[  234911ms] ModuleParseError: Module parse failed: Identifier 'GET' has already been declared (291:22)
+File was processed with these loaders:
+ * ./node_modules/next/dist/build/webpack/loaders/next-flight-loader/index.js
+ * ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js
+You may need an additional loader to handle the result of these loaders.
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB();
+    at <unknown> (File was processed with these loaders:)
+    at handleParseError (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:410388)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:412004)
+    at processResult (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:407869)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:408891)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8727)
+    at iterateNormalLoaders (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5565)
+    at iterateNormalLoaders (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5650)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5879)
+    at r.callback (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+    at Object.transformSource (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/build/webpack/loaders/next-flight-loader/index.js:191:10)
+    at LOADER_EXECUTION (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4134)
+    at runSyncOrAsync (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4145)
+    at iterateNormalLoaders (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5782)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5142)
+    at r.callback (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/build/webpack/loaders/next-swc-loader.js:226:23)
+[  234988ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  234989ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB(); @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  235038ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB(); @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  235048ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB(); @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  235087ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB(); @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  235128ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB(); @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  235241ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Module parse failed: Identifier 'GET' has already been declared (291:22)
+|     }
+| }
+> export async function GET(req) {
+|     try {
+|         await connectDB(); @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  251955ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  252071ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  252071ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  252816ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Error:   × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:300:1]
+ 297 │     const code = searchParams.get("code")?.trim();
+ 298 │ 
+ 299 │     if (!code) {
+ 300 │       return NextResponse.json({ error: "Vui lòng cung cấp mã liên kết của con." }, { status: 400 });
+     ·       ───────────────────────────────────────────────────────────────────────────────────────────────
+ 301 │     }
+ 302 │ 
+ 303 │     // 1. Try to find student in TeacherStudent (school accounts) by parent_access_code (case-insensitive)
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:318:1]
+ 315 │ 
+ 316 │     if (child) {
+ 317 │       if (!child.is_active) {
+ 318 │         return NextResponse.json({ error: "Tài khoản học sinh này đã bị khóa hoặc không hoạt động." }, { status: 404 });
+     ·         ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 319 │       }
+ 320 │       nickname = child.nickname;
+ 321 │       className = child.class_name || "Chưa xếp lớp";
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:339:1]
+ 336 │     }
+ 337 │ 
+ 338 │     if (!child && !isMember) {
+ 339 │       return NextResponse.json({ error: "Không tìm thấy học sinh với mã liên kết này. Vui lòng kiểm tra lại." }, { status: 404 });
+     ·       ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 340 │     }
+ 341 │ 
+ 342 │     // 3. Fetch actual answers to calculate topic accuracies
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:462:1]
+ 459 │           });
+ 460 │         }
+ 461 │     
+ 462 │ ╭─▶     return NextResponse.json({
+ 463 │ │         success: true,
+ 464 │ │         child: {
+ 465 │ │           nickname,
+ 466 │ │           className,
+ 467 │ │           xp,
+ 468 │ │           level,
+ 469 │ │           status: xp >= 150 ? "Hoàn thành tốt" : (xp >= 50 ? "Khá" : "Cần rèn luyện thêm")
+ 470 │ │         },
+ 471 │ │         vulnerabilities,
+ 472 │ │         recommendations,
+ 473 │ │         accuracies: topicAccuracies,
+ 474 │ │         total_answers: answers ? answers.length : 0
+ 475 │ ╰─▶     });
+ 476 │       } catch (err: any) {
+ 477 │         console.error("Parent API Error:", err);
+ 478 │         return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:478:1]
+ 475 │     });
+ 476 │   } catch (err: any) {
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ·     ────────────────────────────────────────────────────────────────────────────────────────────────────
+ 479 │   }
+ 480 │ }
+     ╰────
+  × Expression expected
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:480:1]
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+ 479 │   }
+ 480 │ }
+     · ─
+ 481 │ 
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/api/parent/child-stats/route.ts @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  253012ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  253012ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  253129ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  253129ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  253171ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  253312ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Error:   × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:300:1]
+ 297 │     const code = searchParams.get("code")?.trim();
+ 298 │ 
+ 299 │     if (!code) {
+ 300 │       return NextResponse.json({ error: "Vui lòng cung cấp mã liên kết của con." }, { status: 400 });
+     ·       ───────────────────────────────────────────────────────────────────────────────────────────────
+ 301 │     }
+ 302 │ 
+ 303 │     // 1. Try to find student in TeacherStudent (school accounts) by parent_access_code (case-insensitive)
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:318:1]
+ 315 │ 
+ 316 │     if (child) {
+ 317 │       if (!child.is_active) {
+ 318 │         return NextResponse.json({ error: "Tài khoản học sinh này đã bị khóa hoặc không hoạt động." }, { status: 404 });
+     ·         ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 319 │       }
+ 320 │       nickname = child.nickname;
+ 321 │       className = child.class_name || "Chưa xếp lớp";
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:339:1]
+ 336 │     }
+ 337 │ 
+ 338 │     if (!child && !isMember) {
+ 339 │       return NextResponse.json({ error: "Không tìm thấy học sinh với mã liên kết này. Vui lòng kiểm tra lại." }, { status: 404 });
+     ·       ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 340 │     }
+ 341 │ 
+ 342 │     // 3. Fetch actual answers to calculate topic accuracies
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:462:1]
+ 459 │           });
+ 460 │         }
+ 461 │     
+ 462 │ ╭─▶     return NextResponse.json({
+ 463 │ │         success: true,
+ 464 │ │         child: {
+ 465 │ │           nickname,
+ 466 │ │           className,
+ 467 │ │           xp,
+ 468 │ │           level,
+ 469 │ │           status: xp >= 150 ? "Hoàn thành tốt" : (xp >= 50 ? "Khá" : "Cần rèn luyện thêm")
+ 470 │ │         },
+ 471 │ │         vulnerabilities,
+ 472 │ │         recommendations,
+ 473 │ │         accuracies: topicAccuracies,
+ 474 │ │         total_answers: answers ? answers.length : 0
+ 475 │ ╰─▶     });
+ 476 │       } catch (err: any) {
+ 477 │         console.error("Parent API Error:", err);
+ 478 │         return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:478:1]
+ 475 │     });
+ 476 │   } catch (err: any) {
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ·     ────────────────────────────────────────────────────────────────────────────────────────────────────
+ 479 │   }
+ 480 │ }
+     ╰────
+  × Expression expected
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:480:1]
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+ 479 │   }
+ 480 │ }
+     · ─
+ 481 │ 
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./src/app/api/parent/child-stats/route.ts @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  253528ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/parent?code=PH-D1U6OH3QI1:0
+[  253590ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ webpack-internal:///(pages-dir-browser)/./node_modules/react-dom/cjs/react-dom.development.js:29889
+[  253673ms] ModuleBuildError: Module build failed (from ./node_modules/next/dist/build/webpack/loaders/next-swc-loader.js):
+Error:   × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:300:1]
+ 297 │     const code = searchParams.get("code")?.trim();
+ 298 │ 
+ 299 │     if (!code) {
+ 300 │       return NextResponse.json({ error: "Vui lòng cung cấp mã liên kết của con." }, { status: 400 });
+     ·       ───────────────────────────────────────────────────────────────────────────────────────────────
+ 301 │     }
+ 302 │ 
+ 303 │     // 1. Try to find student in TeacherStudent (school accounts) by parent_access_code (case-insensitive)
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:318:1]
+ 315 │ 
+ 316 │     if (child) {
+ 317 │       if (!child.is_active) {
+ 318 │         return NextResponse.json({ error: "Tài khoản học sinh này đã bị khóa hoặc không hoạt động." }, { status: 404 });
+     ·         ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 319 │       }
+ 320 │       nickname = child.nickname;
+ 321 │       className = child.class_name || "Chưa xếp lớp";
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:339:1]
+ 336 │     }
+ 337 │ 
+ 338 │     if (!child && !isMember) {
+ 339 │       return NextResponse.json({ error: "Không tìm thấy học sinh với mã liên kết này. Vui lòng kiểm tra lại." }, { status: 404 });
+     ·       ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 340 │     }
+ 341 │ 
+ 342 │     // 3. Fetch actual answers to calculate topic accuracies
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:462:1]
+ 459 │           });
+ 460 │         }
+ 461 │     
+ 462 │ ╭─▶     return NextResponse.json({
+ 463 │ │         success: true,
+ 464 │ │         child: {
+ 465 │ │           nickname,
+ 466 │ │           className,
+ 467 │ │           xp,
+ 468 │ │           level,
+ 469 │ │           status: xp >= 150 ? "Hoàn thành tốt" : (xp >= 50 ? "Khá" : "Cần rèn luyện thêm")
+ 470 │ │         },
+ 471 │ │         vulnerabilities,
+ 472 │ │         recommendations,
+ 473 │ │         accuracies: topicAccuracies,
+ 474 │ │         total_answers: answers ? answers.length : 0
+ 475 │ ╰─▶     });
+ 476 │       } catch (err: any) {
+ 477 │         console.error("Parent API Error:", err);
+ 478 │         return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:478:1]
+ 475 │     });
+ 476 │   } catch (err: any) {
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ·     ────────────────────────────────────────────────────────────────────────────────────────────────────
+ 479 │   }
+ 480 │ }
+     ╰────
+  × Expression expected
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:480:1]
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+ 479 │   }
+ 480 │ }
+     · ─
+ 481 │ 
+     ╰────
+
+
+Caused by:
+    Syntax Error
+    at processResult (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:407096)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/webpack/bundle5.js:29:408891)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:8645)
+    at <unknown> (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:5019)
+    at r.callback (file:///Applications/work/hackthon/beantoanso/node_modules/next/dist/compiled/loader-runner/LoaderRunner.js:1:4039)
+[  253792ms] [LOG] [HMR] connected @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  253794ms] [ERROR] ./src/app/api/parent/child-stats/route.ts
+Error:   × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:300:1]
+ 297 │     const code = searchParams.get("code")?.trim();
+ 298 │ 
+ 299 │     if (!code) {
+ 300 │       return NextResponse.json({ error: "Vui lòng cung cấp mã liên kết của con." }, { status: 400 });
+     ·       ───────────────────────────────────────────────────────────────────────────────────────────────
+ 301 │     }
+ 302 │ 
+ 303 │     // 1. Try to find student in TeacherStudent (school accounts) by parent_access_code (case-insensitive)
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:318:1]
+ 315 │ 
+ 316 │     if (child) {
+ 317 │       if (!child.is_active) {
+ 318 │         return NextResponse.json({ error: "Tài khoản học sinh này đã bị khóa hoặc không hoạt động." }, { status: 404 });
+     ·         ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 319 │       }
+ 320 │       nickname = child.nickname;
+ 321 │       className = child.class_name || "Chưa xếp lớp";
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:339:1]
+ 336 │     }
+ 337 │ 
+ 338 │     if (!child && !isMember) {
+ 339 │       return NextResponse.json({ error: "Không tìm thấy học sinh với mã liên kết này. Vui lòng kiểm tra lại." }, { status: 404 });
+     ·       ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ 340 │     }
+ 341 │ 
+ 342 │     // 3. Fetch actual answers to calculate topic accuracies
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:462:1]
+ 459 │           });
+ 460 │         }
+ 461 │     
+ 462 │ ╭─▶     return NextResponse.json({
+ 463 │ │         success: true,
+ 464 │ │         child: {
+ 465 │ │           nickname,
+ 466 │ │           className,
+ 467 │ │           xp,
+ 468 │ │           level,
+ 469 │ │           status: xp >= 150 ? "Hoàn thành tốt" : (xp >= 50 ? "Khá" : "Cần rèn luyện thêm")
+ 470 │ │         },
+ 471 │ │         vulnerabilities,
+ 472 │ │         recommendations,
+ 473 │ │         accuracies: topicAccuracies,
+ 474 │ │         total_answers: answers ? answers.length : 0
+ 475 │ ╰─▶     });
+ 476 │       } catch (err: any) {
+ 477 │         console.error("Parent API Error:", err);
+ 478 │         return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ╰────
+  × Return statement is not allowed here
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:478:1]
+ 475 │     });
+ 476 │   } catch (err: any) {
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+     ·     ────────────────────────────────────────────────────────────────────────────────────────────────────
+ 479 │   }
+ 480 │ }
+     ╰────
+  × Expression expected
+     ╭─[/Applications/work/hackthon/beantoanso/src/app/api/parent/child-stats/route.ts:480:1]
+ 477 │     console.error("Parent API Error:", err);
+ 478 │     return NextResponse.json({ error: "Lỗi kết nối hệ thống. Vui lòng thử lại sau." }, { status: 500 });
+ 479 │   }
+ 480 │ }
+     · ─
+ 481 │ 
+     ╰────
+
+Caused by:
+    Syntax Error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/userspace/pages/pages-dev-overlay-setup.js:70
+[  330343ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  330385ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  330385ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  331240ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/_next/static/webpack/eed2f6c19d4a7f18.webpack.hot-update.json:0
+[  331240ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  331305ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  332327ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ webpack-internal:///(pages-dir-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  333718ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  333798ms] [LOG] [HMR] connected @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  333895ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  334046ms] [LOG] [Fast Refresh] done in 151ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  334166ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  334512ms] [LOG] [Fast Refresh] done in 346ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  352296ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3000/favicon.ico:0
+[  367785ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  368152ms] [LOG] [Fast Refresh] done in 368ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  368308ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  368534ms] [LOG] [Fast Refresh] done in 226ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  368597ms] [LOG] [Fast Refresh] rebuilding @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
+[  368843ms] [LOG] [Fast Refresh] done in 246ms @ webpack-internal:///(app-pages-browser)/./node_modules/next/dist/next-devtools/shared/forward-logs-shared.js:27
