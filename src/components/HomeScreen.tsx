@@ -61,12 +61,20 @@ export function HomeScreen({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center w-full">
           {/* Left Column: Heading, description, and action buttons */}
           <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6">
+<<<<<<< HEAD
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-full text-xs font-black uppercase tracking-wider">
+=======
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-blue-50 border border-blue-100 text-blue-700 rounded-full text-xs font-black uppercase tracking-wider">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
               🛡️ Dành cho học sinh Tiểu học & THCS
             </span>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight font-nunito">
+<<<<<<< HEAD
               Học Internet <span className="text-emerald-500">an toàn</span> <br /> cùng Bé An Toàn Số
+=======
+              Học Internet <span className="text-teal-400">an toàn</span> <br /> cùng Bé An Toàn Số
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
             </h1>
 
             <p className="text-slate-500 text-base md:text-lg font-bold max-w-xl leading-relaxed">
@@ -77,7 +85,11 @@ export function HomeScreen({
             <div className="flex flex-wrap gap-4 pt-2">
               <button
                 onClick={() => { sfx.click(); setShowQuickStart(true); }}
+<<<<<<< HEAD
                 className="bg-emerald-600 text-white rounded-full px-6 py-3 font-bold flex items-center gap-2 hover:bg-emerald-700 active:scale-95 transition-all cursor-pointer shadow-md shadow-emerald-200/40"
+=======
+                className="bg-blue-600 text-white rounded-full px-6 py-3 font-bold flex items-center gap-2 hover:bg-blue-700 active:scale-95 transition-all cursor-pointer shadow-md shadow-blue-200/40"
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
               >
                 🚀 Bắt đầu hành trình ngay
               </button>
@@ -95,8 +107,13 @@ export function HomeScreen({
 
           {/* Right Column: AI Safety Scanner & Mascot */}
           <div className="lg:col-span-5 flex flex-col justify-center items-stretch gap-6 relative mt-6 lg:mt-0 w-full">
+<<<<<<< HEAD
             <div className="flex items-center gap-4 bg-emerald-50 border border-emerald-100 rounded-[24px] p-4 shadow-sm">
               <div className="w-14 h-14 shrink-0 bg-white rounded-2xl overflow-hidden border border-emerald-200 p-1 flex items-center justify-center">
+=======
+            <div className="flex items-center gap-4 bg-sky-50 border border-sky-100 rounded-[24px] p-4 shadow-sm">
+              <div className="w-14 h-14 shrink-0 bg-white rounded-2xl overflow-hidden border border-sky-200 p-1 flex items-center justify-center">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                 <img
                   src="/images/owl_mascot.png"
                   alt="Cú Cú - Mascot Bé An Toàn Số"
@@ -104,8 +121,13 @@ export function HomeScreen({
                 />
               </div>
               <div className="text-left">
+<<<<<<< HEAD
                 <h4 className="font-extrabold text-emerald-950 text-sm">🤖 Bạn Cú Cú AI khuyên:</h4>
                 <p className="text-[11px] text-emerald-800 font-bold leading-normal mt-0.5">Dán tin nhắn nghi vấn hoặc link lạ xuống máy quét bên dưới để Cú bảo vệ con nhé!</p>
+=======
+                <h4 className="font-extrabold text-sky-950 text-sm">🤖 Bạn Cú Cú AI khuyên:</h4>
+                <p className="text-[11px] text-sky-800 font-bold leading-normal mt-0.5">Dán tin nhắn nghi vấn hoặc link lạ xuống máy quét bên dưới để Cú bảo vệ con nhé!</p>
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
               </div>
             </div>
             <AiSafetyScanner />
@@ -114,7 +136,11 @@ export function HomeScreen({
       </section>
 
       {/* ── 3. Mobile App Section ── */}
+<<<<<<< HEAD
       <section className="w-full bg-gradient-to-br from-[#d1fae5]/80 to-[#a7f3d0]/20 py-20 border-t border-b border-slate-100">
+=======
+      <section className="w-full bg-gradient-to-br from-[#e0f2fe]/80 to-[#bae6fd]/20 py-20 border-t border-b border-slate-100">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Mockup & QR scan */}
           <div className="lg:col-span-5 flex flex-col items-center">
@@ -159,7 +185,11 @@ export function HomeScreen({
 
           {/* Right Column: Features List */}
           <div className="lg:col-span-7 flex flex-col items-start text-left">
+<<<<<<< HEAD
             <h2 className="text-3xl md:text-4xl font-black text-emerald-900 tracking-tight leading-tight mb-4 font-nunito">
+=======
+            <h2 className="text-3xl md:text-4xl font-black text-blue-900 tracking-tight leading-tight mb-4 font-nunito">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
               Mang cả thế giới an toàn vào túi <br /> của con
             </h2>
             <p className="text-slate-500 text-base font-bold mb-8 max-w-xl leading-relaxed">
@@ -170,7 +200,11 @@ export function HomeScreen({
             <div className="space-y-6 w-full max-w-xl">
               {/* Feature 1 */}
               <div className="flex gap-4 items-start">
+<<<<<<< HEAD
                 <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-emerald-200">
+=======
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-blue-200">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                   🎮
                 </div>
                 <div className="text-left">
@@ -181,7 +215,11 @@ export function HomeScreen({
 
               {/* Feature 2 */}
               <div className="flex gap-4 items-start">
+<<<<<<< HEAD
                 <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-emerald-200">
+=======
+                <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white text-lg flex-shrink-0 shadow-sm shadow-teal-200">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                   🔍
                 </div>
                 <div className="text-left">
@@ -208,7 +246,11 @@ export function HomeScreen({
       {/* ── 4. Lessons Cards ── */}
       <section id="lessons" className="w-full py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
+<<<<<<< HEAD
           <h2 className="text-center text-3xl font-black text-emerald-900 tracking-tight mb-2 font-nunito">
+=======
+          <h2 className="text-center text-3xl font-black text-blue-900 tracking-tight mb-2 font-nunito">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
             Khám phá lộ trình học thú vị
           </h2>
           <p className="text-center text-slate-500 text-base font-bold max-w-lg mx-auto leading-relaxed mb-12">
@@ -219,7 +261,11 @@ export function HomeScreen({
             {/* Card 1: Password */}
             <div className="bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 flex flex-col justify-between transition-transform hover:-translate-y-1">
               <div>
+<<<<<<< HEAD
                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-2xl text-emerald-600 mb-6">
+=======
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-2xl text-blue-600 mb-6">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                   🔐
                 </div>
                 <h3 className="font-black text-slate-800 text-lg mb-3 font-nunito">An toàn bảo mật</h3>
@@ -238,7 +284,11 @@ export function HomeScreen({
             {/* Card 2: Phishing */}
             <div className="bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 flex flex-col justify-between transition-transform hover:-translate-y-1">
               <div>
+<<<<<<< HEAD
                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-2xl text-emerald-600 mb-6">
+=======
+                <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center text-2xl text-teal-600 mb-6">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                   🔍
                 </div>
                 <h3 className="font-black text-slate-800 text-lg mb-3 font-nunito">Nhận diện lừa đảo</h3>
@@ -257,7 +307,11 @@ export function HomeScreen({
             {/* Card 3: Behavior */}
             <div className="bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 flex flex-col justify-between transition-transform hover:-translate-y-1">
               <div>
+<<<<<<< HEAD
                 <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-2xl text-green-600 mb-6">
+=======
+                <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-2xl text-rose-600 mb-6">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                   👥
                 </div>
                 <h3 className="font-black text-slate-800 text-lg mb-3 font-nunito">Ứng xử văn minh</h3>
@@ -278,12 +332,20 @@ export function HomeScreen({
 
       {/* ── 5. Royal Blue Stats Section ── */}
       <section className="w-full max-w-5xl mx-auto px-6 py-10">
+<<<<<<< HEAD
         <div className="bg-[#065f46] rounded-[36px] py-12 px-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-center text-white shadow-xl shadow-emerald-900/10">
+=======
+        <div className="bg-[#004aad] rounded-[36px] py-12 px-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-center text-white shadow-xl shadow-blue-900/10">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
           <div className="md:col-span-7 text-left space-y-2">
             <h3 className="text-2xl md:text-3xl font-black font-nunito">
               Mạng lưới học tập an toàn ngày <br /> càng lớn mạnh
             </h3>
+<<<<<<< HEAD
             <p className="text-emerald-100 text-sm font-semibold leading-relaxed max-w-md">
+=======
+            <p className="text-blue-100 text-sm font-semibold leading-relaxed max-w-md">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
               Tham gia cùng hàng nghìn bạn nhỏ khác trong hành trình trở thành Hiệp sĩ An toàn số.
             </p>
           </div>
@@ -291,11 +353,19 @@ export function HomeScreen({
           <div className="md:col-span-5 grid grid-cols-2 gap-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10 text-center">
               <span className="text-3xl font-black font-nunito block">2,500+</span>
+<<<<<<< HEAD
               <span className="text-[10px] uppercase font-bold text-emerald-200 mt-1 block">Học sinh tham gia</span>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10 text-center">
               <span className="text-3xl font-black font-nunito block">50+</span>
               <span className="text-[10px] uppercase font-bold text-emerald-200 mt-1 block">Bài học tương tác</span>
+=======
+              <span className="text-[10px] uppercase font-bold text-blue-200 mt-1 block">Học sinh tham gia</span>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10 text-center">
+              <span className="text-3xl font-black font-nunito block">50+</span>
+              <span className="text-[10px] uppercase font-bold text-blue-200 mt-1 block">Bài học tương tác</span>
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
             </div>
           </div>
         </div>
@@ -310,7 +380,11 @@ export function HomeScreen({
           <div className="w-14 h-14 bg-amber-100 border-4 border-white rounded-full flex items-center justify-center text-2xl shadow-md z-20">👦</div>
         </div>
 
+<<<<<<< HEAD
         <h2 className="text-3xl md:text-4xl font-black text-emerald-900 font-nunito leading-tight mb-3">
+=======
+        <h2 className="text-3xl md:text-4xl font-black text-blue-900 font-nunito leading-tight mb-3">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
           Sẵn sàng để bắt đầu cuộc phiêu lưu số?
         </h2>
         <p className="text-slate-500 text-sm font-bold max-w-xl leading-relaxed mb-8">
@@ -319,7 +393,11 @@ export function HomeScreen({
 
         <button
           onClick={() => { sfx.click(); setShowQuickStart(true); }}
+<<<<<<< HEAD
           className="bg-[#047857] text-white rounded-full px-8 py-4 font-black text-base hover:bg-emerald-800 active:scale-95 transition-all shadow-md shadow-emerald-200/40 cursor-pointer"
+=======
+          className="bg-[#005fb8] text-white rounded-full px-8 py-4 font-black text-base hover:bg-blue-700 active:scale-95 transition-all shadow-md shadow-blue-200/40 cursor-pointer"
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         >
           Bắt đầu hành trình ngay
         </button>
@@ -371,7 +449,11 @@ export function HomeScreen({
                   onKeyDown={(e) => e.key === "Enter" && handleStart()}
                   maxLength={30}
                   placeholder="Ví dụ: Bé Minh"
+<<<<<<< HEAD
                   className="input-kid padding-left-4 text-base py-3 focus:border-emerald-600"
+=======
+                  className="input-kid padding-left-4 text-base py-3 focus:border-blue-600"
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                   autoComplete="given-name"
                 />
               </div>
@@ -386,7 +468,11 @@ export function HomeScreen({
                   value={birthYear}
                   onChange={(e) => setBirthYear(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleStart()}
+<<<<<<< HEAD
                   className="input-kid padding-left-4 text-base py-3 focus:border-emerald-600"
+=======
+                  className="input-kid padding-left-4 text-base py-3 focus:border-blue-600"
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                   placeholder="2014"
                   min={1990}
                   max={new Date().getFullYear()}
@@ -398,7 +484,11 @@ export function HomeScreen({
                 <button
                   onClick={handleStart}
                   disabled={!canStart}
+<<<<<<< HEAD
                   className="btn-kid bg-emerald-600 text-white border-emerald-800 hover:bg-emerald-700 w-full justify-center text-base"
+=======
+                  className="btn-kid bg-blue-600 text-white border-blue-800 hover:bg-blue-700 w-full justify-center text-base"
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                 >
                   🚀 Bắt đầu học ngay
                 </button>

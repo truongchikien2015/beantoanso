@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { MissionScreen } from "../../components/MissionScreen";
 import { useAppStore } from "../../lib/globalStore";
 import { totalXpForPlayer } from "../../lib/xp";
+<<<<<<< HEAD
 import { supabase } from "../../lib/supabase";
+=======
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
 export default function MissionPage() {
   const router = useRouter();
@@ -46,8 +49,12 @@ export default function MissionPage() {
     router.push(mapHref);
   };
 
+<<<<<<< HEAD
   const handleLogout = async () => {
     await supabase?.auth.signOut();
+=======
+  const handleLogout = () => {
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     useAppStore.getState().logout();
     router.push("/");
   };

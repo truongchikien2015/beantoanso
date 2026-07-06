@@ -6,7 +6,10 @@ import { ResultScreen } from "../../components/ResultScreen";
 import { Certificate } from "../../components/Certificate";
 import { useAppStore } from "../../lib/globalStore";
 import { totalXpForPlayer } from "../../lib/xp";
+<<<<<<< HEAD
 import { supabase } from "../../lib/supabase";
+=======
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 import { Results } from "../../lib/store";
 
 export default function ResultPage() {
@@ -29,8 +32,12 @@ export default function ResultPage() {
     }
   }, [nickname, quiz, router]);
 
+<<<<<<< HEAD
   const handleLogout = async () => {
     await supabase?.auth.signOut();
+=======
+  const handleLogout = () => {
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     useAppStore.getState().logout();
     router.push("/");
   };

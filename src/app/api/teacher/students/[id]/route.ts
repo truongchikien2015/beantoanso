@@ -57,6 +57,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
 
   await connectDB();
 
+<<<<<<< HEAD
   const student = await TeacherStudent.findOneAndUpdate(
     { _id: toObjectId(id), created_by: uid },
     { is_active: false },
@@ -64,6 +65,18 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
   ).lean();
 
   if (!student) return NextResponse.json({ error: "Student not found or unauthorized" }, { status: 404 });
+=======
+  // Hard delete so student_code can be reused on re-import — soft-deleted rows
+  // used to collide with the unique index and block CSV re-import of the same code.
+  const del = await TeacherStudent.deleteOne({
+    _id: toObjectId(id),
+    created_by: uid,
+  } as any);
+
+  if (del.deletedCount === 0) {
+    return NextResponse.json({ error: "Student not found or unauthorized" }, { status: 404 });
+  }
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
   return NextResponse.json({ success: true });
 }

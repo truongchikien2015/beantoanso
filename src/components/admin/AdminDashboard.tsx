@@ -177,6 +177,17 @@ export function AdminDashboard({ onBack }: { onBack: () => void }) {
   );
 }
 
+<<<<<<< HEAD
+=======
+// Deterministic hue (0-360) from an arbitrary string — used to color avatar bubbles
+// so the same student always renders the same shade across reloads.
+function hueFromString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h % 360;
+}
+
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 function AdminContentShell({
   children,
   wide = false,
@@ -586,10 +597,20 @@ type AdminStudent = {
   xp: number;
   level: number;
   totalScore: number;
+<<<<<<< HEAD
+=======
+  hasPassword: boolean;
+  teacherId: string | null;
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   createdAt: string;
   updatedAt: string;
 };
 
+<<<<<<< HEAD
+=======
+type TeacherOption = { id: string; authUid: string; name: string; email: string };
+
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 function AllStudentsView() {
   const [students, setStudents] = useState<AdminStudent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -597,8 +618,45 @@ function AllStudentsView() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [resetTarget, setResetTarget] = useState<AdminStudent | null>(null);
+<<<<<<< HEAD
   const PAGE_SIZE = 20;
 
+=======
+  const [deleteTarget, setDeleteTarget] = useState<AdminStudent | null>(null);
+  const [assignTarget, setAssignTarget] = useState<AdminStudent | null>(null);
+  const [bulkAssignOpen, setBulkAssignOpen] = useState(false);
+  const [teachers, setTeachers] = useState<TeacherOption[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const PAGE_SIZE = 20;
+
+  // Fetch teacher list once — used to populate the assign-teacher pickers.
+  useEffect(() => {
+    const pw = Admin.getPassword();
+    fetch("/api/teachers", { headers: { "x-admin-password": pw } })
+      .then((r) => r.json())
+      .then((body) => {
+        if (Array.isArray(body?.data)) {
+          setTeachers(
+            body.data.map((t: any) => ({
+              id: t.id,
+              authUid: t.authUid,
+              name: t.name,
+              email: t.email,
+            })),
+          );
+        }
+      })
+      .catch((err) => console.error("[AllStudentsView] load teachers failed:", err));
+  }, []);
+
+  const teacherByAuthUid = useMemo(() => {
+    const m = new Map<string, TeacherOption>();
+    for (const t of teachers) m.set(t.authUid, t);
+    return m;
+  }, [teachers]);
+
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   const load = async () => {
     setLoading(true);
     setError("");
@@ -672,8 +730,50 @@ function AllStudentsView() {
             className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-xs sm:text-sm font-semibold"
             style={{ maxWidth: 360 }}
           />
+<<<<<<< HEAD
         </div>
 
+=======
+          <button
+            onClick={() => {
+              const brokenIds = students.filter((s) => !s.email || !s.hasPassword).map((s) => s.id);
+              setSelectedIds(new Set(brokenIds));
+            }}
+            className="Btn BtnSm rounded-2xl font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-100 text-xs whitespace-nowrap"
+          >
+            ⚠️ Chọn hết user lỗi
+          </button>
+        </div>
+
+        {selectedIds.size > 0 && (
+          <div className="px-4 sm:px-5 py-3 bg-sky-50 border-b-2 border-sky-100 flex items-center justify-between gap-3">
+            <p className="text-xs sm:text-sm font-black text-sky-800">
+              Đã chọn <span className="text-base">{selectedIds.size}</span> học sinh
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedIds(new Set())}
+                className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-sky-700 text-xs"
+              >
+                Bỏ chọn
+              </button>
+              <button
+                onClick={() => setBulkAssignOpen(true)}
+                className="Btn BtnSm rounded-xl font-black bg-indigo-600 hover:bg-indigo-700 text-white text-xs shadow-md"
+              >
+                👩‍🏫 Gán giáo viên
+              </button>
+              <button
+                onClick={() => setBulkDeleteOpen(true)}
+                className="Btn BtnSm rounded-xl font-black bg-rose-600 hover:bg-rose-700 text-white text-xs shadow-md"
+              >
+                🗑️ Xoá {selectedIds.size}
+              </button>
+            </div>
+          </div>
+        )}
+
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         {loading ? (
           <div className="py-20 text-center font-bold text-slate-400">⏳ Đang tải danh sách học sinh...</div>
         ) : error ? (
@@ -684,6 +784,7 @@ function AllStudentsView() {
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
+<<<<<<< HEAD
             <table className="w-full min-w-[760px]">
               <thead>
                 <tr className="bg-sky-50/50">
@@ -713,6 +814,171 @@ function AllStudentsView() {
                 ))}
                 {filtered.length === 0 && (
                   <tr><td colSpan={8} className="text-center py-16 font-bold text-slate-400">
+=======
+            <table className="w-full min-w-[680px]">
+              <thead>
+                <tr className="bg-slate-50 border-b-2 border-slate-100">
+                  <th className="py-3 pl-5 pr-2 text-left w-10">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 rounded border-2 border-sky-300 cursor-pointer accent-sky-600"
+                      checked={paged.length > 0 && paged.every((s) => selectedIds.has(s.id))}
+                      ref={(el) => {
+                        if (el) {
+                          const some = paged.some((s) => selectedIds.has(s.id));
+                          const all = paged.length > 0 && paged.every((s) => selectedIds.has(s.id));
+                          el.indeterminate = some && !all;
+                        }
+                      }}
+                      onChange={(e) => {
+                        setSelectedIds((prev) => {
+                          const next = new Set(prev);
+                          if (e.target.checked) paged.forEach((s) => next.add(s.id));
+                          else paged.forEach((s) => next.delete(s.id));
+                          return next;
+                        });
+                      }}
+                    />
+                  </th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left">Học sinh</th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left hidden sm:table-cell">Thông tin</th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left">Trình độ</th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left hidden md:table-cell">Đăng ký</th>
+                  <th className="py-3 px-3 pr-5 text-[10px] font-black uppercase tracking-wider text-slate-500 text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paged.map((s) => {
+                  const isBroken = !s.email || !s.hasPassword;
+                  const isSelected = selectedIds.has(s.id);
+                  const initial = (s.fullName || s.email || "?").trim().charAt(0).toUpperCase();
+                  const avatarHue = hueFromString(s.id);
+                  const displayName = s.fullName && !s.fullName.includes("@") ? s.fullName : (s.email ? s.email.split("@")[0] : "Chưa đặt tên");
+                  const meta: string[] = [];
+                  if (s.gender) meta.push(genderLabel(s.gender));
+                  if (s.birthYear) meta.push(String(s.birthYear));
+                  return (
+                    <tr
+                      key={s.id}
+                      className={[
+                        "group transition-colors border-b border-slate-100 relative",
+                        isSelected ? "bg-sky-50/70" : isBroken ? "bg-rose-50/30 hover:bg-rose-50/60" : "hover:bg-slate-50/70",
+                      ].join(" ")}
+                    >
+                      {/* Left accent bar */}
+                      <td className="w-1 p-0">
+                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${isSelected ? "bg-sky-500" : isBroken ? "bg-rose-400" : "bg-transparent group-hover:bg-slate-300"}`} />
+                      </td>
+                      {/* Checkbox */}
+                      <td className="py-4 pl-5 pr-2 align-middle">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 rounded border-2 border-sky-300 cursor-pointer accent-sky-600"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            setSelectedIds((prev) => {
+                              const next = new Set(prev);
+                              if (e.target.checked) next.add(s.id);
+                              else next.delete(s.id);
+                              return next;
+                            });
+                          }}
+                        />
+                      </td>
+                      {/* Học sinh: avatar + name stack */}
+                      <td className="py-4 px-3 align-middle">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div
+                            className="w-10 h-10 rounded-2xl flex items-center justify-center font-black text-white text-sm shrink-0 shadow-sm"
+                            style={{ background: `linear-gradient(135deg, hsl(${avatarHue}, 70%, 60%), hsl(${avatarHue + 30}, 70%, 55%))` }}
+                          >
+                            {initial}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-black text-slate-800 text-sm truncate max-w-[220px]" title={displayName}>{displayName}</span>
+                              {isBroken && (
+                                <span
+                                  title={`${!s.email ? "Thiếu email. " : ""}${!s.hasPassword ? "Chưa có mật khẩu." : ""}`}
+                                  className="inline-flex items-center gap-1 rounded-full bg-rose-100 border border-rose-200 px-2 py-0.5 text-[10px] font-black text-rose-700 shrink-0"
+                                >
+                                  ⚠️ Lỗi login
+                                </span>
+                              )}
+                            </div>
+                            {s.email && (
+                              <div className="text-[11px] text-slate-500 font-semibold truncate max-w-[260px]" title={s.email}>{s.email}</div>
+                            )}
+                            {(() => {
+                              const t = s.teacherId ? teacherByAuthUid.get(s.teacherId) : null;
+                              if (!t) return null;
+                              return (
+                                <div className="mt-1 inline-flex items-center gap-1 rounded-md bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-[10px] font-black text-indigo-700 max-w-[240px]" title={`${t.name} (${t.email})`}>
+                                  👩‍🏫 <span className="truncate">{t.name}</span>
+                                </div>
+                              );
+                            })()}
+                            {/* Mobile: show meta + date inline since columns hidden */}
+                            <div className="text-[10px] text-slate-400 font-bold mt-0.5 sm:hidden">
+                              {meta.join(" · ") || "—"} · Đăng ký {new Date(s.createdAt).toLocaleDateString("vi-VN")}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      {/* Thông tin */}
+                      <td className="py-4 px-3 align-middle hidden sm:table-cell">
+                        <div className="text-xs font-bold text-slate-600">{meta.join(" · ") || "—"}</div>
+                      </td>
+                      {/* Trình độ: Lv N + ★ score */}
+                      <td className="py-4 px-3 align-middle">
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center rounded-lg bg-sky-50 border border-sky-100 px-2 py-1 text-[11px] font-black text-sky-700">
+                            Lv {s.level}
+                          </span>
+                          <span className="inline-flex items-center gap-0.5 text-[11px] font-black text-amber-500">
+                            ★ {s.totalScore}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Đăng ký */}
+                      <td className="py-4 px-3 align-middle hidden md:table-cell">
+                        <div className="text-[11px] text-slate-500 font-semibold">{new Date(s.createdAt).toLocaleDateString("vi-VN")}</div>
+                      </td>
+                      {/* Thao tác */}
+                      <td className="py-4 px-3 pr-5 align-middle">
+                        <div className="flex gap-1 justify-end">
+                          <button
+                            onClick={() => setAssignTarget(s)}
+                            title="Gán giáo viên"
+                            aria-label="Gán giáo viên"
+                            className="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-600 hover:text-indigo-700 transition border border-indigo-100"
+                          >
+                            👩‍🏫
+                          </button>
+                          <button
+                            onClick={() => setResetTarget(s)}
+                            title="Đổi mật khẩu"
+                            aria-label="Đổi mật khẩu"
+                            className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-600 hover:text-amber-700 transition border border-amber-100"
+                          >
+                            🔑
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget(s)}
+                            title="Xoá"
+                            aria-label="Xoá học sinh"
+                            className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 transition border border-rose-100"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={7} className="text-center py-16 font-bold text-slate-400">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                     {students.length === 0 ? "Chưa có học sinh nào tự đăng ký." : "Không có học sinh nào phù hợp với tìm kiếm."}
                   </td></tr>
                 )}
@@ -740,6 +1006,316 @@ function AllStudentsView() {
           onClose={() => setResetTarget(null)}
         />
       )}
+<<<<<<< HEAD
+=======
+      {deleteTarget && (
+        <ConfirmDeleteStudentModal
+          label={deleteTarget.fullName}
+          endpoint={`/api/admin/students/${deleteTarget.id}`}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={() => { setDeleteTarget(null); load(); }}
+        />
+      )}
+      {bulkDeleteOpen && (
+        <ConfirmBulkDeleteModal
+          count={selectedIds.size}
+          endpoint="/api/admin/students/bulk-delete"
+          ids={Array.from(selectedIds)}
+          onClose={() => setBulkDeleteOpen(false)}
+          onDeleted={(n) => {
+            setBulkDeleteOpen(false);
+            setSelectedIds(new Set());
+            load();
+            console.info(`[admin/students] bulk-deleted ${n}`);
+          }}
+        />
+      )}
+      {assignTarget && (
+        <AssignTeacherModal
+          label={assignTarget.fullName}
+          teachers={teachers}
+          currentTeacherId={assignTarget.teacherId}
+          onClose={() => setAssignTarget(null)}
+          onAssigned={async (teacherId) => {
+            const pw = Admin.getPassword();
+            const res = await fetch(`/api/admin/students/${assignTarget.id}/assign-teacher`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "x-admin-password": pw },
+              body: JSON.stringify({ teacherId }),
+            });
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+            setAssignTarget(null);
+            await load();
+          }}
+        />
+      )}
+      {bulkAssignOpen && (
+        <AssignTeacherModal
+          label={`${selectedIds.size} học sinh đã chọn`}
+          teachers={teachers}
+          currentTeacherId={null}
+          onClose={() => setBulkAssignOpen(false)}
+          onAssigned={async (teacherId) => {
+            const pw = Admin.getPassword();
+            const res = await fetch(`/api/admin/students/bulk-assign-teacher`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "x-admin-password": pw },
+              body: JSON.stringify({ ids: Array.from(selectedIds), teacherId }),
+            });
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+            setBulkAssignOpen(false);
+            setSelectedIds(new Set());
+            await load();
+            console.info(`[admin/students] bulk-assigned matched=${body.matched} modified=${body.modified}`);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Assign Teacher Modal (shared: single + bulk) ───────────────────────────────
+function AssignTeacherModal({
+  label,
+  teachers,
+  currentTeacherId,
+  onClose,
+  onAssigned,
+}: {
+  label: string;
+  teachers: TeacherOption[];
+  currentTeacherId: string | null;
+  onClose: () => void;
+  onAssigned: (teacherId: string | null) => Promise<void>;
+}) {
+  const [pickedId, setPickedId] = useState<string | null>(currentTeacherId);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const filtered = useMemo(() => {
+    const t = query.trim().toLowerCase();
+    if (!t) return teachers;
+    return teachers.filter(
+      (x) => x.name.toLowerCase().includes(t) || x.email.toLowerCase().includes(t),
+    );
+  }, [teachers, query]);
+
+  const submit = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      await onAssigned(pickedId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Lỗi gán giáo viên");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="ModalOverlay p-2 sm:p-4" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="ModalBox w-full rounded-3xl border-4 border-indigo-200 shadow-2xl overflow-hidden" style={{ maxWidth: 480 }}>
+        <div className="ModalHeader bg-indigo-50 border-b-2 border-indigo-100 p-4 sm:p-5 flex items-center justify-between">
+          <div>
+            <h3 className="font-black text-indigo-900 text-lg sm:text-xl flex items-center gap-1.5">👩‍🏫 Gán giáo viên</h3>
+            <p className="text-indigo-700 font-bold text-xs sm:text-sm mt-0.5 truncate max-w-[300px]" title={label}>{label}</p>
+          </div>
+          <button onClick={onClose} disabled={loading} className="Btn BtnSm rounded-xl font-black bg-white text-slate-600 hover:bg-slate-100 px-3 py-1 text-xs">✕</button>
+        </div>
+        <div className="p-4 sm:p-5 space-y-3 bg-white">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="🔍 Tìm giáo viên theo tên hoặc email..."
+            className="Input w-full rounded-xl border-2 border-indigo-100 focus:border-indigo-300 outline-none text-sm font-semibold p-2"
+          />
+          <div className="max-h-[280px] overflow-y-auto rounded-xl border-2 border-slate-100 divide-y divide-slate-100 bg-slate-50">
+            <label className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition ${pickedId === null ? "bg-indigo-50" : "hover:bg-white"}`}>
+              <input
+                type="radio"
+                checked={pickedId === null}
+                onChange={() => setPickedId(null)}
+                className="w-4 h-4 accent-indigo-600"
+              />
+              <div className="flex-1">
+                <div className="text-sm font-black text-slate-700">Chưa gán / Bỏ gán</div>
+                <div className="text-[11px] text-slate-400 font-semibold">Học sinh không thuộc giáo viên nào</div>
+              </div>
+            </label>
+            {filtered.length === 0 && (
+              <div className="px-3 py-6 text-center text-xs font-bold text-slate-400">Không tìm thấy giáo viên phù hợp.</div>
+            )}
+            {filtered.map((t) => (
+              <label key={t.authUid} className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition ${pickedId === t.authUid ? "bg-indigo-50" : "hover:bg-white"}`}>
+                <input
+                  type="radio"
+                  checked={pickedId === t.authUid}
+                  onChange={() => setPickedId(t.authUid)}
+                  className="w-4 h-4 accent-indigo-600"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-black text-slate-800 truncate">{t.name}</div>
+                  <div className="text-[11px] text-slate-500 font-semibold truncate">{t.email}</div>
+                </div>
+              </label>
+            ))}
+          </div>
+          {error && <div className="p-3 rounded-xl bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs">❌ {error}</div>}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={submit}
+              disabled={loading}
+              className="Btn font-black rounded-2xl shadow-md flex-1 justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2"
+            >
+              {loading ? "Đang gán..." : pickedId ? "Gán giáo viên" : "Bỏ gán"}
+            </button>
+            <button type="button" onClick={onClose} disabled={loading} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-slate-200">Huỷ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Confirm Bulk-Delete Modal ──────────────────────────────────────────────────
+function ConfirmBulkDeleteModal({
+  count,
+  endpoint,
+  ids,
+  onClose,
+  onDeleted,
+}: {
+  count: number;
+  endpoint: string;
+  ids: string[];
+  onClose: () => void;
+  onDeleted: (deleted: number) => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const confirm = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const pw = Admin.getPassword();
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": pw },
+        body: JSON.stringify({ ids }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+      onDeleted(body.deleted ?? 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Lỗi xoá");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="ModalOverlay p-2 sm:p-4" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="ModalBox w-full rounded-3xl border-4 border-rose-200 shadow-2xl overflow-hidden" style={{ maxWidth: 440 }}>
+        <div className="ModalHeader bg-rose-50 border-b-2 border-rose-100 p-4 sm:p-5 flex items-center justify-between">
+          <div>
+            <h3 className="font-black text-rose-900 text-lg sm:text-xl flex items-center gap-1.5">🗑️ Xoá hàng loạt?</h3>
+            <p className="text-rose-700 font-bold text-xs sm:text-sm mt-0.5">Không thể hoàn tác</p>
+          </div>
+          <button onClick={onClose} disabled={loading} className="Btn BtnSm rounded-xl font-black bg-white text-slate-600 hover:bg-slate-100 px-3 py-1 text-xs">✕</button>
+        </div>
+        <div className="p-4 sm:p-5 space-y-4 bg-white">
+          <p className="text-sm font-semibold text-slate-700">
+            Xoá <span className="font-black text-rose-700">{count}</span> học sinh đang chọn khỏi hệ thống?
+          </p>
+          <p className="text-xs text-slate-500 font-medium">
+            Kết quả học tập và câu trả lời đã lưu vẫn còn (dạng orphan) — có thể dọn sau.
+          </p>
+          {error && <div className="p-3 rounded-2xl bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs sm:text-sm">❌ {error}</div>}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={confirm}
+              disabled={loading}
+              className="Btn font-black rounded-2xl shadow-md flex-1 justify-center bg-rose-600 hover:bg-rose-700 text-white text-sm py-2"
+            >
+              {loading ? "Đang xoá..." : `Xoá ${count} học sinh`}
+            </button>
+            <button type="button" onClick={onClose} disabled={loading} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-slate-200">Huỷ</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Confirm-Delete Student Modal (shared by self-registered + teacher-created) ──
+function ConfirmDeleteStudentModal({
+  label,
+  endpoint,
+  onClose,
+  onDeleted,
+}: {
+  label: string;
+  endpoint: string;
+  onClose: () => void;
+  onDeleted: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const confirm = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const pw = Admin.getPassword();
+      const res = await fetch(endpoint, {
+        method: "DELETE",
+        headers: { "x-admin-password": pw },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+      onDeleted();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Lỗi xoá học sinh");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="ModalOverlay p-2 sm:p-4" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="ModalBox w-full rounded-3xl border-4 border-rose-200 shadow-2xl overflow-hidden" style={{ maxWidth: 440 }}>
+        <div className="ModalHeader bg-rose-50 border-b-2 border-rose-100 p-4 sm:p-5 flex items-center justify-between">
+          <div>
+            <h3 className="font-black text-rose-900 text-lg sm:text-xl flex items-center gap-1.5">🗑️ Xoá học sinh?</h3>
+            <p className="text-rose-700 font-bold text-xs sm:text-sm mt-0.5">Không thể hoàn tác</p>
+          </div>
+          <button onClick={onClose} disabled={loading} className="Btn BtnSm rounded-xl font-black bg-white text-slate-600 hover:bg-slate-100 px-3 py-1 text-xs">✕</button>
+        </div>
+        <div className="p-4 sm:p-5 space-y-4 bg-white">
+          <p className="text-sm font-semibold text-slate-700">
+            Xoá <span className="font-black text-rose-700">{label}</span> khỏi hệ thống?
+          </p>
+          <p className="text-xs text-slate-500 font-medium">
+            Kết quả học tập và câu trả lời đã lưu sẽ vẫn còn trong database (dạng orphan) — có thể dọn thủ công sau.
+          </p>
+          {error && <div className="p-3 rounded-2xl bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs sm:text-sm">❌ {error}</div>}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={confirm}
+              disabled={loading}
+              className="Btn font-black rounded-2xl shadow-md flex-1 justify-center bg-rose-600 hover:bg-rose-700 text-white text-sm py-2"
+            >
+              {loading ? "Đang xoá..." : "Xoá vĩnh viễn"}
+            </button>
+            <button type="button" onClick={onClose} disabled={loading} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-slate-200">Huỷ</button>
+          </div>
+        </div>
+      </div>
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     </div>
   );
 }
@@ -848,6 +1424,12 @@ function TeacherStudentsView() {
   const [classFilter, setClassFilter] = useState("");
   const [page, setPage] = useState(1);
   const [resetTarget, setResetTarget] = useState<AdminTeacherStudent | null>(null);
+<<<<<<< HEAD
+=======
+  const [deleteTarget, setDeleteTarget] = useState<AdminTeacherStudent | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   const PAGE_SIZE = 20;
 
   const load = async () => {
@@ -942,6 +1524,31 @@ function TeacherStudentsView() {
           </select>
         </div>
 
+<<<<<<< HEAD
+=======
+        {selectedIds.size > 0 && (
+          <div className="px-4 sm:px-5 py-3 bg-rose-50 border-b-2 border-rose-100 flex items-center justify-between gap-3">
+            <p className="text-xs sm:text-sm font-black text-rose-800">
+              Đã chọn <span className="text-base">{selectedIds.size}</span> học sinh
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSelectedIds(new Set())}
+                className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-rose-100 hover:bg-rose-50 text-rose-700 text-xs"
+              >
+                Bỏ chọn
+              </button>
+              <button
+                onClick={() => setBulkDeleteOpen(true)}
+                className="Btn BtnSm rounded-xl font-black bg-rose-600 hover:bg-rose-700 text-white text-xs shadow-md"
+              >
+                🗑️ Xoá {selectedIds.size} học sinh
+              </button>
+            </div>
+          </div>
+        )}
+
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         {loading ? (
           <div className="py-20 text-center font-bold text-slate-400">⏳ Đang tải danh sách học sinh...</div>
         ) : error ? (
@@ -952,6 +1559,7 @@ function TeacherStudentsView() {
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
+<<<<<<< HEAD
             <table className="w-full min-w-[820px]">
               <thead>
                 <tr className="bg-sky-50/50">
@@ -989,6 +1597,137 @@ function TeacherStudentsView() {
                 ))}
                 {filtered.length === 0 && (
                   <tr><td colSpan={8} className="text-center py-16 font-bold text-slate-400">
+=======
+            <table className="w-full min-w-[720px]">
+              <thead>
+                <tr className="bg-slate-50 border-b-2 border-slate-100">
+                  <th className="py-3 pl-5 pr-2 text-left w-10">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 rounded border-2 border-sky-300 cursor-pointer accent-sky-600"
+                      checked={paged.length > 0 && paged.every((s) => selectedIds.has(s.id))}
+                      ref={(el) => {
+                        if (el) {
+                          const some = paged.some((s) => selectedIds.has(s.id));
+                          const all = paged.length > 0 && paged.every((s) => selectedIds.has(s.id));
+                          el.indeterminate = some && !all;
+                        }
+                      }}
+                      onChange={(e) => {
+                        setSelectedIds((prev) => {
+                          const next = new Set(prev);
+                          if (e.target.checked) paged.forEach((s) => next.add(s.id));
+                          else paged.forEach((s) => next.delete(s.id));
+                          return next;
+                        });
+                      }}
+                    />
+                  </th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left">Học sinh</th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left hidden md:table-cell">Lớp · Giáo viên</th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left hidden lg:table-cell">Lộ trình</th>
+                  <th className="py-3 px-3 text-[10px] font-black uppercase tracking-wider text-slate-500 text-left">Trạng thái</th>
+                  <th className="py-3 px-3 pr-5 text-[10px] font-black uppercase tracking-wider text-slate-500 text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paged.map((s) => {
+                  const isSelected = selectedIds.has(s.id);
+                  const initial = (s.nickname || s.studentCode || "?").trim().charAt(0).toUpperCase();
+                  const avatarHue = hueFromString(s.id);
+                  return (
+                    <tr
+                      key={s.id}
+                      className={[
+                        "group transition-colors border-b border-slate-100 relative",
+                        isSelected ? "bg-sky-50/70" : "hover:bg-slate-50/70",
+                      ].join(" ")}
+                    >
+                      <td className="w-1 p-0">
+                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${isSelected ? "bg-sky-500" : "bg-transparent group-hover:bg-slate-300"}`} />
+                      </td>
+                      <td className="py-4 pl-5 pr-2 align-middle">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 rounded border-2 border-sky-300 cursor-pointer accent-sky-600"
+                          checked={isSelected}
+                          onChange={(e) => {
+                            setSelectedIds((prev) => {
+                              const next = new Set(prev);
+                              if (e.target.checked) next.add(s.id);
+                              else next.delete(s.id);
+                              return next;
+                            });
+                          }}
+                        />
+                      </td>
+                      {/* Học sinh: avatar + nickname + code */}
+                      <td className="py-4 px-3 align-middle">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div
+                            className="w-10 h-10 rounded-2xl flex items-center justify-center font-black text-white text-sm shrink-0 shadow-sm"
+                            style={{ background: `linear-gradient(135deg, hsl(${avatarHue}, 70%, 60%), hsl(${avatarHue + 30}, 70%, 55%))` }}
+                          >
+                            {initial}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-black text-slate-800 text-sm truncate max-w-[220px]" title={s.nickname}>{s.nickname}</div>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="rounded-md bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] text-slate-600">{s.studentCode}</span>
+                              <span className="text-[10px] text-slate-400 font-semibold hidden sm:inline">Tạo {new Date(s.createdAt).toLocaleDateString("vi-VN")}</span>
+                            </div>
+                            {/* Mobile: inline class · teacher */}
+                            <div className="text-[10px] text-slate-500 font-bold mt-1 md:hidden">
+                              {s.className || "—"} · {s.teacherName || "—"}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      {/* Lớp · Giáo viên */}
+                      <td className="py-4 px-3 align-middle hidden md:table-cell">
+                        <div className="text-xs font-black text-slate-700">{s.className || "—"}</div>
+                        <div className="text-[11px] text-slate-500 font-semibold mt-0.5 truncate max-w-[200px]" title={s.teacherName || ""}>{s.teacherName || "—"}</div>
+                      </td>
+                      {/* Lộ trình */}
+                      <td className="py-4 px-3 align-middle hidden lg:table-cell">
+                        {s.assignedPathTitle
+                          ? <span className="inline-flex items-center rounded-lg border border-sky-100 bg-sky-50 px-2 py-1 text-[11px] font-semibold text-sky-700 max-w-[200px] truncate" title={s.assignedPathTitle}>{s.assignedPathTitle}</span>
+                          : <span className="text-slate-400 text-[11px] font-semibold">Chưa gán</span>}
+                      </td>
+                      {/* Trạng thái */}
+                      <td className="py-4 px-3 align-middle">
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-black ${s.isActive ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-slate-100 text-slate-500 border border-slate-200"}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${s.isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
+                          {s.isActive ? "Hoạt động" : "Đã khoá"}
+                        </span>
+                      </td>
+                      {/* Thao tác */}
+                      <td className="py-4 px-3 pr-5 align-middle">
+                        <div className="flex gap-1 justify-end">
+                          <button
+                            onClick={() => setResetTarget(s)}
+                            title="Đổi mật khẩu"
+                            aria-label="Đổi mật khẩu"
+                            className="w-9 h-9 rounded-xl flex items-center justify-center bg-amber-50 hover:bg-amber-100 text-amber-600 hover:text-amber-700 transition border border-amber-100"
+                          >
+                            🔑
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget(s)}
+                            title="Xoá"
+                            aria-label="Xoá học sinh"
+                            className="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 transition border border-rose-100"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={7} className="text-center py-16 font-bold text-slate-400">
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                     {students.length === 0 ? "Chưa có học sinh nào được giáo viên tạo." : "Không có học sinh nào phù hợp với bộ lọc."}
                   </td></tr>
                 )}
@@ -1016,6 +1755,31 @@ function TeacherStudentsView() {
           onClose={() => setResetTarget(null)}
         />
       )}
+<<<<<<< HEAD
+=======
+      {deleteTarget && (
+        <ConfirmDeleteStudentModal
+          label={`${deleteTarget.nickname} (${deleteTarget.studentCode})`}
+          endpoint={`/api/admin/teacher-students/${deleteTarget.id}`}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={() => { setDeleteTarget(null); load(); }}
+        />
+      )}
+      {bulkDeleteOpen && (
+        <ConfirmBulkDeleteModal
+          count={selectedIds.size}
+          endpoint="/api/admin/teacher-students/bulk-delete"
+          ids={Array.from(selectedIds)}
+          onClose={() => setBulkDeleteOpen(false)}
+          onDeleted={(n) => {
+            setBulkDeleteOpen(false);
+            setSelectedIds(new Set());
+            load();
+            console.info(`[admin/teacher-students] bulk-deleted ${n}`);
+          }}
+        />
+      )}
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     </div>
   );
 }

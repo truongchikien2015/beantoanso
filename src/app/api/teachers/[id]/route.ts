@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAdmin } from "@/lib/admin-auth";
 import { connectDB } from "@/lib/mongodb";
 import { Teacher } from "@/lib/db/models/Teacher";
+<<<<<<< HEAD
 import { supabaseAdmin } from "@/lib/supabase-admin";
+=======
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 import mongoose from "mongoose";
 
 function toObjectId(id: string): mongoose.Types.ObjectId {
@@ -76,13 +79,18 @@ export async function DELETE(req: NextRequest, { params }: Params) {
 
   const teacherObjectId = toObjectId(id);
 
+<<<<<<< HEAD
   // Fetch the teacher to get auth_uid
   const teacher = await Teacher.findOne({ _id: teacherObjectId } as any).lean();
 
+=======
+  const teacher = await Teacher.findOne({ _id: teacherObjectId } as any).lean();
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   if (!teacher) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+<<<<<<< HEAD
   // Delete from MongoDB
   await Teacher.deleteOne({ _id: teacherObjectId });
 
@@ -95,5 +103,9 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     }
   }
 
+=======
+  await Teacher.deleteOne({ _id: teacherObjectId });
+
+>>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   return NextResponse.json({ data: { id } });
 }
