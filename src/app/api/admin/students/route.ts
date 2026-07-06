@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
       level: p.level ?? 1,
       totalScore: p.total_score ?? 0,
       hasPassword: !!p.password_hash,
+      teacherId: p.teacher_id ?? null,
       createdAt: p.created_at,
       updatedAt: p.updated_at,
     }));

@@ -595,9 +595,12 @@ type AdminStudent = {
   level: number;
   totalScore: number;
   hasPassword: boolean;
+  teacherId: string | null;
   createdAt: string;
   updatedAt: string;
 };
+
+type TeacherOption = { id: string; authUid: string; name: string; email: string };
 
 function AllStudentsView() {
   const [students, setStudents] = useState<AdminStudent[]>([]);
@@ -607,9 +610,38 @@ function AllStudentsView() {
   const [page, setPage] = useState(1);
   const [resetTarget, setResetTarget] = useState<AdminStudent | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminStudent | null>(null);
+  const [assignTarget, setAssignTarget] = useState<AdminStudent | null>(null);
+  const [bulkAssignOpen, setBulkAssignOpen] = useState(false);
+  const [teachers, setTeachers] = useState<TeacherOption[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const PAGE_SIZE = 20;
+
+  // Fetch teacher list once — used to populate the assign-teacher pickers.
+  useEffect(() => {
+    const pw = Admin.getPassword();
+    fetch("/api/teachers", { headers: { "x-admin-password": pw } })
+      .then((r) => r.json())
+      .then((body) => {
+        if (Array.isArray(body?.data)) {
+          setTeachers(
+            body.data.map((t: any) => ({
+              id: t.id,
+              authUid: t.authUid,
+              name: t.name,
+              email: t.email,
+            })),
+          );
+        }
+      })
+      .catch((err) => console.error("[AllStudentsView] load teachers failed:", err));
+  }, []);
+
+  const teacherByAuthUid = useMemo(() => {
+    const m = new Map<string, TeacherOption>();
+    for (const t of teachers) m.set(t.authUid, t);
+    return m;
+  }, [teachers]);
 
   const load = async () => {
     setLoading(true);
@@ -696,22 +728,28 @@ function AllStudentsView() {
         </div>
 
         {selectedIds.size > 0 && (
-          <div className="px-4 sm:px-5 py-3 bg-rose-50 border-b-2 border-rose-100 flex items-center justify-between gap-3">
-            <p className="text-xs sm:text-sm font-black text-rose-800">
+          <div className="px-4 sm:px-5 py-3 bg-sky-50 border-b-2 border-sky-100 flex items-center justify-between gap-3">
+            <p className="text-xs sm:text-sm font-black text-sky-800">
               Đã chọn <span className="text-base">{selectedIds.size}</span> học sinh
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setSelectedIds(new Set())}
-                className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-rose-100 hover:bg-rose-50 text-rose-700 text-xs"
+                className="Btn BtnSm rounded-xl font-bold bg-white border-2 border-sky-100 hover:bg-sky-50 text-sky-700 text-xs"
               >
                 Bỏ chọn
+              </button>
+              <button
+                onClick={() => setBulkAssignOpen(true)}
+                className="Btn BtnSm rounded-xl font-black bg-indigo-600 hover:bg-indigo-700 text-white text-xs shadow-md"
+              >
+                👩‍🏫 Gán giáo viên
               </button>
               <button
                 onClick={() => setBulkDeleteOpen(true)}
                 className="Btn BtnSm rounded-xl font-black bg-rose-600 hover:bg-rose-700 text-white text-xs shadow-md"
               >
-                🗑️ Xoá {selectedIds.size} học sinh
+                🗑️ Xoá {selectedIds.size}
               </button>
             </div>
           </div>
@@ -821,6 +859,15 @@ function AllStudentsView() {
                             {s.email && (
                               <div className="text-[11px] text-slate-500 font-semibold truncate max-w-[260px]" title={s.email}>{s.email}</div>
                             )}
+                            {(() => {
+                              const t = s.teacherId ? teacherByAuthUid.get(s.teacherId) : null;
+                              if (!t) return null;
+                              return (
+                                <div className="mt-1 inline-flex items-center gap-1 rounded-md bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 text-[10px] font-black text-indigo-700 max-w-[240px]" title={`${t.name} (${t.email})`}>
+                                  👩‍🏫 <span className="truncate">{t.name}</span>
+                                </div>
+                              );
+                            })()}
                             {/* Mobile: show meta + date inline since columns hidden */}
                             <div className="text-[10px] text-slate-400 font-bold mt-0.5 sm:hidden">
                               {meta.join(" · ") || "—"} · Đăng ký {new Date(s.createdAt).toLocaleDateString("vi-VN")}
@@ -850,6 +897,14 @@ function AllStudentsView() {
                       {/* Thao tác */}
                       <td className="py-4 px-3 pr-5 align-middle">
                         <div className="flex gap-1 justify-end">
+                          <button
+                            onClick={() => setAssignTarget(s)}
+                            title="Gán giáo viên"
+                            aria-label="Gán giáo viên"
+                            className="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 hover:bg-indigo-100 text-indigo-600 hover:text-indigo-700 transition border border-indigo-100"
+                          >
+                            👩‍🏫
+                          </button>
                           <button
                             onClick={() => setResetTarget(s)}
                             title="Đổi mật khẩu"
@@ -922,6 +977,152 @@ function AllStudentsView() {
           }}
         />
       )}
+      {assignTarget && (
+        <AssignTeacherModal
+          label={assignTarget.fullName}
+          teachers={teachers}
+          currentTeacherId={assignTarget.teacherId}
+          onClose={() => setAssignTarget(null)}
+          onAssigned={async (teacherId) => {
+            const pw = Admin.getPassword();
+            const res = await fetch(`/api/admin/students/${assignTarget.id}/assign-teacher`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "x-admin-password": pw },
+              body: JSON.stringify({ teacherId }),
+            });
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+            setAssignTarget(null);
+            await load();
+          }}
+        />
+      )}
+      {bulkAssignOpen && (
+        <AssignTeacherModal
+          label={`${selectedIds.size} học sinh đã chọn`}
+          teachers={teachers}
+          currentTeacherId={null}
+          onClose={() => setBulkAssignOpen(false)}
+          onAssigned={async (teacherId) => {
+            const pw = Admin.getPassword();
+            const res = await fetch(`/api/admin/students/bulk-assign-teacher`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "x-admin-password": pw },
+              body: JSON.stringify({ ids: Array.from(selectedIds), teacherId }),
+            });
+            const body = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(body.error ?? `Lỗi ${res.status}`);
+            setBulkAssignOpen(false);
+            setSelectedIds(new Set());
+            await load();
+            console.info(`[admin/students] bulk-assigned matched=${body.matched} modified=${body.modified}`);
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Assign Teacher Modal (shared: single + bulk) ───────────────────────────────
+function AssignTeacherModal({
+  label,
+  teachers,
+  currentTeacherId,
+  onClose,
+  onAssigned,
+}: {
+  label: string;
+  teachers: TeacherOption[];
+  currentTeacherId: string | null;
+  onClose: () => void;
+  onAssigned: (teacherId: string | null) => Promise<void>;
+}) {
+  const [pickedId, setPickedId] = useState<string | null>(currentTeacherId);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const filtered = useMemo(() => {
+    const t = query.trim().toLowerCase();
+    if (!t) return teachers;
+    return teachers.filter(
+      (x) => x.name.toLowerCase().includes(t) || x.email.toLowerCase().includes(t),
+    );
+  }, [teachers, query]);
+
+  const submit = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      await onAssigned(pickedId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Lỗi gán giáo viên");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="ModalOverlay p-2 sm:p-4" onClick={(e) => { if (e.target === e.currentTarget && !loading) onClose(); }}>
+      <div className="ModalBox w-full rounded-3xl border-4 border-indigo-200 shadow-2xl overflow-hidden" style={{ maxWidth: 480 }}>
+        <div className="ModalHeader bg-indigo-50 border-b-2 border-indigo-100 p-4 sm:p-5 flex items-center justify-between">
+          <div>
+            <h3 className="font-black text-indigo-900 text-lg sm:text-xl flex items-center gap-1.5">👩‍🏫 Gán giáo viên</h3>
+            <p className="text-indigo-700 font-bold text-xs sm:text-sm mt-0.5 truncate max-w-[300px]" title={label}>{label}</p>
+          </div>
+          <button onClick={onClose} disabled={loading} className="Btn BtnSm rounded-xl font-black bg-white text-slate-600 hover:bg-slate-100 px-3 py-1 text-xs">✕</button>
+        </div>
+        <div className="p-4 sm:p-5 space-y-3 bg-white">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="🔍 Tìm giáo viên theo tên hoặc email..."
+            className="Input w-full rounded-xl border-2 border-indigo-100 focus:border-indigo-300 outline-none text-sm font-semibold p-2"
+          />
+          <div className="max-h-[280px] overflow-y-auto rounded-xl border-2 border-slate-100 divide-y divide-slate-100 bg-slate-50">
+            <label className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition ${pickedId === null ? "bg-indigo-50" : "hover:bg-white"}`}>
+              <input
+                type="radio"
+                checked={pickedId === null}
+                onChange={() => setPickedId(null)}
+                className="w-4 h-4 accent-indigo-600"
+              />
+              <div className="flex-1">
+                <div className="text-sm font-black text-slate-700">Chưa gán / Bỏ gán</div>
+                <div className="text-[11px] text-slate-400 font-semibold">Học sinh không thuộc giáo viên nào</div>
+              </div>
+            </label>
+            {filtered.length === 0 && (
+              <div className="px-3 py-6 text-center text-xs font-bold text-slate-400">Không tìm thấy giáo viên phù hợp.</div>
+            )}
+            {filtered.map((t) => (
+              <label key={t.authUid} className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer transition ${pickedId === t.authUid ? "bg-indigo-50" : "hover:bg-white"}`}>
+                <input
+                  type="radio"
+                  checked={pickedId === t.authUid}
+                  onChange={() => setPickedId(t.authUid)}
+                  className="w-4 h-4 accent-indigo-600"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-black text-slate-800 truncate">{t.name}</div>
+                  <div className="text-[11px] text-slate-500 font-semibold truncate">{t.email}</div>
+                </div>
+              </label>
+            ))}
+          </div>
+          {error && <div className="p-3 rounded-xl bg-rose-50 border-2 border-rose-200 text-rose-700 font-bold text-xs">❌ {error}</div>}
+          <div className="flex gap-2 pt-1">
+            <button
+              onClick={submit}
+              disabled={loading}
+              className="Btn font-black rounded-2xl shadow-md flex-1 justify-center bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2"
+            >
+              {loading ? "Đang gán..." : pickedId ? "Gán giáo viên" : "Bỏ gán"}
+            </button>
+            <button type="button" onClick={onClose} disabled={loading} className="Btn BtnSm rounded-2xl font-bold bg-white border-2 border-slate-200">Huỷ</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

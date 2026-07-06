@@ -72,6 +72,13 @@ export interface TeacherStudent {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  // "teacher" = created by this teacher via bulk import / manual add.
+  // "self" = self-registered student assigned to this teacher by admin.
+  // Some fields (student_code, parent_access_code) are empty for "self".
+  source?: "teacher" | "self";
+  xp?: number;
+  level?: number;
+  total_score?: number;
 }
 
 export interface TeacherStudentProgress {

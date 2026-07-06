@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
 import { parseStudentFile, validateAndPrepareImport } from "@/lib/excelParser";
-import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound, Users, Copy, Share2 } from "lucide-react";
+import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound, Users, Copy, Share2, UserPlus } from "lucide-react";
 
 const SAMPLE_HEADERS = ["nickname", "email", "class_name", "student_code", "password"];
 
@@ -39,6 +39,9 @@ export function StudentImportManager() {
   const [showBulkAssign, setShowBulkAssign] = useState(false);
   const [bulkAssignLoading, setBulkAssignLoading] = useState(false);
   const [bulkAssignSuccess, setBulkAssignSuccess] = useState("");
+
+  // Single-student add
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,7 +120,21 @@ export function StudentImportManager() {
     setImportedCredentials(null);
     clearError();
     try {
-      const rows = await parseStudentFile(file);
+      // Stage 1: parse file
+      let rows;
+      try {
+        rows = await parseStudentFile(file);
+      } catch (parseErr) {
+        setImportError({ errors: [{ row: 0, message: `[Đọc file] ${parseErr instanceof Error ? parseErr.message : String(parseErr)}` }] });
+        return;
+      }
+
+      if (rows.length === 0) {
+        setImportError({ errors: [{ row: 0, message: `File "${file.name}" không có dòng nào có tên học sinh. Kiểm tra cột "nickname".` }] });
+        return;
+      }
+
+      // Stage 2: validate + prepare
       const existingCodes = new Set(students.map(s => s.student_code));
       const { valid, errors } = validateAndPrepareImport(rows, existingCodes);
 
@@ -131,41 +148,38 @@ export function StudentImportManager() {
         return;
       }
 
+      // Stage 3: check auth
       const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      if (!token) {
+        setImportError({ errors: [{ row: 0, message: "[Chưa đăng nhập] Không tìm thấy teacher_token trong localStorage. Đăng nhập lại giáo viên rồi thử." }] });
+        return;
+      }
 
-      // Call API to import
+      // Stage 4: POST to API
       const res = await fetch("/api/teacher/students", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ students: valid }),
       });
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        setImportError({ errors: [{ row: 0, message: body.error ?? "Lỗi nhập học sinh" }] });
+        const detail = body.error ?? `HTTP ${res.status} ${res.statusText}`;
+        setImportError({ errors: [{ row: 0, message: `[API] ${detail}` }] });
         return;
       }
 
       const body = await res.json();
+      if (body.created && body.created.length > 0) setImportedCredentials(body.created);
+      if (body.result?.failed > 0) setImportError({ errors: body.result.errors ?? [] });
 
-      // Show credentials
-      if (body.created && body.created.length > 0) {
-        setImportedCredentials(body.created);
-      }
-
-      // Show errors
-      if (body.result?.failed > 0) {
-        setImportError({ errors: body.result.errors ?? [] });
-      }
-
-      // Refresh student list
       await fetchStudents();
-
     } catch (err) {
-      setImportError({ errors: [{ row: 0, message: `Lỗi đọc file: ${err instanceof Error ? err.message : String(err)}` }] });
+      // Catch-all — network fail, JSON parse fail, etc.
+      setImportError({ errors: [{ row: 0, message: `[Không xác định] ${err instanceof Error ? err.message : String(err)}` }] });
     } finally {
       setImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -198,9 +212,74 @@ export function StudentImportManager() {
     URL.revokeObjectURL(url);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Xóa học sinh này?")) return;
-    await deleteStudent(id);
+  const handleDelete = async (student: { id: string; nickname: string; source?: "teacher" | "self" }) => {
+    const isSelf = student.source === "self";
+    const confirmMsg = isSelf
+      ? `Bỏ "${student.nickname}" khỏi lớp của bạn? (Tài khoản học sinh không bị xoá.)`
+      : `Xoá học sinh "${student.nickname}"?`;
+    if (!confirm(confirmMsg)) return;
+
+    if (isSelf) {
+      try {
+        const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+        const res = await fetch(`/api/teacher/students/${student.id}/unassign`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          alert(body.error ?? `Lỗi ${res.status}`);
+          return;
+        }
+        await fetchStudents();
+      } catch (err) {
+        alert(err instanceof Error ? err.message : String(err));
+      }
+    } else {
+      await deleteStudent(student.id);
+    }
+  };
+
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
+  const handleBulkDelete = async () => {
+    if (selectedStudents.size === 0) return;
+    const items = filteredStudents
+      .filter((s) => selectedStudents.has(s.id))
+      .map((s) => ({ id: s.id, source: s.source ?? "teacher" as const }));
+    const teacherCount = items.filter((x) => x.source === "teacher").length;
+    const selfCount = items.filter((x) => x.source === "self").length;
+    const parts: string[] = [];
+    if (teacherCount) parts.push(`Xoá ${teacherCount} học sinh do bạn tạo`);
+    if (selfCount) parts.push(`bỏ ${selfCount} học sinh tự đăng ký khỏi lớp`);
+    if (!confirm(`${parts.join(" và ")}?\n\nHành động không thể hoàn tác.`)) return;
+
+    setBulkDeleting(true);
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      const res = await fetch("/api/teacher/students/bulk-delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ items }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(body.error ?? `Lỗi ${res.status}`);
+        return;
+      }
+      setSelectedStudents(new Set());
+      await fetchStudents();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBulkDeleting(false);
+    }
   };
 
   const handleAssign = async (studentId: string) => {
@@ -364,6 +443,9 @@ export function StudentImportManager() {
               <Route size={14} /> Gán lộ trình hàng loạt
             </button>
           )}
+          <button onClick={() => setShowAddModal(true)} className="Btn Btn--outline Btn--sm flex items-center gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50">
+            <UserPlus size={14} /> Thêm học sinh
+          </button>
           <button onClick={downloadTemplate} className="Btn Btn--outline Btn--sm flex items-center gap-1">
             <Download size={14} /> Tải mẫu CSV
           </button>
@@ -562,6 +644,13 @@ export function StudentImportManager() {
               >
                 <Route size={12} /> Gán lộ trình
               </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkDeleting}
+                className="Btn Btn--sm text-xs flex items-center gap-1 bg-rose-600 hover:bg-rose-700 text-white shadow-sm disabled:opacity-60"
+              >
+                <Trash2 size={12} /> {bulkDeleting ? "Đang xoá..." : `Xoá ${selectedStudents.size} học sinh`}
+              </button>
             </div>
           </div>
         )}
@@ -614,6 +703,10 @@ export function StudentImportManager() {
             <div className="divide-y divide-sky-50">
               {filteredStudents.map(student => {
                 const assignedPaths = learningPaths.filter(p => (student.assigned_path_ids || []).includes(p.id));
+                // Self-registered students (linked via Profile.teacher_id) don't
+                // live in teacher_students — teacher-only actions (reset password,
+                // parent code, path assign, delete) are read-only for them.
+                const isSelf = student.source === "self";
                 return (
                   <div key={student.id} className={`grid gap-3 px-4 py-3 transition hover:bg-sky-50/50 md:grid-cols-[44px_1.1fr_0.5fr_0.6fr_1fr_1.1fr_132px] md:items-center ${selectedStudents.has(student.id) ? "bg-indigo-50/70" : ""}`}>
                     <div className="flex items-center justify-between md:block">
@@ -625,28 +718,44 @@ export function StudentImportManager() {
                         aria-label={`Chọn ${student.nickname}`}
                       />
                       <div className="flex gap-1 md:hidden">
-                        {learningPaths.length > 0 && (
+                        {!isSelf && learningPaths.length > 0 && (
                           <button onClick={() => { setAssignTarget(student.id); setAssignPathIds(student.assigned_path_ids || []); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
                             <Plus size={14} />
                           </button>
                         )}
-                        <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
-                          <KeyRound size={14} />
-                        </button>
-                        <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
-                          <Users size={14} />
-                        </button>
-                        <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
+                        {!isSelf && (
+                          <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
+                            <KeyRound size={14} />
+                          </button>
+                        )}
+                        {!isSelf && (
+                          <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
+                            <Users size={14} />
+                          </button>
+                        )}
+                        <button onClick={() => handleDelete(student)} className="Btn Btn--ghost Btn--sm text-red-500" title={isSelf ? "Bỏ khỏi lớp" : "Xóa"}>
                           <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate font-semibold text-slate-900">{student.nickname}</p>
+                      <p className="truncate font-semibold text-slate-900 flex items-center gap-1.5">
+                        {student.nickname}
+                        {student.source === "self" && (
+                          <span
+                            title="Học sinh tự đăng ký, được admin gán vào lớp bạn"
+                            className="inline-flex items-center rounded-md bg-indigo-100 border border-indigo-200 px-1.5 py-0.5 text-[9px] font-black text-indigo-700"
+                          >
+                            TỰ ĐĂNG KÝ
+                          </span>
+                        )}
+                      </p>
                       <p className="mt-0.5 flex items-center gap-1 text-xs text-emerald-600"><UserCheck size={11} /> Hoạt động</p>
                     </div>
-                    <span className="text-sm text-slate-600">{student.class_name || "Chưa có lớp"}</span>
-                    <span className="w-fit rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600">{student.student_code}</span>
+                    <span className="text-sm text-slate-600">{student.class_name || (student.source === "self" ? "Tự do" : "Chưa có lớp")}</span>
+                    <span className="w-fit rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600">
+                      {student.student_code || (student.source === "self" ? "—" : "")}
+                    </span>
                     <div className="min-w-0">
                       {assignedPaths.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
@@ -662,7 +771,9 @@ export function StudentImportManager() {
                     </div>
                     <div className="flex items-center gap-1.5 md:block">
                       <span className="text-xs font-bold text-slate-400 md:hidden">Mã phụ huynh: </span>
-                      {student.parent_access_code ? (
+                      {isSelf ? (
+                        <span className="text-xs text-slate-400">—</span>
+                      ) : student.parent_access_code ? (
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })}
@@ -693,18 +804,22 @@ export function StudentImportManager() {
                       )}
                     </div>
                     <div className="hidden justify-end gap-1 md:flex">
-                      {learningPaths.length > 0 && (
+                      {!isSelf && learningPaths.length > 0 && (
                         <button onClick={() => { setAssignTarget(student.id); setAssignPathIds(student.assigned_path_ids || []); }} className="Btn Btn--secondary Btn--sm" title="Gán lộ trình">
                           <Plus size={14} />
                         </button>
                       )}
-                      <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
-                        <KeyRound size={14} />
-                      </button>
-                      <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
-                        <Users size={14} />
-                      </button>
-                      <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
+                      {!isSelf && (
+                        <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
+                          <KeyRound size={14} />
+                        </button>
+                      )}
+                      {!isSelf && (
+                        <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
+                          <Users size={14} />
+                        </button>
+                      )}
+                      <button onClick={() => handleDelete(student)} className="Btn Btn--ghost Btn--sm text-red-500" title={isSelf ? "Bỏ khỏi lớp" : "Xóa"}>
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -761,11 +876,21 @@ export function StudentImportManager() {
                     className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1 flex-shrink-0 cursor-pointer"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{student.nickname}</p>
+                    <p className="font-medium text-gray-900 truncate flex items-center gap-1.5">
+                      {student.nickname}
+                      {student.source === "self" && (
+                        <span
+                          title="Học sinh tự đăng ký, được admin gán vào lớp bạn"
+                          className="inline-flex items-center rounded-md bg-indigo-100 border border-indigo-200 px-1.5 py-0.5 text-[9px] font-black text-indigo-700"
+                        >
+                          TỰ ĐK
+                        </span>
+                      )}
+                    </p>
                     {student.class_name && <p className="text-xs text-gray-500">{student.class_name}</p>}
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-                        {student.student_code}
+                        {student.student_code || "—"}
                       </span>
                       <span className="text-xs text-green-600 flex items-center gap-0.5"><UserCheck size={10} /> Hoạt động</span>
                     </div>
@@ -828,7 +953,7 @@ export function StudentImportManager() {
                     <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
                       <Users size={14} />
                     </button>
-                    <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
+                    <button onClick={() => handleDelete(student)} className="Btn Btn--ghost Btn--sm text-red-500" title={student.source === "self" ? "Bỏ khỏi lớp" : "Xóa"}>
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -1158,6 +1283,166 @@ export function StudentImportManager() {
           </div>
         </div>
       )}
+
+      {showAddModal && (
+        <AddStudentModal
+          existingCodes={new Set(students.map((s) => s.student_code))}
+          onClose={() => setShowAddModal(false)}
+          onCreated={async () => {
+            setShowAddModal(false);
+            await fetchStudents();
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Add Single Student Modal ──────────────────────────────────────────────────
+function AddStudentModal({
+  existingCodes,
+  onClose,
+  onCreated,
+}: {
+  existingCodes: Set<string>;
+  onClose: () => void;
+  onCreated: (credentials: { nickname: string; student_code: string; password: string }) => void;
+}) {
+  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState("");
+  const [className, setClassName] = useState("");
+  const [studentCode, setStudentCode] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState<{ student_code: string; password: string } | null>(null);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!nickname.trim()) return setError("Vui lòng nhập tên học sinh");
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Email không hợp lệ");
+    if (studentCode && existingCodes.has(studentCode.trim())) return setError(`Mã "${studentCode}" đã tồn tại`);
+    if (password && password.length < 6) return setError("Mật khẩu phải có ít nhất 6 ký tự");
+
+    setLoading(true);
+    try {
+      // Reuse the bulk import validator so codes/passwords are auto-generated
+      // when omitted, and shape matches /api/teacher/students exactly.
+      const { validateAndPrepareImport } = await import("@/lib/excelParser");
+      const { valid, errors } = validateAndPrepareImport(
+        [{ nickname: nickname.trim(), email: email.trim() || undefined, class_name: className.trim() || undefined, student_code: studentCode.trim() || undefined, password: password || undefined }],
+        existingCodes,
+      );
+      if (errors.length > 0) {
+        setError(errors[0].message);
+        return;
+      }
+
+      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
+      const res = await fetch("/api/teacher/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ students: valid }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(body.error ?? `Lỗi ${res.status}`);
+        return;
+      }
+      const created = body.created?.[0];
+      if (created) {
+        setSuccess({ student_code: created.student_code, password: created.password });
+        onCreated(created);
+      } else {
+        setError(body.result?.errors?.[0]?.message ?? "Không tạo được học sinh");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
+        <div className="bg-white rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="text-center space-y-3">
+            <div className="text-4xl">🎉</div>
+            <h3 className="text-lg font-black text-emerald-700">Đã tạo học sinh</h3>
+            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-4 space-y-2 text-left">
+              <div className="text-xs font-bold text-emerald-800">Thông tin đăng nhập:</div>
+              <div className="font-mono text-sm"><span className="text-slate-500">Mã HS:</span> <strong>{success.student_code}</strong></div>
+              <div className="font-mono text-sm"><span className="text-slate-500">Mật khẩu:</span> <strong>{success.password}</strong></div>
+              <p className="text-[11px] text-amber-700 font-semibold pt-2">⚠️ Hãy chép lại — sau khi đóng sẽ không xem lại được.</p>
+            </div>
+            <button onClick={onClose} className="Btn Btn--primary w-full justify-center">Đóng</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-black text-slate-800 flex items-center gap-2">
+            <UserPlus size={20} className="text-emerald-600" /> Thêm học sinh mới
+          </h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-700"><X size={20} /></button>
+        </div>
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <label className="block text-xs font-black text-slate-600 mb-1">Tên học sinh <span className="text-rose-500">*</span></label>
+            <input value={nickname} onChange={(e) => setNickname(e.target.value)} required autoFocus
+              className="Input w-full rounded-lg border-2 border-slate-200 focus:border-emerald-500 p-2 text-sm"
+              placeholder="Ví dụ: Nguyễn Văn A" />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-slate-600 mb-1">Email (tuỳ chọn)</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              className="Input w-full rounded-lg border-2 border-slate-200 focus:border-emerald-500 p-2 text-sm"
+              placeholder="example@email.com" />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-slate-600 mb-1">Lớp (tuỳ chọn)</label>
+            <input value={className} onChange={(e) => setClassName(e.target.value)}
+              className="Input w-full rounded-lg border-2 border-slate-200 focus:border-emerald-500 p-2 text-sm"
+              placeholder="Ví dụ: 5A" />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-slate-600 mb-1">Mã học sinh (để trống → tự sinh)</label>
+            <input value={studentCode} onChange={(e) => setStudentCode(e.target.value)}
+              className="Input w-full rounded-lg border-2 border-slate-200 focus:border-emerald-500 p-2 text-sm font-mono"
+              placeholder="HS001" />
+          </div>
+          <div>
+            <label className="block text-xs font-black text-slate-600 mb-1">Mật khẩu (để trống → tự sinh)</label>
+            <input type="text" value={password} onChange={(e) => setPassword(e.target.value)}
+              className="Input w-full rounded-lg border-2 border-slate-200 focus:border-emerald-500 p-2 text-sm font-mono"
+              placeholder="Tối thiểu 6 ký tự" />
+          </div>
+          {error && (
+            <div className="p-3 rounded-lg bg-rose-50 border-2 border-rose-200 text-rose-700 text-xs font-bold">
+              ❌ {error}
+            </div>
+          )}
+          <div className="flex gap-2 pt-2">
+            <button type="submit" disabled={loading} className="Btn Btn--primary flex-1 justify-center">
+              {loading ? "Đang tạo..." : "Tạo học sinh"}
+            </button>
+            <button type="button" onClick={onClose} disabled={loading} className="Btn Btn--outline">Huỷ</button>
+          </div>
+          <p className="text-[10px] text-slate-400 font-semibold text-center">
+            Học sinh sẽ được tự động gán cho giáo viên đang đăng nhập.
+          </p>
+        </form>
+      </div>
     </div>
   );
 }
