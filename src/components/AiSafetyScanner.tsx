@@ -98,22 +98,14 @@ export function AiSafetyScanner() {
     <div className="card-kid p-6 bg-white w-full text-left shadow-md border-3 border-slate-200 rounded-[32px]">
       {/* Title */}
       <div className="flex items-center gap-3.5 mb-3">
-<<<<<<< HEAD
         <div className="bg-emerald-100 p-2.5 rounded-2xl flex items-center justify-center flex-shrink-0 w-11 h-11 border-2 border-emerald-200">
-=======
-        <div className="bg-sky-100 p-2.5 rounded-2xl flex items-center justify-center flex-shrink-0 w-11 h-11 border-2 border-sky-200">
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
           <span className="text-xl">🤖</span>
         </div>
         <div>
           <h3 className="font-black text-xl text-slate-800 font-nunito leading-tight">
             Máy quét tin nhắn & Link lạ AI
           </h3>
-<<<<<<< HEAD
           <span className="text-[10px] font-black uppercase text-emerald-600 tracking-wider">Bảo vệ con thời gian thực</span>
-=======
-          <span className="text-[10px] font-black uppercase text-sky-600 tracking-wider">Bảo vệ con thời gian thực</span>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         </div>
       </div>
 
@@ -126,11 +118,7 @@ export function AiSafetyScanner() {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Ví dụ: Bạn trúng thưởng 9.999 Kim Cương, đăng nhập http://garena-nha-kim-cuong.com để nhận..."
-<<<<<<< HEAD
           className="input-kid h-24 text-sm resize-none py-3 px-4 focus:border-emerald-500 rounded-2xl bg-slate-50 border-slate-100 placeholder:text-slate-400"
-=======
-          className="input-kid h-24 text-sm resize-none py-3 px-4 focus:border-sky-500 rounded-2xl bg-slate-50 border-slate-100 placeholder:text-slate-400"
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
           maxLength={500}
           disabled={loading}
           required
@@ -140,11 +128,7 @@ export function AiSafetyScanner() {
           <button
             type="submit"
             disabled={loading || !content.trim()}
-<<<<<<< HEAD
             className="btn-kid bg-emerald-500 border-emerald-700 hover:bg-emerald-600 text-white flex-1 flex items-center justify-center gap-2 text-sm font-black min-h-[46px] h-[46px] cursor-pointer active:translate-y-[2px] active:shadow-none transition"
-=======
-            className="btn-kid bg-sky-500 border-sky-700 hover:bg-sky-600 text-white flex-1 flex items-center justify-center gap-2 text-sm font-black min-h-[46px] h-[46px] cursor-pointer active:translate-y-[2px] active:shadow-none transition"
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
           >
             {loading ? (
               <span>🤖 Robot đang quét...</span>

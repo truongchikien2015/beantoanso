@@ -3,12 +3,9 @@ node_modules
 .next
 .pnpm-store
 tsconfig.tsbuildinfo
-<<<<<<< HEAD
-=======
 
 # Local dev-only uploads (production uses Vercel Blob).
 # Existing files already committed here (public/uploads/questions/*) stay tracked;
 # only NEW uploads written during `npm run dev` are ignored via this pattern.
 public/uploads/questions/*
 !public/uploads/questions/.gitkeep
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331

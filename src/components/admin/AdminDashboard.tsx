@@ -177,8 +177,6 @@ export function AdminDashboard({ onBack }: { onBack: () => void }) {
   );
 }
 
-<<<<<<< HEAD
-=======
 // Deterministic hue (0-360) from an arbitrary string — used to color avatar bubbles
 // so the same student always renders the same shade across reloads.
 function hueFromString(s: string): number {
@@ -187,7 +185,6 @@ function hueFromString(s: string): number {
   return h % 360;
 }
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 function AdminContentShell({
   children,
   wide = false,
@@ -597,20 +594,14 @@ type AdminStudent = {
   xp: number;
   level: number;
   totalScore: number;
-<<<<<<< HEAD
-=======
   hasPassword: boolean;
   teacherId: string | null;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   createdAt: string;
   updatedAt: string;
 };
 
-<<<<<<< HEAD
-=======
 type TeacherOption = { id: string; authUid: string; name: string; email: string };
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 function AllStudentsView() {
   const [students, setStudents] = useState<AdminStudent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -618,10 +609,6 @@ function AllStudentsView() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [resetTarget, setResetTarget] = useState<AdminStudent | null>(null);
-<<<<<<< HEAD
-  const PAGE_SIZE = 20;
-
-=======
   const [deleteTarget, setDeleteTarget] = useState<AdminStudent | null>(null);
   const [assignTarget, setAssignTarget] = useState<AdminStudent | null>(null);
   const [bulkAssignOpen, setBulkAssignOpen] = useState(false);
@@ -656,7 +643,6 @@ function AllStudentsView() {
     return m;
   }, [teachers]);
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   const load = async () => {
     setLoading(true);
     setError("");
@@ -730,10 +716,6 @@ function AllStudentsView() {
             className="Input w-full rounded-2xl border-2 border-sky-100 focus:border-sky-300 outline-none text-xs sm:text-sm font-semibold"
             style={{ maxWidth: 360 }}
           />
-<<<<<<< HEAD
-        </div>
-
-=======
           <button
             onClick={() => {
               const brokenIds = students.filter((s) => !s.email || !s.hasPassword).map((s) => s.id);
@@ -773,7 +755,6 @@ function AllStudentsView() {
           </div>
         )}
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         {loading ? (
           <div className="py-20 text-center font-bold text-slate-400">⏳ Đang tải danh sách học sinh...</div>
         ) : error ? (
@@ -784,37 +765,6 @@ function AllStudentsView() {
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
-<<<<<<< HEAD
-            <table className="w-full min-w-[760px]">
-              <thead>
-                <tr className="bg-sky-50/50">
-                  {["Học sinh", "Email", "Giới tính", "Năm sinh", "Cấp độ", "Điểm", "Ngày đăng ký", "Thao tác"].map((h, i) => (
-                    <th key={i} className="TableTh text-sky-950 font-black py-4 px-3 text-left text-xs sm:text-sm">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {paged.map((s) => (
-                  <tr key={s.id} className="TableTr hover:bg-sky-50/20 border-b border-sky-100">
-                    <td className="TableTd font-black text-sky-950 px-3 py-3.5 text-xs sm:text-sm">{s.fullName}</td>
-                    <td className="TableTd text-slate-600 font-semibold px-3 py-3.5 text-xs sm:text-sm">{s.email || "—"}</td>
-                    <td className="TableTd text-slate-600 font-bold px-3 py-3.5 text-xs sm:text-sm">{genderLabel(s.gender)}</td>
-                    <td className="TableTd text-slate-600 font-bold px-3 py-3.5 text-xs sm:text-sm">{s.birthYear || "—"}</td>
-                    <td className="TableTd px-3 py-3.5 text-xs sm:text-sm">
-                      <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] sm:text-xs font-black text-sky-700">Lv {s.level}</span>
-                    </td>
-                    <td className="TableTd font-black px-3 py-3.5 text-xs sm:text-sm" style={{ color: "#f59e0b" }}>★ {s.totalScore}</td>
-                    <td className="TableTd text-slate-400 font-semibold text-[10px] sm:text-xs px-3 py-3.5">{new Date(s.createdAt).toLocaleDateString("vi-VN")}</td>
-                    <td className="TableTd px-3 py-3.5">
-                      <button onClick={() => setResetTarget(s)} className="Btn BtnSm rounded-xl font-bold bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs py-1 px-2.5">
-                        🔑 Đổi mật khẩu
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan={8} className="text-center py-16 font-bold text-slate-400">
-=======
             <table className="w-full min-w-[680px]">
               <thead>
                 <tr className="bg-slate-50 border-b-2 border-slate-100">
@@ -978,7 +928,6 @@ function AllStudentsView() {
                 })}
                 {filtered.length === 0 && (
                   <tr><td colSpan={7} className="text-center py-16 font-bold text-slate-400">
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                     {students.length === 0 ? "Chưa có học sinh nào tự đăng ký." : "Không có học sinh nào phù hợp với tìm kiếm."}
                   </td></tr>
                 )}
@@ -1006,8 +955,6 @@ function AllStudentsView() {
           onClose={() => setResetTarget(null)}
         />
       )}
-<<<<<<< HEAD
-=======
       {deleteTarget && (
         <ConfirmDeleteStudentModal
           label={deleteTarget.fullName}
@@ -1315,7 +1262,6 @@ function ConfirmDeleteStudentModal({
           </div>
         </div>
       </div>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     </div>
   );
 }
@@ -1424,12 +1370,9 @@ function TeacherStudentsView() {
   const [classFilter, setClassFilter] = useState("");
   const [page, setPage] = useState(1);
   const [resetTarget, setResetTarget] = useState<AdminTeacherStudent | null>(null);
-<<<<<<< HEAD
-=======
   const [deleteTarget, setDeleteTarget] = useState<AdminTeacherStudent | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   const PAGE_SIZE = 20;
 
   const load = async () => {
@@ -1524,8 +1467,6 @@ function TeacherStudentsView() {
           </select>
         </div>
 
-<<<<<<< HEAD
-=======
         {selectedIds.size > 0 && (
           <div className="px-4 sm:px-5 py-3 bg-rose-50 border-b-2 border-rose-100 flex items-center justify-between gap-3">
             <p className="text-xs sm:text-sm font-black text-rose-800">
@@ -1548,7 +1489,6 @@ function TeacherStudentsView() {
           </div>
         )}
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         {loading ? (
           <div className="py-20 text-center font-bold text-slate-400">⏳ Đang tải danh sách học sinh...</div>
         ) : error ? (
@@ -1559,45 +1499,6 @@ function TeacherStudentsView() {
           </div>
         ) : (
           <div className="w-full overflow-x-auto">
-<<<<<<< HEAD
-            <table className="w-full min-w-[820px]">
-              <thead>
-                <tr className="bg-sky-50/50">
-                  {["Học sinh", "Mã", "Lớp", "Giáo viên", "Lộ trình", "Trạng thái", "Ngày tạo", "Thao tác"].map((h, i) => (
-                    <th key={i} className="TableTh text-sky-950 font-black py-4 px-3 text-left text-xs sm:text-sm">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {paged.map((s) => (
-                  <tr key={s.id} className="TableTr hover:bg-sky-50/20 border-b border-sky-100">
-                    <td className="TableTd font-black text-sky-950 px-3 py-3.5 text-xs sm:text-sm">{s.nickname}</td>
-                    <td className="TableTd px-3 py-3.5">
-                      <span className="rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] sm:text-xs text-slate-600">{s.studentCode}</span>
-                    </td>
-                    <td className="TableTd text-slate-600 font-bold px-3 py-3.5 text-xs sm:text-sm">{s.className || "—"}</td>
-                    <td className="TableTd text-slate-600 font-semibold px-3 py-3.5 text-xs sm:text-sm">{s.teacherName || "—"}</td>
-                    <td className="TableTd px-3 py-3.5 text-xs sm:text-sm">
-                      {s.assignedPathTitle
-                        ? <span className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-sky-700">{s.assignedPathTitle}</span>
-                        : <span className="text-slate-400 text-[10px] sm:text-xs">Chưa gán</span>}
-                    </td>
-                    <td className="TableTd px-3 py-3.5">
-                      <span className={`px-2.5 py-0.5 rounded-xl text-[10px] sm:text-xs font-black ${s.isActive ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
-                        {s.isActive ? "● Hoạt động" : "○ Đã khóa"}
-                      </span>
-                    </td>
-                    <td className="TableTd text-slate-400 font-semibold text-[10px] sm:text-xs px-3 py-3.5">{new Date(s.createdAt).toLocaleDateString("vi-VN")}</td>
-                    <td className="TableTd px-3 py-3.5">
-                      <button onClick={() => setResetTarget(s)} className="Btn BtnSm rounded-xl font-bold bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs py-1 px-2.5">
-                        🔑 Đổi mật khẩu
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && (
-                  <tr><td colSpan={8} className="text-center py-16 font-bold text-slate-400">
-=======
             <table className="w-full min-w-[720px]">
               <thead>
                 <tr className="bg-slate-50 border-b-2 border-slate-100">
@@ -1727,7 +1628,6 @@ function TeacherStudentsView() {
                 })}
                 {filtered.length === 0 && (
                   <tr><td colSpan={7} className="text-center py-16 font-bold text-slate-400">
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                     {students.length === 0 ? "Chưa có học sinh nào được giáo viên tạo." : "Không có học sinh nào phù hợp với bộ lọc."}
                   </td></tr>
                 )}
@@ -1755,8 +1655,6 @@ function TeacherStudentsView() {
           onClose={() => setResetTarget(null)}
         />
       )}
-<<<<<<< HEAD
-=======
       {deleteTarget && (
         <ConfirmDeleteStudentModal
           label={`${deleteTarget.nickname} (${deleteTarget.studentCode})`}
@@ -1779,7 +1677,6 @@ function TeacherStudentsView() {
           }}
         />
       )}
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     </div>
   );
 }

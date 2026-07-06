@@ -2,10 +2,7 @@
 
 import { useEffect, useState, useRef, useMemo } from "react";
 import { Admin } from "../../lib/store";
-<<<<<<< HEAD
-=======
 import { slugify } from "../../lib/slugify";
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 import { Loader2, Wand2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import "react-quill-new/dist/quill.snow.css";
@@ -42,12 +39,9 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
   });
   const [aiLoading, setAiLoading] = useState(false);
   const [aiContentLoading, setAiContentLoading] = useState(false);
-<<<<<<< HEAD
-=======
   // Track whether the user has manually edited the slug. Once they do, we stop
   // auto-syncing from the title so we don't clobber their intent.
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
   // Filter and Edit states
   const [searchTerm, setSearchTerm] = useState("");
@@ -56,10 +50,7 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
 
   const resetForm = () => {
     setEditId(null);
-<<<<<<< HEAD
-=======
     setSlugManuallyEdited(false);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     setFormData({
       title: "", slug: "", content: "", thumbnail: "", category_id: "", meta_title: "", meta_description: "", keywords: "", is_published: true
     });
@@ -148,25 +139,12 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
       });
       const data = await res.json();
       if (data.success && data.data) {
-<<<<<<< HEAD
-=======
         const aiSlug = typeof data.data.slug === "string" ? data.data.slug : "";
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         setFormData((prev) => ({
           ...prev,
           meta_title: data.data.meta_title || prev.meta_title,
           meta_description: data.data.meta_description || prev.meta_description,
           keywords: Array.isArray(data.data.keywords) ? data.data.keywords.join(", ") : (data.data.keywords || prev.keywords),
-<<<<<<< HEAD
-          content: prev.content || data.data.suggested_outline || ""
-        }));
-        alert("Đã tự động điền Meta SEO bằng AI Grok!");
-      } else {
-        alert(data.error || "Có lỗi từ AI");
-      }
-    } catch (e) {
-      alert("Lỗi kết nối AI");
-=======
           // Prefer AI slug; keep existing user-edited slug intact.
           slug: slugManuallyEdited && prev.slug ? prev.slug : (aiSlug || prev.slug),
           content: prev.content || data.data.suggested_outline || "",
@@ -178,7 +156,6 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
       }
     } catch (e) {
       alert(`Lỗi kết nối AI: ${e instanceof Error ? e.message : String(e)}`);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     } finally {
       setAiLoading(false);
     }
@@ -266,12 +243,9 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
 
   const handleEditArticle = (article: any) => {
     setEditId(article._id);
-<<<<<<< HEAD
-=======
     // Editing an existing article: treat its slug as user-authored so the
     // title→slug auto-sync doesn't clobber it.
     setSlugManuallyEdited(true);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     setFormData({
       title: article.title || "",
       slug: article.slug || "",
@@ -459,9 +433,6 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
               <div className="flex gap-4">
                 <div className="flex-1">
                   <label className="block text-sm font-bold mb-1 text-slate-700">Tiêu đề bài viết</label>
-<<<<<<< HEAD
-                  <input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required className="w-full border-2 border-slate-200 rounded-xl p-3 focus:border-sky-500 font-bold text-lg" placeholder="Ví dụ: 5 Cách bảo vệ trẻ em trên mạng..." />
-=======
                   <input
                     value={formData.title}
                     onChange={e => {
@@ -477,7 +448,6 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
                     className="w-full border-2 border-slate-200 rounded-xl p-3 focus:border-sky-500 font-bold text-lg"
                     placeholder="Ví dụ: 5 Cách bảo vệ trẻ em trên mạng..."
                   />
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                 </div>
               </div>
               
@@ -514,9 +484,6 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
 
               <div>
                 <label className="block text-sm font-bold mb-1">Đường dẫn (Slug)</label>
-<<<<<<< HEAD
-                <input value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} required className="w-full border border-slate-300 rounded-lg p-2 text-sm" />
-=======
                 <input
                   value={formData.slug}
                   onChange={e => {
@@ -532,7 +499,6 @@ export function NewsManager({ onHome }: { onHome: () => void }) {
                     ? "✏️ Slug đã chỉnh tay — không tự đồng bộ với tiêu đề nữa."
                     : "🔗 Tự động sinh từ Tiêu đề. Sửa tay để dừng đồng bộ."}
                 </p>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
               </div>
               
               <div>

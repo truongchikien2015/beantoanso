@@ -42,7 +42,6 @@ html, body {
   --radius-kid: 20px;
   --radius-kid-lg: 28px;
   --radius-kid-xl: 36px;
-<<<<<<< HEAD
   --brand-ink: #064e3b;
   --brand-muted: #4b5563;
   --brand-sky: #059669;
@@ -54,19 +53,6 @@ html, body {
   --brand-rose: #e11d48;
   --brand-page: #f0fdf4;
   --brand-border: rgba(5, 150, 105, 0.14);
-=======
-  --brand-ink: #14324a;
-  --brand-muted: #64748b;
-  --brand-sky: #0284c7;
-  --brand-sky-soft: #e0f2fe;
-  --brand-teal: #0f766e;
-  --brand-teal-soft: #ccfbf1;
-  --brand-gold: #d97706;
-  --brand-gold-soft: #fef3c7;
-  --brand-rose: #e11d48;
-  --brand-page: #f6fbff;
-  --brand-border: rgba(2, 132, 199, 0.14);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   
   /* Thick button border (pressed effect) */
   --btn-border-width: 4px;
@@ -116,15 +102,9 @@ html, body {
 
 /* Button color variants */
 .btn-kid-sky {
-<<<<<<< HEAD
   background: linear-gradient(160deg, #6ee7b7 0%, #059669 100%);
   color: white;
   border-color: #064e3b;
-=======
-  background: linear-gradient(160deg, var(--kid-sky) 0%, var(--kid-sky-dark) 100%);
-  color: white;
-  border-color: #075985;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .btn-kid-yellow {
@@ -172,7 +152,6 @@ html, body {
 
 /* Btn Primary Gradient - Updated with new colors */
 .BtnPrimary {
-<<<<<<< HEAD
   background: linear-gradient(135deg, #10b981, #047857);
   color: white;
   box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
@@ -181,16 +160,6 @@ html, body {
 .BtnPrimary:hover {
   background: linear-gradient(135deg, #059669, #065f46);
   box-shadow: 0 12px 24px rgba(5, 150, 105, 0.35);
-=======
-  background: linear-gradient(135deg, var(--kid-coral-new), var(--kid-teal-new));
-  color: white;
-  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
-}
-
-.BtnPrimary:hover {
-  background: linear-gradient(135deg, #ff5252, #26d0ce);
-  box-shadow: 0 12px 24px rgba(255, 107, 107, 0.35);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   transform: translateY(-1px);
 }
 
@@ -352,22 +321,13 @@ html, body {
   min-height: 100vh;
   background:
     radial-gradient(circle at 10% 8%, rgba(255, 230, 109, 0.32), transparent 22rem),
-<<<<<<< HEAD
     radial-gradient(circle at 92% 16%, rgba(110, 231, 183, 0.24), transparent 24rem),
     linear-gradient(180deg, var(--kid-bg-cream) 0%, #fff7ed 44%, #ecfdf5 100%);
-=======
-    radial-gradient(circle at 92% 16%, rgba(78, 205, 196, 0.24), transparent 24rem),
-    linear-gradient(180deg, var(--kid-bg-cream) 0%, #fff7ed 44%, #ecfeff 100%);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   color: var(--kid-ink);
 }
 
 .kid-paper-header {
-<<<<<<< HEAD
   background: linear-gradient(135deg, #10b981, #047857);
-=======
-  background: linear-gradient(135deg, var(--kid-coral-new), var(--kid-teal-new));
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   color: white;
   box-shadow: 0 12px 0 rgba(11, 32, 48, 0.10);
 }
@@ -462,11 +422,7 @@ html, body {
 
 /* ── Page background ── */
 .bg-kid-page {
-<<<<<<< HEAD
   background: linear-gradient(170deg, var(--kid-bg-cream) 0%, #fff7ed 45%, #ecfdf5 100%);
-=======
-  background: linear-gradient(170deg, var(--kid-bg-cream) 0%, #fff7ed 45%, #ecfeff 100%);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   min-height: 100vh;
 }
 
@@ -474,11 +430,7 @@ html, body {
 .input-kid {
   width: 100%;
   border-radius: var(--radius-kid);
-<<<<<<< HEAD
   border: 2.5px solid #a7f3d0;
-=======
-  border: 2.5px solid #bae6fd;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   font-family: var(--font-nunito, 'Nunito'), sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
@@ -489,13 +441,8 @@ html, body {
 }
 
 .input-kid:focus {
-<<<<<<< HEAD
   border-color: #10b981;
   box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.18);
-=======
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 /* ── XP Bar ── */
@@ -509,11 +456,7 @@ html, body {
 .xp-bar-fill {
   height: 100%;
   border-radius: 999px;
-<<<<<<< HEAD
   background: linear-gradient(90deg, #10b981, #6ee7b7);
-=======
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -546,19 +489,11 @@ html, body {
 
 .CardHeader {
   padding: 16px 20px;
-<<<<<<< HEAD
   border-bottom: 1px solid rgba(5, 150, 105, 0.12);
   display: flex;
   align-items: center;
   gap: 12px;
   background: linear-gradient(180deg, rgba(209, 250, 229, 0.55), rgba(255, 255, 255, 0));
-=======
-  border-bottom: 1px solid rgba(2, 132, 199, 0.12);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(180deg, rgba(224, 242, 254, 0.55), rgba(255, 255, 255, 0));
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .CardTitle {
@@ -569,11 +504,7 @@ html, body {
 
 /* ── Table ── */
 thead {
-<<<<<<< HEAD
   background: #ecfdf5;
-=======
-  background: #f0f9ff;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .TableTh {
@@ -581,11 +512,7 @@ thead {
   padding: 10px 16px;
   font-size: 12px;
   font-weight: 800;
-<<<<<<< HEAD
   color: #047857;
-=======
-  color: #0369a1;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
@@ -595,11 +522,7 @@ thead {
   padding: 12px 16px;
   font-size: 14px;
   color: #334155;
-<<<<<<< HEAD
   border-top: 1px solid #d1fae5;
-=======
-  border-top: 1px solid #eef6fb;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   vertical-align: middle;
   max-width: 200px;
   overflow: hidden;
@@ -632,21 +555,12 @@ thead {
 .BtnPrimary {
   background: linear-gradient(135deg, var(--brand-sky), var(--brand-teal));
   color: white;
-<<<<<<< HEAD
   box-shadow: 0 8px 20px rgba(5, 150, 105, 0.22);
 }
 
 .BtnPrimary:hover {
   background: linear-gradient(135deg, #047857, #065f46);
   box-shadow: 0 12px 24px rgba(5, 150, 105, 0.28);
-=======
-  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.22);
-}
-
-.BtnPrimary:hover {
-  background: linear-gradient(135deg, #0369a1, #0f766e);
-  box-shadow: 0 12px 24px rgba(2, 132, 199, 0.28);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   transform: translateY(-1px);
 }
 
@@ -655,29 +569,17 @@ thead {
   border-radius: 8px;
   font-size: 12px;
   font-weight: 800;
-<<<<<<< HEAD
   border: 1px solid #a7f3d0;
   background: white;
   color: #064e3b;
-=======
-  border: 1px solid #bae6fd;
-  background: white;
-  color: #0f4c68;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .BtnSm:hover {
-<<<<<<< HEAD
   background: #ecfdf5;
   border-color: #6ee7b7;
   color: #047857;
-=======
-  background: #f0f9ff;
-  border-color: #7dd3fc;
-  color: #075985;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .BtnDanger {
@@ -698,18 +600,12 @@ thead {
 }
 
 .BtnGhost:hover {
-<<<<<<< HEAD
   background: #ecfdf5;
   color: #047857;
-=======
-  background: #f0f9ff;
-  color: #075985;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .BtnOutline {
   background: #fff;
-<<<<<<< HEAD
   color: #047857;
   border: 1px solid #a7f3d0;
 }
@@ -717,15 +613,6 @@ thead {
 .BtnOutline:hover {
   background: #ecfdf5;
   border-color: #6ee7b7;
-=======
-  color: #0369a1;
-  border: 1px solid #bae6fd;
-}
-
-.BtnOutline:hover {
-  background: #f0f9ff;
-  border-color: #7dd3fc;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .BtnSecondary {
@@ -735,7 +622,6 @@ thead {
 }
 
 .BtnSecondary:hover {
-<<<<<<< HEAD
   background: #ecfdf5;
   border-color: #a7f3d0;
 }
@@ -749,32 +635,13 @@ thead {
 .Btn--outline:hover { background: #ecfdf5; border-color: #6ee7b7; }
 .Btn--secondary { background: #f8fafc; color: #334155; border-color: #cbd5e1; }
 .Btn--secondary:hover { background: #ecfdf5; border-color: #a7f3d0; }
-=======
-  background: #eef6fb;
-  border-color: #bae6fd;
-}
-
-.Btn--primary { background: linear-gradient(135deg, var(--brand-sky), var(--brand-teal)); color: #fff; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.22); }
-.Btn--primary:hover { background: linear-gradient(135deg, #0369a1, #0f766e); transform: translateY(-1px); }
-.Btn--sm { padding: 5px 12px; border-radius: 10px; font-size: 12px; }
-.Btn--ghost { background: transparent; color: var(--brand-muted); border-color: transparent; }
-.Btn--ghost:hover { background: #f0f9ff; color: #075985; }
-.Btn--outline { background: #fff; color: #0369a1; border-color: #bae6fd; }
-.Btn--outline:hover { background: #f0f9ff; border-color: #7dd3fc; }
-.Btn--secondary { background: #f8fafc; color: #334155; border-color: #cbd5e1; }
-.Btn--secondary:hover { background: #eef6fb; border-color: #bae6fd; }
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
 /* ── Input ── */
 .Input {
   width: 100%;
   padding: 9px 14px;
   border-radius: 12px;
-<<<<<<< HEAD
   border: 1.5px solid #a7f3d0;
-=======
-  border: 1.5px solid #bae6fd;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   font-size: 14px;
   font-family: inherit;
   color: #1e293b;
@@ -785,11 +652,7 @@ thead {
 
 .Input:focus {
   border-color: var(--brand-sky);
-<<<<<<< HEAD
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
-=======
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .Input::placeholder {
@@ -813,11 +676,7 @@ thead {
   background: white;
   border-radius: 22px;
   border: 1px solid var(--brand-border);
-<<<<<<< HEAD
   box-shadow: 0 25px 50px rgba(6, 78, 59, 0.18), 0 0 0 1px rgba(5,150,105,0.06);
-=======
-  box-shadow: 0 25px 50px rgba(20, 50, 74, 0.18), 0 0 0 1px rgba(2,132,199,0.06);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   width: 100%;
   max-width: 480px;
   overflow: hidden;
@@ -825,13 +684,8 @@ thead {
 
 .ModalHeader {
   padding: 20px 24px 16px;
-<<<<<<< HEAD
   border-bottom: 1px solid rgba(5, 150, 105, 0.12);
   background: linear-gradient(180deg, rgba(209, 250, 229, 0.7), rgba(255, 255, 255, 0));
-=======
-  border-bottom: 1px solid rgba(2, 132, 199, 0.12);
-  background: linear-gradient(180deg, rgba(224, 242, 254, 0.7), rgba(255, 255, 255, 0));
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -868,11 +722,7 @@ thead {
 .FieldInput {
   padding: 9px 13px;
   border-radius: 12px;
-<<<<<<< HEAD
   border: 1.5px solid #a7f3d0;
-=======
-  border: 1.5px solid #bae6fd;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   font-size: 14px;
   font-family: inherit;
   color: #1e293b;
@@ -884,11 +734,7 @@ thead {
 
 .FieldInput:focus {
   border-color: var(--brand-sky);
-<<<<<<< HEAD
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
-=======
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 .FieldError {
@@ -911,16 +757,11 @@ thead {
 .BadgeInactive { background: #f1f5f9; color: #64748b; }
 .BadgeError { background: #fef2f2; color: #dc2626; }
 .BadgeWarning { background: var(--brand-gold-soft); color: var(--brand-gold); }
-<<<<<<< HEAD
 .BadgeInfo { background: var(--brand-sky-soft); color: #047857; }
-=======
-.BadgeInfo { background: var(--brand-sky-soft); color: #0369a1; }
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
 .app-page {
   min-height: 100vh;
   background:
-<<<<<<< HEAD
     radial-gradient(circle at top left, rgba(167, 243, 208, 0.9), transparent 34rem),
     radial-gradient(circle at bottom right, rgba(209, 250, 229, 0.75), transparent 30rem),
     linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 48%, #fff7ed 100%);
@@ -930,17 +771,6 @@ thead {
   background: linear-gradient(135deg, #059669, #047857);
   color: white;
   box-shadow: 0 12px 28px rgba(5, 150, 105, 0.22);
-=======
-    radial-gradient(circle at top left, rgba(186, 230, 253, 0.9), transparent 34rem),
-    radial-gradient(circle at bottom right, rgba(204, 251, 241, 0.75), transparent 30rem),
-    linear-gradient(180deg, #f8fcff 0%, #f6fbff 48%, #fff7ed 100%);
-}
-
-.app-header {
-  background: linear-gradient(135deg, #0284c7, #0f766e);
-  color: white;
-  box-shadow: 0 12px 28px rgba(2, 132, 199, 0.22);
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }
 
 @media (prefers-reduced-motion: reduce) {

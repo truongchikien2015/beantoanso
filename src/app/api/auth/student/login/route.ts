@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-// POST /api/auth/student/login — Self-registered student auth (MongoDB + profiles)
-// Migrated to MongoDB with custom JWTs
-=======
 // POST /api/auth/student/login — Self-registered student auth (MongoDB only, no Supabase)
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Profile } from "@/lib/db/models/Profile";
@@ -40,10 +35,6 @@ export async function POST(req: NextRequest) {
   const bcrypt = await import("bcryptjs");
 
   if (isLogin) {
-<<<<<<< HEAD
-    // 1. Try to login existing student in MongoDB
-=======
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     profile = await Profile.findOne({ email: normalizedEmail }).lean();
     if (!profile) {
       return NextResponse.json({ error: "Email hoặc mật khẩu không đúng" }, { status: 401 });
@@ -61,10 +52,6 @@ export async function POST(req: NextRequest) {
     userId = profile._id;
     access_token = createAuthToken(userId, normalizedEmail);
   } else {
-<<<<<<< HEAD
-    // 2. Registration: check if email exists in MongoDB
-=======
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     const existing = await Profile.findOne({ email: normalizedEmail }).lean();
     if (existing) {
       return NextResponse.json({ error: "Email đã được sử dụng" }, { status: 409 });
@@ -73,10 +60,6 @@ export async function POST(req: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10);
     const profileId = new mongoose.Types.ObjectId().toString();
 
-<<<<<<< HEAD
-    // Create Profile document
-=======
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     profile = await Profile.create({
       _id: profileId,
       email: normalizedEmail,

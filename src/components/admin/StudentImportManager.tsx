@@ -2,11 +2,7 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
 import { parseStudentFile, validateAndPrepareImport } from "@/lib/excelParser";
-<<<<<<< HEAD
-import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound, Users, Copy, Share2 } from "lucide-react";
-=======
 import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound, Users, Copy, Share2, UserPlus, Loader2 } from "lucide-react";
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
 const SAMPLE_HEADERS = ["nickname", "email", "class_name", "student_code", "password"];
 
@@ -20,10 +16,6 @@ export function StudentImportManager() {
   const {
     students, learningPaths, fetchStudents, fetchLearningPaths,
     deleteStudent, assignPathToStudent, resetStudentPassword, error, clearError,
-<<<<<<< HEAD
-  } = useTeacherContentStore();
-
-=======
     loading: storeLoading,
   } = useTeacherContentStore();
 
@@ -35,7 +27,6 @@ export function StudentImportManager() {
     if (!storeLoading) setInitialLoad(false);
   }, [storeLoading]);
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<{ errors: Array<{ row: number; message: string }> } | null>(null);
@@ -58,12 +49,9 @@ export function StudentImportManager() {
   const [bulkAssignLoading, setBulkAssignLoading] = useState(false);
   const [bulkAssignSuccess, setBulkAssignSuccess] = useState("");
 
-<<<<<<< HEAD
-=======
   // Single-student add
   const [showAddModal, setShowAddModal] = useState(false);
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   // Filter state
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -141,9 +129,6 @@ export function StudentImportManager() {
     setImportedCredentials(null);
     clearError();
     try {
-<<<<<<< HEAD
-      const rows = await parseStudentFile(file);
-=======
       // Stage 1: parse file
       let rows;
       try {
@@ -159,7 +144,6 @@ export function StudentImportManager() {
       }
 
       // Stage 2: validate + prepare
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
       const existingCodes = new Set(students.map(s => s.student_code));
       const { valid, errors } = validateAndPrepareImport(rows, existingCodes);
 
@@ -173,11 +157,6 @@ export function StudentImportManager() {
         return;
       }
 
-<<<<<<< HEAD
-      const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
-
-      // Call API to import
-=======
       // Stage 3: check auth
       const token = typeof window !== "undefined" ? localStorage.getItem("teacher_token") : null;
       if (!token) {
@@ -186,50 +165,23 @@ export function StudentImportManager() {
       }
 
       // Stage 4: POST to API
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
       const res = await fetch("/api/teacher/students", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-<<<<<<< HEAD
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-=======
           Authorization: `Bearer ${token}`,
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         },
         body: JSON.stringify({ students: valid }),
       });
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-<<<<<<< HEAD
-        setImportError({ errors: [{ row: 0, message: body.error ?? "Lỗi nhập học sinh" }] });
-=======
         const detail = body.error ?? `HTTP ${res.status} ${res.statusText}`;
         setImportError({ errors: [{ row: 0, message: `[API] ${detail}` }] });
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         return;
       }
 
       const body = await res.json();
-<<<<<<< HEAD
-
-      // Show credentials
-      if (body.created && body.created.length > 0) {
-        setImportedCredentials(body.created);
-      }
-
-      // Show errors
-      if (body.result?.failed > 0) {
-        setImportError({ errors: body.result.errors ?? [] });
-      }
-
-      // Refresh student list
-      await fetchStudents();
-
-    } catch (err) {
-      setImportError({ errors: [{ row: 0, message: `Lỗi đọc file: ${err instanceof Error ? err.message : String(err)}` }] });
-=======
       if (body.created && body.created.length > 0) setImportedCredentials(body.created);
       if (body.result?.failed > 0) setImportError({ errors: body.result.errors ?? [] });
 
@@ -237,7 +189,6 @@ export function StudentImportManager() {
     } catch (err) {
       // Catch-all — network fail, JSON parse fail, etc.
       setImportError({ errors: [{ row: 0, message: `[Không xác định] ${err instanceof Error ? err.message : String(err)}` }] });
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     } finally {
       setImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -270,11 +221,6 @@ export function StudentImportManager() {
     URL.revokeObjectURL(url);
   };
 
-<<<<<<< HEAD
-  const handleDelete = async (id: string) => {
-    if (!confirm("Xóa học sinh này?")) return;
-    await deleteStudent(id);
-=======
   const handleDelete = async (student: { id: string; nickname: string; source?: "teacher" | "self" }) => {
     const isSelf = student.source === "self";
     const confirmMsg = isSelf
@@ -343,7 +289,6 @@ export function StudentImportManager() {
     } finally {
       setBulkDeleting(false);
     }
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   };
 
   const handleAssign = async (studentId: string) => {
@@ -495,8 +440,6 @@ export function StudentImportManager() {
 
   return (
     <div className="space-y-4">
-<<<<<<< HEAD
-=======
       {/* Full-screen upload overlay — dismissible-proof while parse+POST runs.
           Blocks accidental double submissions and makes the wait tangible. */}
       {importing && (
@@ -515,7 +458,6 @@ export function StudentImportManager() {
         </div>
       )}
 
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-sky-900">Quản lý học sinh</h2>
@@ -528,15 +470,6 @@ export function StudentImportManager() {
               <Route size={14} /> Gán lộ trình hàng loạt
             </button>
           )}
-<<<<<<< HEAD
-          <button onClick={downloadTemplate} className="Btn Btn--outline Btn--sm flex items-center gap-1">
-            <Download size={14} /> Tải mẫu CSV
-          </button>
-          <label className="Btn Btn--primary Btn--sm flex items-center gap-1 cursor-pointer">
-            <Upload size={14} /> Nhập từ Excel
-            <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFileChange}
-              className="hidden" disabled={importing} />
-=======
           <button onClick={() => setShowAddModal(true)} className="Btn Btn--outline Btn--sm flex items-center gap-1 text-emerald-700 border-emerald-300 hover:bg-emerald-50">
             <UserPlus size={14} /> Thêm học sinh
           </button>
@@ -557,7 +490,6 @@ export function StudentImportManager() {
               className="hidden"
               disabled={importing}
             />
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
           </label>
         </div>
       </div>
@@ -730,9 +662,6 @@ export function StudentImportManager() {
 
       {/* Students list */}
       <div className="space-y-3">
-<<<<<<< HEAD
-        {students.length === 0 && !importedCredentials && (
-=======
         {/* Initial load skeleton — replaces the "empty state" until fetchStudents
             has resolved at least once. Prevents "Chưa có học sinh nào" flash. */}
         {initialLoad && storeLoading && (
@@ -751,13 +680,10 @@ export function StudentImportManager() {
 
         {/* Empty state — only after initial load resolved */}
         {!initialLoad && students.length === 0 && !importedCredentials && (
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
           <div className="Card p-8 text-center text-gray-500 text-sm">
             Chưa có học sinh nào. Tải mẫu CSV để bắt đầu.
           </div>
         )}
-<<<<<<< HEAD
-=======
 
         {/* Reload pill — visible during background reloads (fetchStudents after
             create/delete/import) so the user knows the list is refreshing. */}
@@ -767,7 +693,6 @@ export function StudentImportManager() {
             Đang cập nhật danh sách...
           </div>
         )}
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
         {selectedStudents.size > 0 && (
           <div className="Card p-3 bg-indigo-50 border border-indigo-200 flex items-center justify-between">
             <span className="text-sm text-indigo-700">
@@ -782,8 +707,6 @@ export function StudentImportManager() {
               >
                 <Route size={12} /> Gán lộ trình
               </button>
-<<<<<<< HEAD
-=======
               <button
                 onClick={handleBulkDelete}
                 disabled={bulkDeleting}
@@ -791,7 +714,6 @@ export function StudentImportManager() {
               >
                 <Trash2 size={12} /> {bulkDeleting ? "Đang xoá..." : `Xoá ${selectedStudents.size} học sinh`}
               </button>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
             </div>
           </div>
         )}
@@ -844,13 +766,10 @@ export function StudentImportManager() {
             <div className="divide-y divide-sky-50">
               {filteredStudents.map(student => {
                 const assignedPaths = learningPaths.filter(p => (student.assigned_path_ids || []).includes(p.id));
-<<<<<<< HEAD
-=======
                 // Self-registered students (linked via Profile.teacher_id) don't
                 // live in teacher_students — teacher-only actions (reset password,
                 // parent code, path assign, delete) are read-only for them.
                 const isSelf = student.source === "self";
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                 return (
                   <div key={student.id} className={`grid gap-3 px-4 py-3 transition hover:bg-sky-50/50 md:grid-cols-[44px_1.1fr_0.5fr_0.6fr_1fr_1.1fr_132px] md:items-center ${selectedStudents.has(student.id) ? "bg-indigo-50/70" : ""}`}>
                     <div className="flex items-center justify-between md:block">
@@ -862,24 +781,11 @@ export function StudentImportManager() {
                         aria-label={`Chọn ${student.nickname}`}
                       />
                       <div className="flex gap-1 md:hidden">
-<<<<<<< HEAD
-                        {learningPaths.length > 0 && (
-=======
                         {!isSelf && learningPaths.length > 0 && (
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                           <button onClick={() => { setAssignTarget(student.id); setAssignPathIds(student.assigned_path_ids || []); }} className="Btn Btn--ghost Btn--sm" title="Gán lộ trình">
                             <Plus size={14} />
                           </button>
                         )}
-<<<<<<< HEAD
-                        <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
-                          <KeyRound size={14} />
-                        </button>
-                        <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
-                          <Users size={14} />
-                        </button>
-                        <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
-=======
                         {!isSelf && (
                           <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
                             <KeyRound size={14} />
@@ -891,19 +797,11 @@ export function StudentImportManager() {
                           </button>
                         )}
                         <button onClick={() => handleDelete(student)} className="Btn Btn--ghost Btn--sm text-red-500" title={isSelf ? "Bỏ khỏi lớp" : "Xóa"}>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                           <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
                     <div className="min-w-0">
-<<<<<<< HEAD
-                      <p className="truncate font-semibold text-slate-900">{student.nickname}</p>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-emerald-600"><UserCheck size={11} /> Hoạt động</p>
-                    </div>
-                    <span className="text-sm text-slate-600">{student.class_name || "Chưa có lớp"}</span>
-                    <span className="w-fit rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600">{student.student_code}</span>
-=======
                       <p className="truncate font-semibold text-slate-900 flex items-center gap-1.5">
                         {student.nickname}
                         {student.source === "self" && (
@@ -921,7 +819,6 @@ export function StudentImportManager() {
                     <span className="w-fit rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600">
                       {student.student_code || (student.source === "self" ? "—" : "")}
                     </span>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                     <div className="min-w-0">
                       {assignedPaths.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
@@ -937,13 +834,9 @@ export function StudentImportManager() {
                     </div>
                     <div className="flex items-center gap-1.5 md:block">
                       <span className="text-xs font-bold text-slate-400 md:hidden">Mã phụ huynh: </span>
-<<<<<<< HEAD
-                      {student.parent_access_code ? (
-=======
                       {isSelf ? (
                         <span className="text-xs text-slate-400">—</span>
                       ) : student.parent_access_code ? (
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })}
@@ -974,24 +867,11 @@ export function StudentImportManager() {
                       )}
                     </div>
                     <div className="hidden justify-end gap-1 md:flex">
-<<<<<<< HEAD
-                      {learningPaths.length > 0 && (
-=======
                       {!isSelf && learningPaths.length > 0 && (
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                         <button onClick={() => { setAssignTarget(student.id); setAssignPathIds(student.assigned_path_ids || []); }} className="Btn Btn--secondary Btn--sm" title="Gán lộ trình">
                           <Plus size={14} />
                         </button>
                       )}
-<<<<<<< HEAD
-                      <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
-                        <KeyRound size={14} />
-                      </button>
-                      <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
-                        <Users size={14} />
-                      </button>
-                      <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
-=======
                       {!isSelf && (
                         <button onClick={() => openResetPassword(student)} className="Btn Btn--ghost Btn--sm text-amber-600" title="Đổi mật khẩu">
                           <KeyRound size={14} />
@@ -1003,7 +883,6 @@ export function StudentImportManager() {
                         </button>
                       )}
                       <button onClick={() => handleDelete(student)} className="Btn Btn--ghost Btn--sm text-red-500" title={isSelf ? "Bỏ khỏi lớp" : "Xóa"}>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -1060,13 +939,6 @@ export function StudentImportManager() {
                     className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mt-1 flex-shrink-0 cursor-pointer"
                   />
                   <div className="flex-1 min-w-0">
-<<<<<<< HEAD
-                    <p className="font-medium text-gray-900 truncate">{student.nickname}</p>
-                    {student.class_name && <p className="text-xs text-gray-500">{student.class_name}</p>}
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
-                        {student.student_code}
-=======
                     <p className="font-medium text-gray-900 truncate flex items-center gap-1.5">
                       {student.nickname}
                       {student.source === "self" && (
@@ -1082,7 +954,6 @@ export function StudentImportManager() {
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
                         {student.student_code || "—"}
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                       </span>
                       <span className="text-xs text-green-600 flex items-center gap-0.5"><UserCheck size={10} /> Hoạt động</span>
                     </div>
@@ -1145,11 +1016,7 @@ export function StudentImportManager() {
                     <button onClick={() => setParentLinkTarget({ id: student.id, nickname: student.nickname, parent_access_code: student.parent_access_code })} className="Btn Btn--ghost Btn--sm text-indigo-600" title="Mã liên kết phụ huynh">
                       <Users size={14} />
                     </button>
-<<<<<<< HEAD
-                    <button onClick={() => handleDelete(student.id)} className="Btn Btn--ghost Btn--sm text-red-500" title="Xóa">
-=======
                     <button onClick={() => handleDelete(student)} className="Btn Btn--ghost Btn--sm text-red-500" title={student.source === "self" ? "Bỏ khỏi lớp" : "Xóa"}>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -1479,8 +1346,6 @@ export function StudentImportManager() {
           </div>
         </div>
       )}
-<<<<<<< HEAD
-=======
 
       {showAddModal && (
         <AddStudentModal
@@ -1641,7 +1506,6 @@ function AddStudentModal({
           </p>
         </form>
       </div>
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     </div>
   );
 }

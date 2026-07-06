@@ -11,12 +11,9 @@ export interface IProfile {
   xp: number;
   level: number;
   total_score: number;
-<<<<<<< HEAD
-=======
   // Optional link to a Teacher (by Teacher.auth_uid) — used when admin assigns
   // a self-registered student to a specific teacher for follow-up.
   teacher_id?: string | null;
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   created_at: Date;
   updated_at: Date;
 }
@@ -33,10 +30,7 @@ const ProfileSchema = new Schema<IProfile>(
     xp: { type: Number, default: 0 },
     level: { type: Number, default: 1 },
     total_score: { type: Number, default: 0 },
-<<<<<<< HEAD
-=======
     teacher_id: { type: String, default: null, index: true },
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );

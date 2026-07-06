@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { createChatCompletion } from "@/lib/server/aiProvider";
-<<<<<<< HEAD
-=======
 import { slugify } from "@/lib/slugify";
 
 // LLMs (esp. DeepSeek) sometimes ignore response_format and wrap JSON in a
@@ -54,7 +52,6 @@ function extractJson(raw: string): unknown {
 
   throw new Error("No JSON object found in response");
 }
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
 export async function POST(req: Request) {
   try {
@@ -70,11 +67,7 @@ export async function POST(req: Request) {
     }
 
     const prompt = `
-<<<<<<< HEAD
-Bạn là một chuyên gia SEO nội dung. Hãy tạo Meta Title, Meta Description và Keywords (Tags) dựa trên thông tin sau:
-=======
 Bạn là một chuyên gia SEO nội dung. Hãy tạo Meta Title, Meta Description, Keywords (Tags) và Slug URL dựa trên thông tin sau:
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 Chủ đề / Tiêu đề nháp: ${topic || "Không có"}
 Nội dung bài viết: ${content || "Chưa có nội dung chi tiết, hãy dựa vào chủ đề để gợi ý."}
 
@@ -83,20 +76,13 @@ Yêu cầu định dạng đầu ra (JSON hợp lệ):
   "meta_title": "Tiêu đề SEO (khoảng 50-60 ký tự)",
   "meta_description": "Mô tả SEO hấp dẫn, chứa từ khóa chính (khoảng 150-160 ký tự)",
   "keywords": ["từ khóa 1", "từ khóa 2", "từ khóa 3"],
-<<<<<<< HEAD
-=======
   "slug": "duong-dan-url-thuan-viet-khong-dau-cach-nhau-bang-dau-gach-ngang",
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   "suggested_outline": "Nếu nội dung chưa có, hãy gợi ý một dàn ý bài viết chuẩn SEO ở dạng văn bản thuần."
 }
 Chỉ trả về JSON, không kèm giải thích hay markdown code block.`;
 
     const response = await createChatCompletion({
-<<<<<<< HEAD
-      provider: "grok",
-=======
       provider: "deepseek",
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
       maxTokens: 1200,
       temperature: 0.7,
       responseFormat: "json_object",
@@ -104,16 +90,6 @@ Chỉ trả về JSON, không kèm giải thích hay markdown code block.`;
     });
 
     const resultText = response.text || "{}";
-<<<<<<< HEAD
-    const result = JSON.parse(resultText);
-
-    return NextResponse.json({ success: true, data: result });
-  } catch (error: any) {
-    console.error("Lỗi AI SEO:", error);
-    return NextResponse.json(
-      { error: "Lỗi kết nối với AI để tạo SEO" },
-      { status: 500 }
-=======
     let result: any;
     try {
       result = extractJson(resultText);
@@ -166,7 +142,6 @@ Chỉ trả về JSON, không kèm giải thích hay markdown code block.`;
         },
       },
       { status },
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     );
   }
 }

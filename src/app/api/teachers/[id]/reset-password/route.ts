@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkAdmin } from "@/lib/admin-auth";
 import { connectDB } from "@/lib/mongodb";
 import { Teacher } from "@/lib/db/models/Teacher";
-<<<<<<< HEAD
-import { supabaseAdmin } from "@/lib/supabase-admin";
-=======
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 import mongoose from "mongoose";
 
 function toObjectId(id: string): mongoose.Types.ObjectId {
@@ -19,68 +15,21 @@ function toObjectId(id: string): mongoose.Types.ObjectId {
 
 type Params = { params: Promise<{ id: string }> };
 
-<<<<<<< HEAD
-// POST /api/teachers/[id]/reset-password — admin resets teacher password
-=======
 // POST /api/teachers/[id]/reset-password — admin resets teacher password.
 // Verifies write with a read-back so a silent 0-modified doesn't look like success.
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 export async function POST(req: NextRequest, { params }: Params) {
   const authError = checkAdmin(req);
   if (authError) return authError;
 
   const { id } = await params;
 
-<<<<<<< HEAD
-  let body: { newPassword: string };
-=======
   let body: { newPassword?: string };
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-<<<<<<< HEAD
-  const { newPassword } = body;
-  if (!newPassword || newPassword.length < 6) {
-    return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
-  }
-
-  await connectDB();
-
-  const teacherObjectId = toObjectId(id);
-
-  // Fetch teacher
-  const teacher = await Teacher.findOne({ _id: teacherObjectId } as any).lean();
-
-  if (!teacher) {
-    return NextResponse.json({ error: "Teacher not found" }, { status: 404 });
-  }
-
-  const bcrypt = await import("bcryptjs");
-  const passwordHash = await bcrypt.hash(newPassword, 10);
-
-  // Update password in MongoDB
-  await (Teacher as any).updateOne({ _id: teacherObjectId }, { password_hash: passwordHash });
-
-  // Update password via Supabase Admin Auth if configured
-  if (supabaseAdmin && teacher.auth_uid) {
-    try {
-      await supabaseAdmin.auth.admin.updateUserById(
-        teacher.auth_uid,
-        { password: newPassword }
-      );
-    } catch (updateError: any) {
-      console.warn("[teachers reset-password] Supabase password reset failed:", updateError.message);
-    }
-  }
-
-  return NextResponse.json({
-    data: { message: `Password reset for ${teacher.name}` },
-  });
-=======
   const newPassword = body.newPassword?.trim();
   if (!newPassword || newPassword.length < 6) {
     return NextResponse.json({ error: "Mật khẩu phải có ít nhất 6 ký tự" }, { status: 400 });
@@ -138,5 +87,4 @@ export async function POST(req: NextRequest, { params }: Params) {
       { status: 500 },
     );
   }
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 }

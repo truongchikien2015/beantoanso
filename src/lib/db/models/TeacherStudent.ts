@@ -22,13 +22,9 @@ const TeacherStudentSchema = new Schema<ITeacherStudent>(
     email: { type: String, default: null },
     class_name: { type: String, default: null },
     student_code: { type: String, required: true, unique: true },
-<<<<<<< HEAD
-    parent_access_code: { type: String, default: null },
-=======
     // No default: null — sparse index only excludes MISSING values, treating
     // explicit null as a real value. Leaving unset lets sparse work as intended.
     parent_access_code: { type: String },
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
     password_hash: { type: String, required: true },
     assigned_path_ids: [{ type: Schema.Types.ObjectId, ref: "TeacherLearningPath" }],
     assigned_at: { type: Date, default: null },
@@ -38,9 +34,6 @@ const TeacherStudentSchema = new Schema<ITeacherStudent>(
 );
 
 TeacherStudentSchema.index({ created_by: 1 });
-<<<<<<< HEAD
-TeacherStudentSchema.index({ parent_access_code: 1 }, { unique: true, sparse: true });
-=======
 // Partial filter: only enforce uniqueness when parent_access_code is a real
 // string. Any missing/null document is excluded — no more E11000 collisions on
 // bulk import. Requires Mongo to drop the old sparse+unique index first (see
@@ -52,7 +45,6 @@ TeacherStudentSchema.index(
     partialFilterExpression: { parent_access_code: { $type: "string" } },
   },
 );
->>>>>>> 63771e6d805e9ba0b1418fb71692bcfb593b2331
 
 export const TeacherStudent: Model<ITeacherStudent> =
   models.TeacherStudent || model<ITeacherStudent>("TeacherStudent", TeacherStudentSchema, "teacher_students");
