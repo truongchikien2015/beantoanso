@@ -138,11 +138,19 @@ export async function POST(req: NextRequest) {
       continue;
     }
 
-    // Check for duplicate student_code BEFORE hashing (cheap early-exit)
+    // Check for duplicate student_code BEFORE hashing.
+    // Historically DELETE was soft (is_active=false) — the row stayed and blocked
+    // re-import via the unique index. Now: if the existing row is inactive,
+    // hard-delete it first so this import can reuse the code cleanly.
     const existing = await TeacherStudent.findOne({ student_code: s.student_code }).lean();
     if (existing) {
-      errors.push({ row, message: `Mã học sinh "${s.student_code}" đã tồn tại` });
-      continue;
+      if (existing.is_active === false) {
+        await TeacherStudent.deleteOne({ _id: existing._id } as any);
+        console.log(`[teacher/students] purged inactive doc for code=${s.student_code}`);
+      } else {
+        errors.push({ row, message: `Mã học sinh "${s.student_code}" đã tồn tại` });
+        continue;
+      }
     }
 
     let hash: string;

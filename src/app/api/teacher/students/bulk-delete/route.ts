@@ -54,13 +54,15 @@ export async function POST(req: NextRequest) {
   const teacherIds = items.filter((x) => x.source === "teacher").map((x) => toObjectId(x.id));
   const selfIds = items.filter((x) => x.source === "self").map((x) => x.id);
 
+  // Hard delete teacher-created students so their student_code frees up for
+  // re-import; still scope by created_by so a teacher can only delete their own.
   const [teacherResult, selfResult] = await Promise.all([
     teacherIds.length > 0
-      ? TeacherStudent.updateMany(
-          { _id: { $in: teacherIds }, created_by: uid } as any,
-          { $set: { is_active: false } },
-        )
-      : Promise.resolve({ matchedCount: 0, modifiedCount: 0 }),
+      ? TeacherStudent.deleteMany({
+          _id: { $in: teacherIds },
+          created_by: uid,
+        } as any)
+      : Promise.resolve({ deletedCount: 0 }),
     selfIds.length > 0
       ? Profile.updateMany(
           { _id: { $in: selfIds }, teacher_id: uid } as any,
@@ -72,12 +74,11 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     success: true,
     teacherStudents: {
-      matched: teacherResult.matchedCount ?? 0,
-      modified: teacherResult.modifiedCount ?? 0,
+      deleted: (teacherResult as { deletedCount?: number }).deletedCount ?? 0,
     },
     selfRegistered: {
-      matched: selfResult.matchedCount ?? 0,
-      modified: selfResult.modifiedCount ?? 0,
+      matched: (selfResult as { matchedCount?: number }).matchedCount ?? 0,
+      modified: (selfResult as { modifiedCount?: number }).modifiedCount ?? 0,
     },
   });
 }

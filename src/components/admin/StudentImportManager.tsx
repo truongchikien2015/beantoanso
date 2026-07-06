@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useTeacherContentStore } from "@/lib/teacherContentStore";
 import { parseStudentFile, validateAndPrepareImport } from "@/lib/excelParser";
-import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound, Users, Copy, Share2, UserPlus } from "lucide-react";
+import { Download, Upload, Trash2, UserCheck, Plus, X, Check, AlertCircle, Route, Search, SlidersHorizontal, RotateCcw, LayoutGrid, List, KeyRound, Users, Copy, Share2, UserPlus, Loader2 } from "lucide-react";
 
 const SAMPLE_HEADERS = ["nickname", "email", "class_name", "student_code", "password"];
 
@@ -16,7 +16,16 @@ export function StudentImportManager() {
   const {
     students, learningPaths, fetchStudents, fetchLearningPaths,
     deleteStudent, assignPathToStudent, resetStudentPassword, error, clearError,
+    loading: storeLoading,
   } = useTeacherContentStore();
+
+  // True on the very first fetch (no students loaded yet) — used to swap the
+  // student list for a skeleton. Once the list has been rendered once, we let
+  // reloads show a subtle pill instead of yanking the whole list.
+  const [initialLoad, setInitialLoad] = useState(true);
+  useEffect(() => {
+    if (!storeLoading) setInitialLoad(false);
+  }, [storeLoading]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
@@ -431,6 +440,24 @@ export function StudentImportManager() {
 
   return (
     <div className="space-y-4">
+      {/* Full-screen upload overlay — dismissible-proof while parse+POST runs.
+          Blocks accidental double submissions and makes the wait tangible. */}
+      {importing && (
+        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4" aria-live="polite">
+          <div className="bg-white rounded-3xl shadow-2xl border-4 border-sky-100 p-8 max-w-sm w-full text-center space-y-4">
+            <Loader2 size={48} className="mx-auto animate-spin text-sky-600" />
+            <div>
+              <h3 className="text-lg font-black text-sky-900">Đang tải lên...</h3>
+              <p className="text-sm text-slate-500 mt-1">Đọc file, kiểm tra dữ liệu, và tạo học sinh trên hệ thống.</p>
+            </div>
+            <div className="w-full bg-sky-100 rounded-full h-1.5 overflow-hidden">
+              <div className="h-full bg-sky-500 animate-pulse" style={{ width: "60%" }} />
+            </div>
+            <p className="text-[11px] text-slate-400 font-semibold">Không đóng trang trong lúc chờ.</p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-sky-900">Quản lý học sinh</h2>
@@ -449,10 +476,20 @@ export function StudentImportManager() {
           <button onClick={downloadTemplate} className="Btn Btn--outline Btn--sm flex items-center gap-1">
             <Download size={14} /> Tải mẫu CSV
           </button>
-          <label className="Btn Btn--primary Btn--sm flex items-center gap-1 cursor-pointer">
-            <Upload size={14} /> Nhập từ Excel
-            <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFileChange}
-              className="hidden" disabled={importing} />
+          <label
+            className={`Btn Btn--primary Btn--sm flex items-center gap-1 cursor-pointer ${importing ? "opacity-70 cursor-wait" : ""}`}
+            aria-busy={importing}
+          >
+            {importing ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+            {importing ? "Đang tải lên..." : "Nhập từ Excel"}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={handleFileChange}
+              className="hidden"
+              disabled={importing}
+            />
           </label>
         </div>
       </div>
@@ -625,9 +662,35 @@ export function StudentImportManager() {
 
       {/* Students list */}
       <div className="space-y-3">
-        {students.length === 0 && !importedCredentials && (
+        {/* Initial load skeleton — replaces the "empty state" until fetchStudents
+            has resolved at least once. Prevents "Chưa có học sinh nào" flash. */}
+        {initialLoad && storeLoading && (
+          <div className="Card p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-sky-700">
+              <Loader2 size={14} className="animate-spin" />
+              Đang tải danh sách học sinh...
+            </div>
+            <div className="space-y-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="animate-pulse rounded-lg bg-slate-100 h-14" />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty state — only after initial load resolved */}
+        {!initialLoad && students.length === 0 && !importedCredentials && (
           <div className="Card p-8 text-center text-gray-500 text-sm">
             Chưa có học sinh nào. Tải mẫu CSV để bắt đầu.
+          </div>
+        )}
+
+        {/* Reload pill — visible during background reloads (fetchStudents after
+            create/delete/import) so the user knows the list is refreshing. */}
+        {!initialLoad && storeLoading && students.length > 0 && (
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-600 px-1">
+            <Loader2 size={12} className="animate-spin" />
+            Đang cập nhật danh sách...
           </div>
         )}
         {selectedStudents.size > 0 && (
