@@ -984,10 +984,21 @@ thead {
 }
 
 /* ── Article prose content fixes ── */
-/* Ensure rich-text content from Quill never overflows the card */
-.overflow-wrap-anywhere {
-  overflow-wrap: anywhere;
-  word-break: break-word;
+/* Vietnamese text MUST never break mid-word. Use `!important` to defeat any
+   utility class or inline style that might have been left on descendants
+   (Quill occasionally emits <p class="ql-…"> with default browser rules). */
+.prose,
+.prose p,
+.prose li,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose blockquote {
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  -webkit-hyphens: none !important;
+  hyphens: none !important;
 }
 
 /* Every descendant element must stay within its container */
