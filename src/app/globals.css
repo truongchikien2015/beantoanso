@@ -42,17 +42,17 @@ html, body {
   --radius-kid: 20px;
   --radius-kid-lg: 28px;
   --radius-kid-xl: 36px;
-  --brand-ink: #14324a;
-  --brand-muted: #64748b;
-  --brand-sky: #0284c7;
-  --brand-sky-soft: #e0f2fe;
-  --brand-teal: #0f766e;
-  --brand-teal-soft: #ccfbf1;
+  --brand-ink: #064e3b;
+  --brand-muted: #4b5563;
+  --brand-sky: #059669;
+  --brand-sky-soft: #d1fae5;
+  --brand-teal: #047857;
+  --brand-teal-soft: #ecfdf5;
   --brand-gold: #d97706;
   --brand-gold-soft: #fef3c7;
   --brand-rose: #e11d48;
-  --brand-page: #f6fbff;
-  --brand-border: rgba(2, 132, 199, 0.14);
+  --brand-page: #f0fdf4;
+  --brand-border: rgba(5, 150, 105, 0.14);
   
   /* Thick button border (pressed effect) */
   --btn-border-width: 4px;
@@ -102,9 +102,9 @@ html, body {
 
 /* Button color variants */
 .btn-kid-sky {
-  background: linear-gradient(160deg, var(--kid-sky) 0%, var(--kid-sky-dark) 100%);
+  background: linear-gradient(160deg, #6ee7b7 0%, #059669 100%);
   color: white;
-  border-color: #075985;
+  border-color: #064e3b;
 }
 
 .btn-kid-yellow {
@@ -152,14 +152,14 @@ html, body {
 
 /* Btn Primary Gradient - Updated with new colors */
 .BtnPrimary {
-  background: linear-gradient(135deg, var(--kid-coral-new), var(--kid-teal-new));
+  background: linear-gradient(135deg, #10b981, #047857);
   color: white;
-  box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
 }
 
 .BtnPrimary:hover {
-  background: linear-gradient(135deg, #ff5252, #26d0ce);
-  box-shadow: 0 12px 24px rgba(255, 107, 107, 0.35);
+  background: linear-gradient(135deg, #059669, #065f46);
+  box-shadow: 0 12px 24px rgba(5, 150, 105, 0.35);
   transform: translateY(-1px);
 }
 
@@ -321,13 +321,13 @@ html, body {
   min-height: 100vh;
   background:
     radial-gradient(circle at 10% 8%, rgba(255, 230, 109, 0.32), transparent 22rem),
-    radial-gradient(circle at 92% 16%, rgba(78, 205, 196, 0.24), transparent 24rem),
-    linear-gradient(180deg, var(--kid-bg-cream) 0%, #fff7ed 44%, #ecfeff 100%);
+    radial-gradient(circle at 92% 16%, rgba(110, 231, 183, 0.24), transparent 24rem),
+    linear-gradient(180deg, var(--kid-bg-cream) 0%, #fff7ed 44%, #ecfdf5 100%);
   color: var(--kid-ink);
 }
 
 .kid-paper-header {
-  background: linear-gradient(135deg, var(--kid-coral-new), var(--kid-teal-new));
+  background: linear-gradient(135deg, #10b981, #047857);
   color: white;
   box-shadow: 0 12px 0 rgba(11, 32, 48, 0.10);
 }
@@ -422,7 +422,7 @@ html, body {
 
 /* ── Page background ── */
 .bg-kid-page {
-  background: linear-gradient(170deg, var(--kid-bg-cream) 0%, #fff7ed 45%, #ecfeff 100%);
+  background: linear-gradient(170deg, var(--kid-bg-cream) 0%, #fff7ed 45%, #ecfdf5 100%);
   min-height: 100vh;
 }
 
@@ -430,7 +430,7 @@ html, body {
 .input-kid {
   width: 100%;
   border-radius: var(--radius-kid);
-  border: 2.5px solid #bae6fd;
+  border: 2.5px solid #a7f3d0;
   font-family: var(--font-nunito, 'Nunito'), sans-serif;
   font-size: 1.05rem;
   font-weight: 600;
@@ -441,8 +441,8 @@ html, body {
 }
 
 .input-kid:focus {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18);
+  border-color: #10b981;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.18);
 }
 
 /* ── XP Bar ── */
@@ -456,7 +456,7 @@ html, body {
 .xp-bar-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  background: linear-gradient(90deg, #10b981, #6ee7b7);
   transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -489,11 +489,11 @@ html, body {
 
 .CardHeader {
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(2, 132, 199, 0.12);
+  border-bottom: 1px solid rgba(5, 150, 105, 0.12);
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(180deg, rgba(224, 242, 254, 0.55), rgba(255, 255, 255, 0));
+  background: linear-gradient(180deg, rgba(209, 250, 229, 0.55), rgba(255, 255, 255, 0));
 }
 
 .CardTitle {
@@ -504,7 +504,7 @@ html, body {
 
 /* ── Table ── */
 thead {
-  background: #f0f9ff;
+  background: #ecfdf5;
 }
 
 .TableTh {
@@ -512,7 +512,7 @@ thead {
   padding: 10px 16px;
   font-size: 12px;
   font-weight: 800;
-  color: #0369a1;
+  color: #047857;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
@@ -522,7 +522,7 @@ thead {
   padding: 12px 16px;
   font-size: 14px;
   color: #334155;
-  border-top: 1px solid #eef6fb;
+  border-top: 1px solid #d1fae5;
   vertical-align: middle;
   max-width: 200px;
   overflow: hidden;
@@ -555,12 +555,12 @@ thead {
 .BtnPrimary {
   background: linear-gradient(135deg, var(--brand-sky), var(--brand-teal));
   color: white;
-  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.22);
+  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.22);
 }
 
 .BtnPrimary:hover {
-  background: linear-gradient(135deg, #0369a1, #0f766e);
-  box-shadow: 0 12px 24px rgba(2, 132, 199, 0.28);
+  background: linear-gradient(135deg, #047857, #065f46);
+  box-shadow: 0 12px 24px rgba(5, 150, 105, 0.28);
   transform: translateY(-1px);
 }
 
@@ -569,17 +569,17 @@ thead {
   border-radius: 8px;
   font-size: 12px;
   font-weight: 800;
-  border: 1px solid #bae6fd;
+  border: 1px solid #a7f3d0;
   background: white;
-  color: #0f4c68;
+  color: #064e3b;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .BtnSm:hover {
-  background: #f0f9ff;
-  border-color: #7dd3fc;
-  color: #075985;
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+  color: #047857;
 }
 
 .BtnDanger {
@@ -600,19 +600,19 @@ thead {
 }
 
 .BtnGhost:hover {
-  background: #f0f9ff;
-  color: #075985;
+  background: #ecfdf5;
+  color: #047857;
 }
 
 .BtnOutline {
   background: #fff;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+  color: #047857;
+  border: 1px solid #a7f3d0;
 }
 
 .BtnOutline:hover {
-  background: #f0f9ff;
-  border-color: #7dd3fc;
+  background: #ecfdf5;
+  border-color: #6ee7b7;
 }
 
 .BtnSecondary {
@@ -622,26 +622,26 @@ thead {
 }
 
 .BtnSecondary:hover {
-  background: #eef6fb;
-  border-color: #bae6fd;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
 }
 
-.Btn--primary { background: linear-gradient(135deg, var(--brand-sky), var(--brand-teal)); color: #fff; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.22); }
-.Btn--primary:hover { background: linear-gradient(135deg, #0369a1, #0f766e); transform: translateY(-1px); }
+.Btn--primary { background: linear-gradient(135deg, var(--brand-sky), var(--brand-teal)); color: #fff; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.22); }
+.Btn--primary:hover { background: linear-gradient(135deg, #047857, #065f46); transform: translateY(-1px); }
 .Btn--sm { padding: 5px 12px; border-radius: 10px; font-size: 12px; }
 .Btn--ghost { background: transparent; color: var(--brand-muted); border-color: transparent; }
-.Btn--ghost:hover { background: #f0f9ff; color: #075985; }
-.Btn--outline { background: #fff; color: #0369a1; border-color: #bae6fd; }
-.Btn--outline:hover { background: #f0f9ff; border-color: #7dd3fc; }
+.Btn--ghost:hover { background: #ecfdf5; color: #047857; }
+.Btn--outline { background: #fff; color: #047857; border-color: #a7f3d0; }
+.Btn--outline:hover { background: #ecfdf5; border-color: #6ee7b7; }
 .Btn--secondary { background: #f8fafc; color: #334155; border-color: #cbd5e1; }
-.Btn--secondary:hover { background: #eef6fb; border-color: #bae6fd; }
+.Btn--secondary:hover { background: #ecfdf5; border-color: #a7f3d0; }
 
 /* ── Input ── */
 .Input {
   width: 100%;
   padding: 9px 14px;
   border-radius: 12px;
-  border: 1.5px solid #bae6fd;
+  border: 1.5px solid #a7f3d0;
   font-size: 14px;
   font-family: inherit;
   color: #1e293b;
@@ -652,7 +652,7 @@ thead {
 
 .Input:focus {
   border-color: var(--brand-sky);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
 
 .Input::placeholder {
@@ -676,7 +676,7 @@ thead {
   background: white;
   border-radius: 22px;
   border: 1px solid var(--brand-border);
-  box-shadow: 0 25px 50px rgba(20, 50, 74, 0.18), 0 0 0 1px rgba(2,132,199,0.06);
+  box-shadow: 0 25px 50px rgba(6, 78, 59, 0.18), 0 0 0 1px rgba(5,150,105,0.06);
   width: 100%;
   max-width: 480px;
   overflow: hidden;
@@ -684,8 +684,8 @@ thead {
 
 .ModalHeader {
   padding: 20px 24px 16px;
-  border-bottom: 1px solid rgba(2, 132, 199, 0.12);
-  background: linear-gradient(180deg, rgba(224, 242, 254, 0.7), rgba(255, 255, 255, 0));
+  border-bottom: 1px solid rgba(5, 150, 105, 0.12);
+  background: linear-gradient(180deg, rgba(209, 250, 229, 0.7), rgba(255, 255, 255, 0));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -722,7 +722,7 @@ thead {
 .FieldInput {
   padding: 9px 13px;
   border-radius: 12px;
-  border: 1.5px solid #bae6fd;
+  border: 1.5px solid #a7f3d0;
   font-size: 14px;
   font-family: inherit;
   color: #1e293b;
@@ -734,7 +734,7 @@ thead {
 
 .FieldInput:focus {
   border-color: var(--brand-sky);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
 
 .FieldError {
@@ -757,20 +757,20 @@ thead {
 .BadgeInactive { background: #f1f5f9; color: #64748b; }
 .BadgeError { background: #fef2f2; color: #dc2626; }
 .BadgeWarning { background: var(--brand-gold-soft); color: var(--brand-gold); }
-.BadgeInfo { background: var(--brand-sky-soft); color: #0369a1; }
+.BadgeInfo { background: var(--brand-sky-soft); color: #047857; }
 
 .app-page {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(186, 230, 253, 0.9), transparent 34rem),
-    radial-gradient(circle at bottom right, rgba(204, 251, 241, 0.75), transparent 30rem),
-    linear-gradient(180deg, #f8fcff 0%, #f6fbff 48%, #fff7ed 100%);
+    radial-gradient(circle at top left, rgba(167, 243, 208, 0.9), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(209, 250, 229, 0.75), transparent 30rem),
+    linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 48%, #fff7ed 100%);
 }
 
 .app-header {
-  background: linear-gradient(135deg, #0284c7, #0f766e);
+  background: linear-gradient(135deg, #059669, #047857);
   color: white;
-  box-shadow: 0 12px 28px rgba(2, 132, 199, 0.22);
+  box-shadow: 0 12px 28px rgba(5, 150, 105, 0.22);
 }
 
 @media (prefers-reduced-motion: reduce) {

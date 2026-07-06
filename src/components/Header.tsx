@@ -224,16 +224,16 @@ export function Header({ currentActiveTab }: Props) {
           width: 2.25rem;
           height: 2.25rem;
           border-radius: 0.75rem;
-          background-color: #2563eb;
+          background-color: #059669;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+          box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
         }
         .sd-logo-text {
           font-size: 1.25rem;
           font-weight: 900;
-          color: #1e3a8a;
+          color: #064e3b;
           letter-spacing: -0.025em;
         }
         .sd-nav-links {
@@ -258,11 +258,11 @@ export function Header({ currentActiveTab }: Props) {
           border-radius: 9999px;
         }
         .sd-nav-link:hover {
-          color: #2563eb;
+          color: #059669;
           background-color: #f8fafc;
         }
         .sd-nav-link.active {
-          color: #2563eb;
+          color: #059669;
           position: relative;
         }
         .sd-nav-link.active::after {
@@ -272,7 +272,7 @@ export function Header({ currentActiveTab }: Props) {
           left: 12px;
           right: 12px;
           height: 3px;
-          background-color: #2563eb;
+          background-color: #059669;
           border-radius: 9999px;
         }
         .sd-nav-actions {
@@ -283,31 +283,31 @@ export function Header({ currentActiveTab }: Props) {
         .sd-nav-btn-outline {
           font-size: 0.875rem;
           font-weight: 700;
-          color: #2563eb;
+          color: #059669;
           background: #ffffff;
-          border: 1.5px solid #2563eb;
+          border: 1.5px solid #059669;
           border-radius: 9999px;
           padding: 0.5rem 1.25rem;
           cursor: pointer;
           transition: all 0.2s;
         }
         .sd-nav-btn-outline:hover {
-          background: #eff6ff;
+          background: #ecfdf5;
         }
         .sd-nav-btn-filled {
           font-size: 0.875rem;
           font-weight: 700;
           color: #ffffff;
-          background: #2563eb;
+          background: #059669;
           border: none;
           border-radius: 9999px;
           padding: 0.5rem 1.25rem;
           cursor: pointer;
           transition: all 0.2s;
-          box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+          box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.2);
         }
         .sd-nav-btn-filled:hover {
-          background: #1d4ed8;
+          background: #047857;
         }
       `}</style>
     </header>
