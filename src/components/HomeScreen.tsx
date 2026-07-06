@@ -82,7 +82,10 @@ export function HomeScreen({
                 🚀 Bắt đầu hành trình ngay
               </button>
               <button
-                onClick={() => { sfx.click(); onLessons(); }}
+                onClick={() => {
+                  sfx.click();
+                  window.dispatchEvent(new Event("openAboutModal"));
+                }}
                 className="bg-white border border-slate-200 text-slate-700 rounded-full px-6 py-3 font-bold flex items-center gap-2 hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
               >
                 <svg className="w-4 h-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -113,8 +116,8 @@ export function HomeScreen({
         </div>
       </section>
 
-      {/* ── 3. Mobile App Section ── */}
-      <section className="w-full bg-gradient-to-br from-[#e0f2fe]/80 to-[#bae6fd]/20 py-20 border-t border-b border-slate-100">
+      {/* ── 3. Mobile App / Intro Section ── */}
+      <section id="intro" className="w-full bg-gradient-to-br from-[#e0f2fe]/80 to-[#bae6fd]/20 py-20 border-t border-b border-slate-100 scroll-mt-20">
         <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Mockup & QR scan */}
           <div className="lg:col-span-5 flex flex-col items-center">

@@ -93,20 +93,32 @@ export default async function ArticlePage({ params }: Props) {
           )}
 
           <div className="p-6 sm:p-10 md:p-14">
-            <div 
-              className="prose prose-slate max-w-none break-words overflow-wrap-anywhere
-                prose-p:text-slate-700 prose-p:leading-[1.9] prose-p:mb-5
-                prose-headings:font-black prose-headings:text-sky-950 prose-headings:leading-snug prose-headings:mb-4
-                prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
-                prose-strong:text-slate-800 prose-strong:font-bold
-                prose-a:text-sky-600 prose-a:font-semibold prose-a:underline hover:prose-a:text-sky-800
-                prose-ul:pl-6 prose-ol:pl-6 prose-li:mb-2 prose-li:text-slate-700
-                prose-blockquote:border-l-4 prose-blockquote:border-sky-400 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-slate-500
-                prose-img:rounded-2xl prose-img:shadow-md prose-img:border prose-img:border-slate-100 prose-img:mx-auto
-                prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                [&>*]:max-w-full [&_img]:max-w-full [&_table]:w-full [&_table]:overflow-x-auto"
-              dangerouslySetInnerHTML={{ __html: article.content }}
-            />
+            {/* No overflow-wrap-anywhere — that lets browsers break mid-word
+                ("Vì vậ|y" bug in Vietnamese). Keep only break-word (URLs) and
+                force normal word-break for prose. We also strip non-breaking spaces
+                (&nbsp; / \u00a0) that cause browsers to treat whole paragraphs as single words. */}
+            {(() => {
+              const cleanContent = article.content
+                ? article.content.replace(/&nbsp;/g, " ").replace(/\u00a0/g, " ")
+                : "";
+              return (
+                <div
+                  style={{ wordBreak: "normal", overflowWrap: "break-word", hyphens: "none" }}
+                  className="prose prose-slate max-w-none
+                    prose-p:text-slate-700 prose-p:leading-[1.9] prose-p:mb-5
+                    prose-headings:font-black prose-headings:text-sky-950 prose-headings:leading-snug prose-headings:mb-4
+                    prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
+                    prose-strong:text-slate-800 prose-strong:font-bold
+                    prose-a:text-sky-600 prose-a:font-semibold prose-a:underline hover:prose-a:text-sky-800
+                    prose-ul:pl-6 prose-ol:pl-6 prose-li:mb-2 prose-li:text-slate-700
+                    prose-blockquote:border-l-4 prose-blockquote:border-sky-400 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-slate-500
+                    prose-img:rounded-2xl prose-img:shadow-md prose-img:border prose-img:border-slate-100 prose-img:mx-auto
+                    prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                    [&>*]:max-w-full [&_img]:max-w-full [&_table]:w-full [&_table]:overflow-x-auto"
+                  dangerouslySetInnerHTML={{ __html: cleanContent }}
+                />
+              );
+            })()}
             
             {article.keywords && article.keywords.length > 0 && (
               <div className="mt-16 pt-8 border-t-2 border-slate-100 border-dashed">
