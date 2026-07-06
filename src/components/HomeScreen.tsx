@@ -62,7 +62,7 @@ export function HomeScreen({
           {/* Left Column: Heading, description, and action buttons */}
           <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-full text-xs font-black uppercase tracking-wider">
-              🛡️ Dành cho học sinh Tiểu học & THCS
+              🛡️ Dành cho học sinh Tiểu học
             </span>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight font-nunito">
